@@ -132,9 +132,11 @@ def writeTree(inputFile):
 	#Save the output root file
 	output.Write()
 
-inputFile = 'root://cmsxrootd.fnal.gov//store/mc/RunIISummer16MiniAODv3/VBF_HToInvisible_M800_13TeV_powheg_pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v2/70000/D2978D87-B53A-E911-856C-0025905B856C.root'
+if __name__ == '__main__':
 
-writeTree(inputFile)
+	inputFile = 'root://cmsxrootd.fnal.gov//store/mc/RunIISummer16MiniAODv3/VBF_HToInvisible_M800_13TeV_powheg_pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v2/70000/D2978D87-B53A-E911-856C-0025905B856C.root'
+
+	writeTree(inputFile)
 
 	
 

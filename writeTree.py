@@ -4,6 +4,8 @@ import argparse
 from math import pi
 from array import array
 
+from vbf_tree import declare_branches
+
 # load FWLite C++ libraries
 ROOT.gSystem.Load("libFWCoreFWLite.so");
 ROOT.gSystem.Load("libDataFormatsFWLite.so");
@@ -49,29 +51,12 @@ def writeTree(inputFile):
 	output = ROOT.TFile('VBF_HToInv.root', 'RECREATE')
 
 	#Create a new ROOT TTree
-	eventTree = ROOT.TTree('eventTree', 'List of different variables in events from VBF_HToInvisible dataset')
+	eventTree = ROOT.TTree('eventTree', 'eventTree')
 
 	#Initialize the variables and create branches
-
-	met = array('f', [0.0])
-	metPhi = array('f', [0.0])
-	leadingJetPt = array('f', [0.0])
-	trailingJetPt = array('f', [0.0])
-	leadingJetEta = array('f', [0.0])
-	trailingJetEta = array('f', [0.0])
-	minPhi_jetMET = array('f', [0.0])
-	etaProduct = array('f', [0.0])
-	delta_jj = array('f', [0.0])
 	
-	eventTree.Branch('met', met, 'met/F')
-	eventTree.Branch('metPhi', metPhi, 'metPhi/F')
-	eventTree.Branch('leadingJetPt', leadingJetPt, 'leadingJetPt/F')
-	eventTree.Branch('trailingJetPt', trailingJetPt, 'trailingJetPt/F')
-	eventTree.Branch('leadingJetEta', leadingJetEta, 'leadingJetEta/F')
-	eventTree.Branch('trailingJetEta', trailingJetEta, 'trailingJetEta/F')
-	eventTree.Branch('minPhi_jetMET', minPhi_jetMET, 'minPhi_jetMET/F')
-	eventTree.Branch('etaProduct', etaProduct, 'etaProduct/F')
-	eventTree.Branch('delta_jj', delta_jj, 'delta_jj/F')
+	declare_branches(eventTree)
+
 
 	electrons, electronLabel = Handle('std::vector<pat::Electron>'), 'slimmedElectrons'
 	muons, muonLabel = Handle('std::vector<pat::Muon>'), 'slimmedMuons'
@@ -79,6 +64,7 @@ def writeTree(inputFile):
 	photons, photonLabel = Handle('std::vector<pat::Photon>'), 'slimmedPhotons'
 	jets, jetLabel = Handle('std::vector<pat::Jet>'), 'slimmedJets'
 	mets, metLabel = Handle('std::vector<pat::MET>'), 'slimmedMETs'
+	genParticles, genParticlesLabel = Handle('std::vector<reco::GenParticle>'), 'prunedGenParticles'
 
 	events = Events(inputFile)
 
@@ -97,6 +83,7 @@ def writeTree(inputFile):
 		event.getByLabel(photonLabel, photons)
 		event.getByLabel(jetLabel, jets)
 		event.getByLabel(metLabel, mets)
+		event.getByLabel(genParticlesLabel, genParticles)
 
 		t2 = time.time()
 
@@ -108,6 +95,15 @@ def writeTree(inputFile):
 		metPhi[0] = mets.product()[0].phi()
 
 		if met[0] < 50: continue
+
+		#########################
+		muons_ = muons.product()
+
+		for muon in muons_:
+			muon_pt.append(muon.pt())
+		#########################
+
+		print(muon_pt)
 
 		jets_ = jets.product()
 

@@ -98,6 +98,8 @@ def writeTree(inputFile):
 
 		jets_ = jets.product()
 
+		nJet[0] = len(jets_)
+
 		if len(jets_) > 1:
 		
 			leadingJetPt[0] = jets_[0].pt()

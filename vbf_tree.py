@@ -11,7 +11,7 @@ genMet = array('f', [0.])
 
 #Jet information
 
-nJet = array('f', [0.])
+nJet = array('i', [0])
 leadingJetPt = array('f', [0.])
 trailingJetPt = array('f', [0.])
 leadingJetEta = array('f', [0.])
@@ -24,28 +24,28 @@ delta_jj = array('f', [0.])
 
 #Electron information
 
-nElectron = array('f', [0.])
+nElectron = array('i', [0])
 electron_pt = array('f', np.zeros(max_num, dtype=float))
 electron_phi = array('f', np.zeros(max_num, dtype=float))
 electron_eta = array('f', np.zeros(max_num, dtype=float))
 
 #Muon information
 
-nMuon = array('f', [0.])
+nMuon = array('i', [0])
 muon_pt = array('f', np.zeros(max_num, dtype=float))
 muon_phi = array('f', np.zeros(max_num, dtype=float))
 muon_eta = array('f', np.zeros(max_num, dtype=float))
 
 #Tau information
 
-nTau = array('f', [0.])
+nTau = array('i', [0])
 tau_pt = array('f', np.zeros(max_num, dtype=float))
 tau_phi = array('f', np.zeros(max_num, dtype=float))
 tau_eta = array('f', np.zeros(max_num, dtype=float))
 
 #Gen-particles
 
-nParticles = array('f', [0.])
+nParticles = array('i', [0])
 pdgId = array('i', np.zeros(max_num, dtype=int))
 mothers = array('i', np.zeros(max_num, dtype=int))
 

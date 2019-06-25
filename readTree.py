@@ -1,5 +1,15 @@
 import ROOT
+from math import sqrt
 
+def deltaR(prt1, prt2):
+	
+	eta1, eta2 = prt1.eta, prt2.eta
+	phi1, phi2 = prt1.phi, prt2.phi
+	eta_diff = eta1 - eta2
+	phi_diff = phi1 - phi2
+	
+	return sqrt((eta_diff)**2 + (phi_diff)**2) 
+	
 def readTree(inputFile):
 
 	f = ROOT.TFile.Open(inputFile)

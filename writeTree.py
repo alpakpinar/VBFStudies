@@ -68,11 +68,11 @@ def writeTree(inputFile):
 	triggerBits, triggerBitLabel = Handle("edm::TriggerResults"), ("TriggerResults","","HLT")
 	triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStandAlone>"), "slimmedPatTrigger"
 	triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"), "patTrigger"
-	l1Muons, l1MuonLabel  = Handle("BXVector"), "gmtStage2Digis:Muon"
-	l1EGammas, l1EGammaLabel  = Handle("BXVector"), "caloStage2Digis:EGamma"
-	l1Jets, l1JetLabel  = Handle("BXVector"), "caloStage2Digis:Jet"
-	l1EtSums, l1EtSumLabel  = Handle("BXVector"), "caloStage2Digis:EtSum"
-	l1Taus, l1TauLabel  = Handle("BXVector"), "caloStage2Digis:Tau"
+	#l1Muons, l1MuonLabel  = Handle("BXVector"), "gmtStage2Digis:Muon"
+	#l1EGammas, l1EGammaLabel  = Handle("BXVector"), "caloStage2Digis:EGamma"
+	#l1Jets, l1JetLabel  = Handle("BXVector"), "caloStage2Digis:Jet"
+	#l1EtSums, l1EtSumLabel  = Handle("BXVector"), "caloStage2Digis:EtSum"
+	#l1Taus, l1TauLabel  = Handle("BXVector"), "caloStage2Digis:Tau"
 
 	events = Events(inputFile)
 
@@ -83,7 +83,7 @@ def writeTree(inputFile):
 	for i, event in enumerate(events):
 
 		if args.test:
-			if i == 100: break
+			if i == 10: break
 
 		event.getByLabel(electronLabel, electrons)
 		event.getByLabel(muonLabel, muons)
@@ -96,11 +96,11 @@ def writeTree(inputFile):
 		event.getByLabel(triggerBitLabel, triggerBits)
 		event.getByLabel(triggerObjectLabel, triggerObjects)
 		event.getByLabel(triggerPrescaleLabel, triggerPrescales)
-		event.getByLabel(l1MuonLabel, l1Muons)
-		event.getByLabel(l1EGammaLabel, l1EGammas)
-		event.getByLabel(l1JetLabel, l1Jets)
-		event.getByLabel(l1EtSumLabel, l1EtSums)
-		event.getByLabel(l1TauLabel, l1Taus)
+		#event.getByLabel(l1MuonLabel, l1Muons)
+		#event.getByLabel(l1EGammaLabel, l1EGammas)
+		#event.getByLabel(l1JetLabel, l1Jets)
+		#event.getByLabel(l1EtSumLabel, l1EtSums)
+		#event.getByLabel(l1TauLabel, l1Taus)
 
 		t2 = time.time()
 
@@ -175,6 +175,15 @@ def writeTree(inputFile):
 
 			pdgId[i] = prt.pdgId()
 			#mothers[i] = prt.mother()
+		
+		print('Number of trigger paths: %d' % triggerBits.product().size())
+
+		names = event.object().triggerNames(triggerBits.product())
+
+
+		for i in range(triggerBits.product().size()):
+
+			print('Trigger ', names.triggerNames()[i], ('PASS' if triggerBits.product().accept(i) else 'FAIL')) 
 
 		eventTree.Fill()
 
@@ -183,8 +192,8 @@ def writeTree(inputFile):
 
 if __name__ == '__main__':
 
-	inputFile = 'root://cmsxrootd.fnal.gov//store/mc/RunIISummer16MiniAODv3/VBF_HToInvisible_M800_13TeV_powheg_pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v2/70000/D2978D87-B53A-E911-856C-0025905B856C.root'
-
+	inputFile = 'root://cmsxrootd.fnal.gov///store/mc/RunIISummer17MiniAOD/VBF_HToInvisible_M125_13TeV_powheg_pythia8/MINIAODSIM/NZSFlatPU28to62_92X_upgrade2017_realistic_v10-v1/50000/CE13A08A-579E-E711-B9BB-001E67E5E8B6.root'	
+	
 	writeTree(inputFile)
 
 	

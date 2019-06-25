@@ -1,85 +1,90 @@
 import numpy as np
+from array import array
 
 max_num = 1000
 
 #MET information
 
-met = np.zeros(1, dtype=float)
-metPhi = np.zeros(1, dtype=float)
-genMet = np.zeros(1, dtype=float)
+met = array('f', [0.])
+metPhi = array('f', [0.])
+genMet = array('f', [0.]) 
 
 #Jet information
 
-nJet = np.zeros(1, dtype=int)
-leadingJetPt = np.zeros(1, dtype=float)
-trailingJetPt = np.zeros(1,dtype=float) 
-leadingJetEta = np.zeros(1, dtype=float)
-trailingJetEta = np.zeros(1, dtype=float)
-leadingJetPhi = np.zeros(1, dtype=float)
-trailingJetPhi = np.zeros(1, dtype=float)
-minPhi_jetMET = np.zeros(1, dtype=float)
-etaProduct = np.zeros(1, dtype=float)
-delta_jj = np.zeros(1, dtype=float)
+nJet = array('f', [0.])
+leadingJetPt = array('f', [0.])
+trailingJetPt = array('f', [0.])
+leadingJetEta = array('f', [0.])
+trailingJetEta = array('f', [0.])
+leadingJetPhi = array('f', [0.])
+trailingJetPhi = array('f', [0.])
+minPhi_jetMET = array('f', [0.])
+etaProduct = array('f', [0.])
+delta_jj = array('f', [0.])
 
 #Electron information
 
-nElectron = np.zeros(1, dtype=int)
-electron_pt = np.zeros(max_num, dtype=float)
-electron_phi = np.zeros(max_num, dtype=float)
-electron_eta = np.zeros(max_num, dtype=float)
+nElectron = array('f', [0.])
+electron_pt = array('f', np.zeros(max_num, dtype=float))
+electron_phi = array('f', np.zeros(max_num, dtype=float))
+electron_eta = array('f', np.zeros(max_num, dtype=float))
 
 #Muon information
 
-nMuon = np.zeros(1, dtype=int)
-muon_pt = np.zeros(max_num, dtype=float)
-muon_phi = np.zeros(max_num, dtype=float)
-muon_eta = np.zeros(max_num, dtype=float)
+nMuon = array('f', [0.])
+muon_pt = array('f', np.zeros(max_num, dtype=float))
+muon_phi = array('f', np.zeros(max_num, dtype=float))
+muon_eta = array('f', np.zeros(max_num, dtype=float))
 
 #Tau information
 
-nTau = np.zeros(1, dtype=int)
-tau_pt = np.zeros(max_num, dtype=float)
-tau_phi = np.zeros(max_num, dtype=float)
-tau_eta = np.zeros(max_num, dtype=float)
+nTau = array('f', [0.])
+tau_pt = array('f', np.zeros(max_num, dtype=float))
+tau_phi = array('f', np.zeros(max_num, dtype=float))
+tau_eta = array('f', np.zeros(max_num, dtype=float))
 
 #Gen-particles
 
-pdgId = np.zeros(max_num, dtype=int)
-mothers = np.zeros(max_num, dtype=int)
+nParticles = array('f', [0.])
+pdgId = array('i', np.zeros(max_num, dtype=int))
+mothers = array('i', np.zeros(max_num, dtype=int))
+
 
 def declare_branches(tree):
-
+	
 	print('######## Creating branches ########')
 
-	tree.branch('met', met, 'met/F')
-	tree.branch('metPhi', metPhi, 'metPhi/F')
-	tree.branch('genMet', genMet, 'genMet/F')
+	tree.Branch('met', met, 'met/F')
+	tree.Branch('metPhi', metPhi, 'metPhi/F')
+	tree.Branch('genMet', genMet, 'genMet/F')
 	
-	tree.branch('nJet', nJet, 'nJet/I')
-	tree.branch('leadingJetPt', leadingJetPt, 'leadingJetPt/F')
-	tree.branch('trailingJetPt', trailingJetPt, 'trailingJetPt/F')
-	tree.branch('leadingJetEta', leadingJetEta, 'leadingJetEta/F')
-	tree.branch('trailingJetEta', trailingJetEta, 'trailingJetEta/F')
-	tree.branch('leadingJetPhi', leadingJetPhi, 'leadingJetPhi/F')
-	tree.branch('trailingJetPhi', trailingJetPhi, 'trailingJetPhi/F')
-	tree.branch('minPhi_jetMET', minPhi_jetMET, 'minPhi_jetMET/F')
-	tree.branch('delta_jj', delta_jj, 'delta_jj/F')
+	tree.Branch('nJet', nJet, 'nJet/I')
+	tree.Branch('leadingJetPt', leadingJetPt, 'leadingJetPt/F')
+	tree.Branch('trailingJetPt', trailingJetPt, 'trailingJetPt/F')
+	tree.Branch('leadingJetEta', leadingJetEta, 'leadingJetEta/F')
+	tree.Branch('trailingJetEta', trailingJetEta, 'trailingJetEta/F')
+	tree.Branch('leadingJetPhi', leadingJetPhi, 'leadingJetPhi/F')
+	tree.Branch('trailingJetPhi', trailingJetPhi, 'trailingJetPhi/F')
+	tree.Branch('minPhi_jetMET', minPhi_jetMET, 'minPhi_jetMET/F')
+	tree.Branch('delta_jj', delta_jj, 'delta_jj/F')
 
-	tree.branch('nElectron', nElectron, 'nElectron/I')
-	tree.branch('electron_pt', electron_pt, 'electron_pt[nElectron]/F')
-	tree.branch('electron_phi', electron_phi, 'electron_phi[nElectron]/F')	
-	tree.branch('electron_eta', electron_eta, 'electron_eta[nElectron]/F')
+	tree.Branch('nElectron', nElectron, 'nElectron/I')
+	tree.Branch('electron_pt', electron_pt, 'electron_pt[nElectron]/F')
+	tree.Branch('electron_phi', electron_phi, 'electron_phi[nElectron]/F')	
+	tree.Branch('electron_eta', electron_eta, 'electron_eta[nElectron]/F')
 	
-	tree.branch('nMuon', nMuon, 'nMuon/I')
-	tree.branch('muon_pt', muon_pt, 'muon_pt[nMuon]/F')
-	tree.branch('muon_phi', muon_phi, 'muon_phi[nMuon]/F')
-	tree.branch('muon_eta', muon_eta, 'muon_eta[nMuon]/F')
+	tree.Branch('nMuon', nMuon, 'nMuon/I')
+	tree.Branch('muon_pt', muon_pt, 'muon_pt[nMuon]/F')
+	tree.Branch('muon_phi', muon_phi, 'muon_phi[nMuon]/F')
+	tree.Branch('muon_eta', muon_eta, 'muon_eta[nMuon]/F')
 
-	tree.branch('nTau', nTau, 'nTau/I')
-	tree.branch('tau_pt', tau_pt, 'tau_pt[nTau]/F')
-	tree.branch('tau_phi', tau_phi, 'tau_phi[nTau]/F')
-	tree.branch('tau_eta', tau_eta, 'tau_eta[nTau]/F')
-	
+	tree.Branch('nTau', nTau, 'nTau/I')
+	tree.Branch('tau_pt', tau_pt, 'tau_pt[nTau]/F')
+	tree.Branch('tau_phi', tau_phi, 'tau_phi[nTau]/F')
+	tree.Branch('tau_eta', tau_eta, 'tau_eta[nTau]/F')
+
+	tree.Branch('nParticles', nParticles, 'nParticles/I')
+	tree.Branch('pdgId', pdgId, 'pdgId[nParticles]/I')
 	print('######## Branches declared ########')
 
 

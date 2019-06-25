@@ -1,10 +1,10 @@
 import ROOT
 import time
 import argparse
-from math import pi
-from array import array
+from math import pi 
+from numpy import zeros
 
-from vbf_tree import declare_branches
+from vbf_tree import * 
 
 # load FWLite C++ libraries
 ROOT.gSystem.Load("libFWCoreFWLite.so");
@@ -45,18 +45,17 @@ def minJetMETPhi(jets, mets):
 
 	return min(phiDiffList)
 
-def writeTree(inputFile):
 
+def writeTree(inputFile):
+	
 	#Create a new ROOT file
 	output = ROOT.TFile('VBF_HToInv.root', 'RECREATE')
 
 	#Create a new ROOT TTree
 	eventTree = ROOT.TTree('eventTree', 'eventTree')
-
-	#Initialize the variables and create branches
 	
+	#Initialize the variables and create branches	
 	declare_branches(eventTree)
-
 
 	electrons, electronLabel = Handle('std::vector<pat::Electron>'), 'slimmedElectrons'
 	muons, muonLabel = Handle('std::vector<pat::Muon>'), 'slimmedMuons'
@@ -93,17 +92,9 @@ def writeTree(inputFile):
 		#Storing kinemaic values of interest	
 		met[0] = mets.product()[0].pt()
 		metPhi[0] = mets.product()[0].phi()
+		#Add genMET!
 
 		if met[0] < 50: continue
-
-		#########################
-		muons_ = muons.product()
-
-		for muon in muons_:
-			muon_pt.append(muon.pt())
-		#########################
-
-		print(muon_pt)
 
 		jets_ = jets.product()
 
@@ -117,11 +108,53 @@ def writeTree(inputFile):
 			leadingJetEta[0] = jets_[0].eta()
 			trailingJetEta[0] = jets_[1].eta()
 			
+			leadingJetPhi[0] = jets_[0].phi()
+			trailingJetPhi[0] = jets_[1].phi()
+			
 			minPhi_jetMET[0] = minJetMETPhi(jets, mets) #Minimum delta_phi between jets and MET
 			
 			etaProduct[0] = jets_[0].eta() * jets_[1].eta() #Eta_1 * Eta_2
 
 			delta_jj[0] = abs(jets_[0].eta() - jets_[1].eta())
+		
+		electrons_ = electrons.product()
+
+		nElectron[0] = len(electrons_)
+	
+		for i, el in enumerate(electrons_):
+	
+			electron_pt[i] = el.pt()
+			electron_eta[i] = el.eta()
+			electron_phi[i] = el.phi()
+		
+		muons_ = muons.product()
+
+		nMuon[0] = len(muons_)
+
+		for i, mu in enumerate(muons_):
+	
+			muon_pt[i] = mu.pt()
+			muon_eta[i] = mu.eta()
+			muon_phi[i] = mu.phi()
+
+		taus_ = taus.product()
+
+		nTau[0] = len(taus_)
+
+		for i, tau in enumerate(taus_):
+	
+			tau_pt[i] = tau.pt()
+			tau_eta[i] = tau.eta()
+			tau_phi[i] = tau.phi()
+
+		genParticles_ = genParticles.product()
+
+		nParticles[0] = len(genParticles_)
+	
+		for i, prt in enumerate(genParticles_):
+
+			pdgId[i] = prt.pdgId()
+			#mothers[i] = prt.mother()
 
 		eventTree.Fill()
 

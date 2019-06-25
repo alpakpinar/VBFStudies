@@ -2,7 +2,6 @@ import ROOT
 import time
 import argparse
 from math import pi 
-from numpy import zeros
 
 from vbf_tree import * 
 
@@ -118,25 +117,17 @@ def writeTree(inputFile):
 
 		nJet[0] = len(jets_)
 
-		if len(jets_) > 1:
-		
-			leadingJetPt[0] = jets_[0].pt()
-			trailingJetPt[0] = jets_[1].pt()
+		for i, jet in enumerate(jets_):
 
-			if leadingJetPt[0] < 40: continue
+			jet_pt[i] = jet.pt()
+			jet_energy[i] = jet.energy()
+			jet_eta[i] = jet.eta()
+			jet_phi[i] = jet.phi()
 
-			leadingJetEta[0] = jets_[0].eta()
-			trailingJetEta[0] = jets_[1].eta()
-			
-			leadingJetPhi[0] = jets_[0].phi()
-			trailingJetPhi[0] = jets_[1].phi()
-			
 			minPhi_jetMET[0] = minJetMETPhi(jets, mets) #Minimum delta_phi between jets and MET
-			
-			etaProduct[0] = jets_[0].eta() * jets_[1].eta() #Eta_1 * Eta_2
-
-			delta_jj[0] = abs(jets_[0].eta() - jets_[1].eta())
-		
+	
+		if jet_pt[0] < 50: continue
+	
 		electrons_ = electrons.product()
 
 		nElectron[0] = len(electrons_)

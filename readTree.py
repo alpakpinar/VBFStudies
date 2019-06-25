@@ -31,7 +31,25 @@ def readTree(inputFile):
 		minPhi_jetMET = event.minPhi_jetMET
 		etaProduct = event.etaProduct
 		delta_jj = event.delta_jj	
+	
+		nElectron = event.nElectron
+		electron_pt = event.electron_pt
+		electron_phi = event.electron_phi
+		electron_eta = event.electron_eta
+
+		nMuon = event.nMuon
+		muon_pt = event.muon_pt
+		muon_phi = event.muon_phi
+		muon_eta = event.muon_eta
 		
+		nTau = event.nTau
+		tau_pt = event.tau_pt
+		tau_phi = event.tau_phi
+		tau_eta = event.tau_eta
+
+		nParticles = event.nParticles
+		pdgId = event.pdgId
+	
 		#VBF cuts
 		if met < 200: continue
 

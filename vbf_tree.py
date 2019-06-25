@@ -18,7 +18,6 @@ jet_energy = array('f', np.zeros(max_num, dtype=float))
 jet_eta = array('f', np.zeros(max_num, dtype=float))
 jet_phi = array('f', np.zeros(max_num, dtype=float))
 
-
 #Electron information
 
 nElectron = array('i', [0])
@@ -85,6 +84,7 @@ def declare_branches(tree):
 
 	tree.Branch('nParticles', nParticles, 'nParticles/I')
 	tree.Branch('pdgId', pdgId, 'pdgId[nParticles]/I')
+
 	print('######## Branches declared ########')
 
 

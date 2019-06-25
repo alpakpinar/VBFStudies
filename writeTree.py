@@ -65,6 +65,15 @@ def writeTree(inputFile):
 	mets, metLabel = Handle('std::vector<pat::MET>'), 'slimmedMETs'
 	genParticles, genParticlesLabel = Handle('std::vector<reco::GenParticle>'), 'prunedGenParticles'
 
+	triggerBits, triggerBitLabel = Handle("edm::TriggerResults"), ("TriggerResults","","HLT")
+	triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStandAlone>"), "slimmedPatTrigger"
+	triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"), "patTrigger"
+	l1Muons, l1MuonLabel  = Handle("BXVector"), "gmtStage2Digis:Muon"
+	l1EGammas, l1EGammaLabel  = Handle("BXVector"), "caloStage2Digis:EGamma"
+	l1Jets, l1JetLabel  = Handle("BXVector"), "caloStage2Digis:Jet"
+	l1EtSums, l1EtSumLabel  = Handle("BXVector"), "caloStage2Digis:EtSum"
+	l1Taus, l1TauLabel  = Handle("BXVector"), "caloStage2Digis:Tau"
+
 	events = Events(inputFile)
 
 	print('Took the input file successfully')
@@ -83,6 +92,15 @@ def writeTree(inputFile):
 		event.getByLabel(jetLabel, jets)
 		event.getByLabel(metLabel, mets)
 		event.getByLabel(genParticlesLabel, genParticles)
+
+		event.getByLabel(triggerBitLabel, triggerBits)
+		event.getByLabel(triggerObjectLabel, triggerObjects)
+		event.getByLabel(triggerPrescaleLabel, triggerPrescales)
+		event.getByLabel(l1MuonLabel, l1Muons)
+		event.getByLabel(l1EGammaLabel, l1EGammas)
+		event.getByLabel(l1JetLabel, l1Jets)
+		event.getByLabel(l1EtSumLabel, l1EtSums)
+		event.getByLabel(l1TauLabel, l1Taus)
 
 		t2 = time.time()
 

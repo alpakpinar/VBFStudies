@@ -24,13 +24,13 @@ def readTree(inputFile):
 		# Reading the branches of eventTree		
 		met = event.met
 		metPhi = event.metPhi
-		leadingJetPt = event.leadingJetPt
-		trailingJetPt = event.trailingJetPt
-		leadingJetEta = event.leadingJetEta
-		trailingJetEta = event.trailingJetEta
+		
+		jet_pt = event.jet_pt
+		jet_eta = event.jet_eta
+		jet_energy = event.jet_energy
+		jet_phi = event.jet_phi
+
 		minPhi_jetMET = event.minPhi_jetMET
-		etaProduct = event.etaProduct
-		delta_jj = event.delta_jj	
 	
 		nElectron = event.nElectron
 		electron_pt = event.electron_pt
@@ -53,7 +53,7 @@ def readTree(inputFile):
 		#VBF cuts
 		if met < 200: continue
 
-		if (leadingJetPt < 80 or trailingJetPt < 40): continue
+		if not (leadingJetPt > 80 and trailingJetPt > 40): continue
 
 		if minPhi_jetMET < 0.5: continue
 

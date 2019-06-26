@@ -82,7 +82,7 @@ def writeTree(inputFile):
 	for i, event in enumerate(events):
 
 		if args.test:
-			if i == 1: break
+			if i == 100: break
 
 		event.getByLabel(electronLabel, electrons)
 		event.getByLabel(muonLabel, muons)
@@ -123,8 +123,8 @@ def writeTree(inputFile):
 			jet_eta[i] = jet.eta()
 			jet_phi[i] = jet.phi()
 			jet_px[i] = jet.px()
-			jet_py[i] = jet.py(i)
-			jet_pz[i] = jet.pz(i)
+			jet_py[i] = jet.py()
+			jet_pz[i] = jet.pz()
 
 			minPhi_jetMET[0] = minJetMETPhi(jets, mets) #Minimum delta_phi between jets and MET
 	
@@ -169,13 +169,31 @@ def writeTree(inputFile):
 			pdgId[i] = prt.pdgId()
 			#mothers[i] = prt.mother()
 		
-		print('Number of trigger paths: %d' % triggerBits.product().size())
+		triggerBits_ = triggerBits.product()
 
-		names = event.object().triggerNames(triggerBits.product())
+		#print('Number of trigger paths: %d' % triggerBits_.size())
 
-		for i in range(triggerBits.product().size()):
+		names = event.object().triggerNames(triggerBits_)
 
-			print(names.triggerNames()[i])
+		for i in range(triggerBits_.size()):
+
+			if names.triggerNames()[i] == 'HLT_DiJet110_35_Mjj650_PFMET110_v2':
+				if triggerBits_.accept(i):
+					HLT_DiJet110_35_Mjj650_PFMET110_v2[0] = 1
+				else:
+					HLT_DiJet110_35_Mjj650_PFMET110_v2[0] = 0 
+ 
+			elif names.triggerNames()[i] == 'HLT_DiJet110_35_Mjj650_PFMET120_v2':
+				if triggerBits_.accept(i):
+					HLT_DiJet110_35_Mjj650_PFMET120_v2[0] = 1
+				else:
+					HLT_DiJet110_35_Mjj650_PFMET120_v2[0] = 0 
+			
+			elif names.triggerNames()[i] == 'HLT_DiJet110_35_Mjj650_PFMET130_v2':
+				if triggerBits_.accept(i):
+					HLT_DiJet110_35_Mjj650_PFMET130_v2[0] = 1
+				else:
+					HLT_DiJet110_35_Mjj650_PFMET130_v2[0] = 0 
 
 		eventTree.Fill()
 

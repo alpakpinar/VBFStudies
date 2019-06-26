@@ -39,15 +39,17 @@ muon_phi = array('f', max_num*[0.])
 #Tau information
 
 nTau = array('i', [0])
-tau_pt = array('f', np.zeros(max_num, dtype=float))
-tau_phi = array('f', np.zeros(max_num, dtype=float))
-tau_eta = array('f', np.zeros(max_num, dtype=float))
-tau_energy = array('f', np.zeros(max_num, dtype=float))
+tau_pt = array('f', max_num*[0.]) 
+tau_energy = array('f', max_num*[0.]) 
+tau_eta = array('f', max_num*[0.]) 
+tau_phi = array('f', max_num*[0.])
 
 #Gen-particles
 
 nParticles = array('i', [0])
 pdgId = array('i', np.zeros(max_num, dtype=int))
+
+#Triggers
 
 
 def declare_branches(tree):

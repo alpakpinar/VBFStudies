@@ -67,11 +67,11 @@ def writeTree(inputFile):
 	triggerBits, triggerBitLabel = Handle("edm::TriggerResults"), ("TriggerResults","","HLT")
 	triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStandAlone>"), "slimmedPatTrigger"
 	triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"), "patTrigger"
-	#l1Muons, l1MuonLabel  = Handle("BXVector"), "gmtStage2Digis:Muon"
-	#l1EGammas, l1EGammaLabel  = Handle("BXVector"), "caloStage2Digis:EGamma"
-	#l1Jets, l1JetLabel  = Handle("BXVector"), "caloStage2Digis:Jet"
-	#l1EtSums, l1EtSumLabel  = Handle("BXVector"), "caloStage2Digis:EtSum"
-	#l1Taus, l1TauLabel  = Handle("BXVector"), "caloStage2Digis:Tau"
+	l1Muons, l1MuonLabel  = Handle("BXVector<l1t::Muon>"), "gmtStage2Digis:Muon"
+	l1EGammas, l1EGammaLabel  = Handle("BXVector<l1t::EGamma>"), "caloStage2Digis:EGamma"
+	l1Jets, l1JetLabel  = Handle("BXVector<l1t::Jet>"), "caloStage2Digis:Jet"
+	l1EtSums, l1EtSumLabel  = Handle("BXVector<l1t::EtSum>"), "caloStage2Digis:EtSum"
+	l1Taus, l1TauLabel  = Handle("BXVector<l1t::Tau>"), "caloStage2Digis:Tau"
 
 	events = Events(inputFile)
 
@@ -82,7 +82,7 @@ def writeTree(inputFile):
 	for i, event in enumerate(events):
 
 		if args.test:
-			if i == 10: break
+			if i == 1: break
 
 		event.getByLabel(electronLabel, electrons)
 		event.getByLabel(muonLabel, muons)
@@ -95,11 +95,11 @@ def writeTree(inputFile):
 		event.getByLabel(triggerBitLabel, triggerBits)
 		event.getByLabel(triggerObjectLabel, triggerObjects)
 		event.getByLabel(triggerPrescaleLabel, triggerPrescales)
-		#event.getByLabel(l1MuonLabel, l1Muons)
-		#event.getByLabel(l1EGammaLabel, l1EGammas)
-		#event.getByLabel(l1JetLabel, l1Jets)
-		#event.getByLabel(l1EtSumLabel, l1EtSums)
-		#event.getByLabel(l1TauLabel, l1Taus)
+		event.getByLabel(l1MuonLabel, l1Muons)
+		event.getByLabel(l1EGammaLabel, l1EGammas)
+		event.getByLabel(l1JetLabel, l1Jets)
+		event.getByLabel(l1EtSumLabel, l1EtSums)
+		event.getByLabel(l1TauLabel, l1Taus)
 
 		t2 = time.time()
 
@@ -109,7 +109,6 @@ def writeTree(inputFile):
 		#Storing kinemaic values of interest	
 		met[0] = mets.product()[0].pt()
 		metPhi[0] = mets.product()[0].phi()
-		#Add genMET!
 
 		if met[0] < 50: continue
 
@@ -123,6 +122,9 @@ def writeTree(inputFile):
 			jet_energy[i] = jet.energy()
 			jet_eta[i] = jet.eta()
 			jet_phi[i] = jet.phi()
+			jet_px[i] = jet.px()
+			jet_py[i] = jet.py(i)
+			jet_pz[i] = jet.pz(i)
 
 			minPhi_jetMET[0] = minJetMETPhi(jets, mets) #Minimum delta_phi between jets and MET
 	
@@ -171,10 +173,9 @@ def writeTree(inputFile):
 
 		names = event.object().triggerNames(triggerBits.product())
 
-
 		for i in range(triggerBits.product().size()):
 
-			print('Trigger ', names.triggerNames()[i], ('PASS' if triggerBits.product().accept(i) else 'FAIL')) 
+			print(names.triggerNames()[i])
 
 		eventTree.Fill()
 

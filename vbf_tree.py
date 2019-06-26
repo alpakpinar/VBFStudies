@@ -49,6 +49,11 @@ tau_phi = array('f', max_num*[0.])
 nParticles = array('i', [0])
 pdgId = array('i', max_num*[0])
 
+#2017 DiJet Triggers
+
+HLT_DiJet110_35_Mjj650_PFMET110_v2 = array('i', [0])
+HLT_DiJet110_35_Mjj650_PFMET120_v2 = array('i', [0])
+HLT_DiJet110_35_Mjj650_PFMET130_v2 = array('i', [0])
 
 def declare_branches(tree):
 	
@@ -88,6 +93,10 @@ def declare_branches(tree):
 
 	tree.Branch('nParticles', nParticles, 'nParticles/I')
 	tree.Branch('pdgId', pdgId, 'pdgId[nParticles]/I')
+
+	tree.Branch('HLT_DiJet110_35_Mjj650_PFMET110_v2', HLT_DiJet110_35_Mjj650_PFMET110_v2, 'HLT_DiJet110_35_Mjj650_PFMET110_v2/I')
+	tree.Branch('HLT_DiJet110_35_Mjj650_PFMET120_v2', HLT_DiJet110_35_Mjj650_PFMET120_v2, 'HLT_DiJet110_35_Mjj650_PFMET120_v2/I')
+	tree.Branch('HLT_DiJet110_35_Mjj650_PFMET130_v2', HLT_DiJet110_35_Mjj650_PFMET130_v2, 'HLT_DiJet110_35_Mjj650_PFMET130_v2/I')
 
 	print('######## Branches declared ########')
 

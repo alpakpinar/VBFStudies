@@ -10,6 +10,7 @@ def deltaR(prt1, prt2):
 	
 	return sqrt((eta_diff)**2 + (phi_diff)**2) 
 	
+
 def readTree(inputFile):
 
 	f = ROOT.TFile.Open(inputFile)
@@ -24,11 +25,24 @@ def readTree(inputFile):
 		# Reading the branches of eventTree		
 		met = event.met
 		metPhi = event.metPhi
-		
+
+		nJet = event.nJet		
 		jet_pt = event.jet_pt
 		jet_eta = event.jet_eta
 		jet_energy = event.jet_energy
 		jet_phi = event.jet_phi
+		jet_px = event.jet_px
+		jet_py = event.jet_py
+		jet_pz = event.jet_pz
+
+		if nJet > 1:
+		
+			totalEnergy = jet_energy[0] + jet_energy[1]
+			totalPx = jet_px[0] + jet_px[1]			
+			totalPy = jet_py[0] + jet_py[1]			
+			totalPz = jet_pz[0] + jet_pz[1]			
+			
+			mjj = totalEnergy**2 - totalPx**2 - totalPy**2 - totalPz**2 #Invariant mass of two leading jets
 
 		minPhi_jetMET = event.minPhi_jetMET
 	

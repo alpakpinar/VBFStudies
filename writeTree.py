@@ -107,8 +107,10 @@ def writeTree(inputFile):
 			print('Analyzing event # %d , Time: %.2f' % (i , t2-t1))
 	
 		#Storing kinemaic values of interest	
+		
 		met[0] = mets.product()[0].pt()
-		metPhi[0] = mets.product()[0].phi()
+		met_phi[0] = mets.product()[0].phi()
+		met_eta[0] = mets.product()[0].eta()
 
 		if met[0] < 50: continue
 

@@ -24,7 +24,8 @@ def readTree(inputFile):
 		
 		# Reading the branches of eventTree		
 		met = event.met
-		metPhi = event.metPhi
+		met_phi = event.met_phi
+		met_eta = event.met_eta
 
 		nJet = event.nJet		
 		jet_pt = event.jet_pt

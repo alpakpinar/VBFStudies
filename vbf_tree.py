@@ -5,8 +5,8 @@ max_num = 1000
 #MET information
 
 met = array('f', [0.])
-metPhi = array('f', [0.])
-genMet = array('f', [0.]) 
+met_phi = array('f', [0.])
+met_eta = array('f', [0.])
 
 #Jet information
 
@@ -60,8 +60,8 @@ def declare_branches(tree):
 	print('######## Creating branches ########')
 
 	tree.Branch('met', met, 'met/F')
-	tree.Branch('metPhi', metPhi, 'metPhi/F')
-	tree.Branch('genMet', genMet, 'genMet/F')
+	tree.Branch('met_phi', met_phi, 'met_phi/F')
+	tree.Branch('met_eta', met_eta, 'met_eta/F')
 	
 	tree.Branch('nJet', nJet, 'nJet/I')
 	tree.Branch('minPhi_jetMET', minPhi_jetMET, 'minPhi_jetMET/F')

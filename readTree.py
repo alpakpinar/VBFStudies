@@ -43,7 +43,7 @@ def readTree(inputFile):
 			totalPy = jet_py[0] + jet_py[1]			
 			totalPz = jet_pz[0] + jet_pz[1]			
 			
-			mjj = totalEnergy**2 - totalPx**2 - totalPy**2 - totalPz**2 #Invariant mass of two leading jets
+			mjj = sqrt(totalEnergy**2 - totalPx**2 - totalPy**2 - totalPz**2) #Invariant mass of two leading jets
 
 		minPhi_jetMET = event.minPhi_jetMET
 	
@@ -72,9 +72,9 @@ def readTree(inputFile):
 
 		if minPhi_jetMET < 0.5: continue
 
-		if etaProduct > 0: continue
+		if jet_eta[0] * jet_eta[1] > 0: continue
 
-		if delta_jj < 2.5: continue
+		if abs(jet_eta[0] - jet_eta[1]) < 2.5: continue
 
 		event_count_after += 1
 				

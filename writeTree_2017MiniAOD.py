@@ -67,11 +67,8 @@ def writeTree(inputFile):
 	triggerBits, triggerBitLabel = Handle("edm::TriggerResults"), ("TriggerResults","","HLT")
 	triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStandAlone>"), "slimmedPatTrigger"
 	triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"), "patTrigger"
-	l1Muons, l1MuonLabel  = Handle("BXVector<l1t::Muon>"), "gmtStage2Digis:Muon"
-	l1EGammas, l1EGammaLabel  = Handle("BXVector<l1t::EGamma>"), "caloStage2Digis:EGamma"
 	l1Jets, l1JetLabel  = Handle("BXVector<l1t::Jet>"), "caloStage2Digis:Jet"
 	l1EtSums, l1EtSumLabel  = Handle("BXVector<l1t::EtSum>"), "caloStage2Digis:EtSum"
-	l1Taus, l1TauLabel  = Handle("BXVector<l1t::Tau>"), "caloStage2Digis:Tau"
 
 	events = Events(inputFile)
 
@@ -196,6 +193,26 @@ def writeTree(inputFile):
 					HLT_DiJet110_35_Mjj650_PFMET130_v2[0] = 1
 				else:
 					HLT_DiJet110_35_Mjj650_PFMET130_v2[0] = 0 
+
+		#Filling L1 level information
+		bxVector_jet = l1Jets.product()
+		
+		bx=0 #Check!
+
+		L1_nJet[0] = bxVector_jet.size(bx)
+
+		for i in range(bxVector_jet.size(bx)):
+
+			jet = bxVector_jet.at(bx, i)				
+			
+			L1_jet_pt[i] = jet.pt()
+			L1_jet_eta[i] = jet.eta()			
+			L1_jet_phi[i] = jet.phi()			
+			L1_jet_energy[i] = jet.energy()			
+			L1_jet_px[i] = jet.px()			
+			L1_jet_py[i] = jet.py()			
+			L1_jet_pz[i] = jet.pz()			
+		
 
 		eventTree.Fill()
 

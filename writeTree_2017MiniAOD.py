@@ -48,7 +48,7 @@ def minJetMETPhi(jets, mets):
 def writeTree(inputFile):
 	
 	#Create a new ROOT file
-	output = ROOT.TFile('VBF_HToInv.root', 'RECREATE')
+	output = ROOT.TFile('VBF_HToInv_2017.root', 'RECREATE')
 
 	#Create a new ROOT TTree
 	eventTree = ROOT.TTree('eventTree', 'eventTree')
@@ -92,11 +92,8 @@ def writeTree(inputFile):
 		event.getByLabel(triggerBitLabel, triggerBits)
 		event.getByLabel(triggerObjectLabel, triggerObjects)
 		event.getByLabel(triggerPrescaleLabel, triggerPrescales)
-		event.getByLabel(l1MuonLabel, l1Muons)
-		event.getByLabel(l1EGammaLabel, l1EGammas)
 		event.getByLabel(l1JetLabel, l1Jets)
 		event.getByLabel(l1EtSumLabel, l1EtSums)
-		event.getByLabel(l1TauLabel, l1Taus)
 
 		t2 = time.time()
 
@@ -213,7 +210,6 @@ def writeTree(inputFile):
 			L1_jet_py[i] = jet.py()			
 			L1_jet_pz[i] = jet.pz()			
 		
-
 		eventTree.Fill()
 
 	#Save the output root file

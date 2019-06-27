@@ -193,8 +193,19 @@ def writeTree(inputFile):
 
 		#Filling L1 level information
 		bxVector_jet = l1Jets.product()
-		
+		bxVector_met = l1EtSums.product()	
+	
 		bx=0 #Check!
+
+		for i in range(bxVector_met.size(bx)):
+
+			etsum_obj = bxVector_met.at(bx, i)
+			
+			if etsum_obj.getType() == getattr(etsum_obj, 'kMissingEt'): #Getting L1 level MET attributes
+			
+				L1_met[0] = etsum_obj.pt()
+				L1_met_eta[0] = etsum_obj.eta()
+				L1_met_phi[0] = etsum_obj.phi()
 
 		L1_nJet[0] = bxVector_jet.size(bx)
 

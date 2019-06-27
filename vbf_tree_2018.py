@@ -66,6 +66,10 @@ L1_jet_px = array('f', max_num*[0.])
 L1_jet_py = array('f', max_num*[0.])
 L1_jet_pz = array('f', max_num*[0.])
 
+L1_met = array('f', [0.])
+L1_met_eta = array('f', [0.])
+L1_met_phi = array('f', [0.])
+
 def declare_branches(tree):
 	
 	print('######## Creating branches ########')
@@ -117,6 +121,10 @@ def declare_branches(tree):
 	tree.Branch('L1_jet_px', L1_jet_px, 'L1_jet_px[L1_nJet]/F')	
 	tree.Branch('L1_jet_py', L1_jet_py, 'L1_jet_py[L1_nJet]/F')	
 	tree.Branch('L1_jet_pz', L1_jet_pz, 'L1_jet_pz[L1_nJet]/F')	
+	
+	tree.Branch('L1_met', L1_met, 'L1_met/F')
+	tree.Branch('L1_met_eta', L1_met_eta, 'L1_met_eta/F')
+	tree.Branch('L1_met_phi', L1_met_phi, 'L1_met_phi/F')
 	
 	print('######## Branches declared ########')
 

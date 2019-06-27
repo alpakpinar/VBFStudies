@@ -55,6 +55,17 @@ HLT_DiJet110_35_Mjj650_PFMET110_v2 = array('i', [0])
 HLT_DiJet110_35_Mjj650_PFMET120_v2 = array('i', [0])
 HLT_DiJet110_35_Mjj650_PFMET130_v2 = array('i', [0])
 
+#L1 Level Information for jets and MET
+
+L1_nJet = array('i', [0])
+L1_jet_pt = array('f', max_num*[0.])
+L1_jet_energy = array('f', max_num*[0.]) 
+L1_jet_eta = array('f', max_num*[0.]) 
+L1_jet_phi = array('f', max_num*[0.])
+L1_jet_px = array('f', max_num*[0.])
+L1_jet_py = array('f', max_num*[0.])
+L1_jet_pz = array('f', max_num*[0.])
+
 def declare_branches(tree):
 	
 	print('######## Creating branches ########')
@@ -97,6 +108,15 @@ def declare_branches(tree):
 	tree.Branch('HLT_DiJet110_35_Mjj650_PFMET110_v2', HLT_DiJet110_35_Mjj650_PFMET110_v2, 'HLT_DiJet110_35_Mjj650_PFMET110_v2/I')
 	tree.Branch('HLT_DiJet110_35_Mjj650_PFMET120_v2', HLT_DiJet110_35_Mjj650_PFMET120_v2, 'HLT_DiJet110_35_Mjj650_PFMET120_v2/I')
 	tree.Branch('HLT_DiJet110_35_Mjj650_PFMET130_v2', HLT_DiJet110_35_Mjj650_PFMET130_v2, 'HLT_DiJet110_35_Mjj650_PFMET130_v2/I')
+	
+	tree.Branch('L1_nJet', L1_nJet, 'L1_nJet/I')
+	tree.Branch('L1_jet_pt', L1_jet_pt, 'L1_jet_pt[L1_nJet]/F')
+	tree.Branch('L1_jet_energy', L1_jet_energy, 'L1_jet_energy[L1_nJet]/F')
+	tree.Branch('L1_jet_eta', L1_jet_eta, 'L1_jet_eta[L1_nJet]/F')
+	tree.Branch('L1_jet_phi', L1_jet_phi, 'L1_jet_phi[L1_nJet]/F')
+	tree.Branch('L1_jet_px', L1_jet_px, 'L1_jet_px[L1_nJet]/F')	
+	tree.Branch('L1_jet_py', L1_jet_py, 'L1_jet_py[L1_nJet]/F')	
+	tree.Branch('L1_jet_pz', L1_jet_pz, 'L1_jet_pz[L1_nJet]/F')	
 
 	print('######## Branches declared ########')
 

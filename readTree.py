@@ -80,6 +80,15 @@ def readTree(inputFile):
 		L1_jet_py = event.L1_jet_py	
 		L1_jet_pz = event.L1_jet_pz
 	
+		if L1_nJet > 1:
+		
+			L1_totalEnergy = L1_jet_energy[0] + L1_jet_energy[1]
+			L1_totalPx = L1_jet_px[0] + L1_jet_px[1]			
+			L1_totalPy = L1_jet_py[0] + L1_jet_py[1]			
+			L1_totalPz = L1_jet_pz[0] + L1_jet_pz[1]			
+			
+			L1_mjj = sqrt(L1_totalEnergy**2 - L1_totalPx**2 - L1_totalPy**2 - L1_totalPz**2) #Invariant mass of two leading jets at L1 level
+		
 		#VBF cuts
 		
 		if met < 200: continue

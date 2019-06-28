@@ -17,6 +17,7 @@ def readTree(inputFile):
 
 	event_count_before = 0
 	event_count_after = 0
+	event_count_afterL1 = 0
 
 	for event in f.eventTree:
 		
@@ -89,18 +90,25 @@ def readTree(inputFile):
 			
 			L1_mjj = sqrt(L1_totalEnergy**2 - L1_totalPx**2 - L1_totalPy**2 - L1_totalPz**2) #Invariant mass of two leading jets at L1 level
 		
+			#L1 seed selection
+		
+			if not jet_pt[0] > 115 and jet_pt[1] > 40 and L1_mjj > 620: continue
+
+			event_count_afterL1 += 1
+		
 		#VBF cuts
 		
 		if met < 200: continue
 
-		if not (leadingJetPt > 80 and trailingJetPt > 40): continue
+		if not (jet_pt[0] > 80 and jet_pt[1] > 40): continue
 
 		if minPhi_jetMET < 0.5: continue
 
 		if jet_eta[0] * jet_eta[1] > 0: continue
 
 		if abs(jet_eta[0] - jet_eta[1]) < 2.5: continue
-
+		
+		#Add mjj > 500 selection here!
 		event_count_after += 1
 				
 

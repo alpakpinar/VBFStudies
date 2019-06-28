@@ -1,6 +1,7 @@
 import ROOT
 import time
 import argparse
+import os 
 from math import pi 
 
 from vbf_tree_2017 import * 
@@ -14,7 +15,7 @@ ROOT.FWLiteEnabler.enable()
 from DataFormats.FWLite import Handle, Events	
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-t', '--test', help = 'Only go over the first 100 events for testing', action = 'store_true')
+parser.add_argument('-t', '--test', help = 'Only go over the first 100 events in the first file for testing', action = 'store_true')
 args = parser.parse_args()
 
 def minJetMETPhi(jets, mets):
@@ -47,15 +48,6 @@ def minJetMETPhi(jets, mets):
 
 def writeTree(inputFile):
 	
-	#Create a new ROOT file
-	output = ROOT.TFile('VBF_HToInv_2017.root', 'RECREATE')
-
-	#Create a new ROOT TTree
-	eventTree = ROOT.TTree('eventTree', 'eventTree')
-	
-	#Initialize the variables and create branches	
-	declare_branches(eventTree)
-
 	electrons, electronLabel = Handle('std::vector<pat::Electron>'), 'slimmedElectrons'
 	muons, muonLabel = Handle('std::vector<pat::Muon>'), 'slimmedMuons'
 	taus, tauLabel = Handle('std::vector<pat::Tau>'), 'slimmedTaus'
@@ -223,14 +215,39 @@ def writeTree(inputFile):
 		
 		eventTree.Fill()
 
-	#Save the output root file
-	output.Write()
 
 if __name__ == '__main__':
 
-	inputFile = 'root://cmsxrootd.fnal.gov///store/mc/RunIISummer17MiniAOD/VBF_HToInvisible_M125_13TeV_powheg_pythia8/MINIAODSIM/NZSFlatPU28to62_92X_upgrade2017_realistic_v10-v1/50000/CE13A08A-579E-E711-B9BB-001E67E5E8B6.root'	
+	#Create a new ROOT file
+	output = ROOT.TFile('VBF_HToInv_2017_all.root', 'RECREATE')
+
+	#Create a new ROOT TTree
+	eventTree = ROOT.TTree('eventTree', 'eventTree')
 	
-	writeTree(inputFile)
+	#Initialize the variables and create branches	
+	declare_branches(eventTree)
+	
+	t1 = time.time()
+
+	f = file('MiniAOD_files2017.txt', 'r')
+
+	for i, filename in enumerate(f.readlines()):
+	
+		t2 = time.time()
+
+		print('Working on file {0:<5d} t = {1:.2f}'.format(i+1, t2-t1))
+
+		if args.test:
+
+			if i == 1: break
+
+		writeTree(filename)
+	
+	#Save the output root file
+	output.Write()
+
+	#inputFile = 'root://cmsxrootd.fnal.gov///store/mc/RunIISummer17MiniAOD/VBF_HToInvisible_M125_13TeV_powheg_pythia8/MINIAODSIM/NZSFlatPU28to62_92X_upgrade2017_realistic_v10-v1/50000/CE13A08A-579E-E711-B9BB-001E67E5E8B6.root'	
+	
 
 	
 

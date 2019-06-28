@@ -64,8 +64,24 @@ def readTree(inputFile):
 
 		nParticles = event.nParticles
 		pdgId = event.pdgId
+
+		#Getting L1 level information
+
+		L1_met = event.L1_met
+		L1_met_eta = event.L1_met_eta
+		L1_met_phi = event.L1_met_phii
+
+		L1_nJet = event.L1_nJet
+		L1_jet_pt = event.L1_jet_pt
+		L1_jet_energy = event.L1_jet_energy
+		L1_jet_eta = event.L1_jet_eta
+		L1_jet_phi = event.L1_jet_phi
+		L1_jet_px = event.L1_jet_px
+		L1_jet_py = event.L1_jet_py	
+		L1_jet_pz = event.L1_jet_pz
 	
 		#VBF cuts
+		
 		if met < 200: continue
 
 		if not (leadingJetPt > 80 and trailingJetPt > 40): continue

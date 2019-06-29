@@ -1,6 +1,16 @@
 from __future__ import division
 import ROOT
+import argparse
 from math import sqrt
+
+def getFileType():
+
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-y', '--year', help = 'The production year for MiniAOD file (2017 or 2018)', type = int)
+	parser.add_argument('-t', '--test', help = 'Run over the test file', action = 'store_true')
+	args = parser.parse_args()
+
+	return args
 
 def deltaR(prt1, prt2):
 	
@@ -133,7 +143,22 @@ def readTree(inputFile):
 
 if __name__ == '__main__':
 
-	inputFile = 'inputs/VBF_HToInv_2017_test.root'
+	file_type = getFileType()
+	
+	if file_type.test:
+
+		inputFile = 'inputs/VBF_HToInv_' + str(file_type.year) + '_test.root'
+		print('Starting job')
+		print('File: {}'.format(inputFile))
+
+	else:
+ 
+		inputFile = 'inputs/VBF_HToInv_' + str(file_type.year) + '.root'
+		print('Starting job')
+		print('File: {}'.format(inputFile))
+
+	#inputFile = 'inputs/VBF_HToInv_2017_test.root'
+
 	readTree(inputFile) 
 
  

@@ -36,6 +36,7 @@ def readTree(inputFile):
 		jet_px = event.jet_px
 		jet_py = event.jet_py
 		jet_pz = event.jet_pz
+		jet_btag_CSVv2 = event.jet_btag_CSVv2
 
 		if nJet > 1:
 		
@@ -70,7 +71,7 @@ def readTree(inputFile):
 
 		L1_met = event.L1_met
 		L1_met_eta = event.L1_met_eta
-		L1_met_phi = event.L1_met_phii
+		L1_met_phi = event.L1_met_phi
 
 		L1_nJet = event.L1_nJet
 		L1_jet_pt = event.L1_jet_pt
@@ -107,14 +108,31 @@ def readTree(inputFile):
 		if jet_eta[0] * jet_eta[1] > 0: continue
 
 		if abs(jet_eta[0] - jet_eta[1]) < 2.5: continue
-		
+	
+		num_bJets = 0
+
+		for val in jet_btag_CSVv2:
+			
+			if val > 0.8484: #2017 requirements			
+				num_bJets += 1	
+
+		if num_bJets != 0: continue #b-jet veto
+
 		#Add mjj > 500 selection here!
 		event_count_after += 1
 				
+	print('*******************')
+	print('Event Yield Results')
+	print('*******************\n')
+	print('Total number of events read                  : {0:6d}'.format(event_count_before))
+	print('Total number of events passed L1 seed        : {0:6d}'.format(event_count_afterL1))
+	print('Total number of events passed VBF selections : {0:6d}\n'.format(event_count_after)) 
+	print('Job finished')
+
 
 if __name__ == '__main__':
 
-	inputFile = 'VBF_HToInv.root'
+	inputFile = 'VBF_HToInv_2017_test.root'
 	readTree(inputFile) 
 
  

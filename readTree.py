@@ -1,3 +1,4 @@
+from __future__ import division
 import ROOT
 from math import sqrt
 
@@ -10,7 +11,6 @@ def deltaR(prt1, prt2):
 	
 	return sqrt((eta_diff)**2 + (phi_diff)**2) 
 	
-
 def readTree(inputFile):
 
 	f = ROOT.TFile.Open(inputFile)
@@ -120,19 +120,20 @@ def readTree(inputFile):
 
 		#Add mjj > 500 selection here!
 		event_count_after += 1
-				
+	
+	print('\n')			
 	print('*******************')
 	print('Event Yield Results')
 	print('*******************\n')
 	print('Total number of events read                  : {0:6d}'.format(event_count_before))
-	print('Total number of events passed L1 seed        : {0:6d}'.format(event_count_afterL1))
-	print('Total number of events passed VBF selections : {0:6d}\n'.format(event_count_after)) 
+	print('Total number of events passed L1 seed        : {0:6d}        Passing Ratio: {1:6.2f}%'.format(event_count_afterL1, event_count_afterL1*100/event_count_before))
+	print('Total number of events passed VBF selections : {0:6d}        Passing Ratio: {1:6.2f}%\n'.format(event_count_after, event_count_after*100/event_count_before)) 
 	print('Job finished')
 
 
 if __name__ == '__main__':
 
-	inputFile = 'VBF_HToInv_2017_test.root'
+	inputFile = 'inputs/VBF_HToInv_2017_test.root'
 	readTree(inputFile) 
 
  

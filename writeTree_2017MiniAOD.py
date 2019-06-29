@@ -231,11 +231,11 @@ if __name__ == '__main__':
 
 	if args.test:
 		
-		output = ROOT.TFile('VBF_HToInv_2017_test.root', 'RECREATE')
+		output = ROOT.TFile('inputs/VBF_HToInv_2017_test.root', 'RECREATE')
 	
 	else:
 	
-		output = ROOT.TFile('VBF_HToInv_2017.root', 'RECREATE')
+		output = ROOT.TFile('inputs/VBF_HToInv_2017.root', 'RECREATE')
 
 	#Create a new ROOT TTree
 	eventTree = ROOT.TTree('eventTree', 'eventTree')
@@ -245,7 +245,7 @@ if __name__ == '__main__':
 	
 	t1 = time.time()
 
-	f = file('MiniAOD_files2017.txt', 'r')
+	f = file('inputs/MiniAOD_files2017.txt', 'r')
 
 	for i, filename in enumerate(f.readlines()):
 	

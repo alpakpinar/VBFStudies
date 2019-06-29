@@ -47,15 +47,6 @@ def minJetMETPhi(jets, mets):
 
 def writeTree(inputFile):
 	
-	#Create a new ROOT file
-	output = ROOT.TFile('VBF_HToInv_2018.root', 'RECREATE')
-
-	#Create a new ROOT TTree
-	eventTree = ROOT.TTree('eventTree', 'eventTree')
-	
-	#Initialize the variables and create branches	
-	declare_branches(eventTree)
-
 	electrons, electronLabel = Handle('std::vector<pat::Electron>'), 'slimmedElectrons'
 	muons, muonLabel = Handle('std::vector<pat::Muon>'), 'slimmedMuons'
 	taus, tauLabel = Handle('std::vector<pat::Tau>'), 'slimmedTaus'
@@ -221,14 +212,44 @@ def writeTree(inputFile):
 		
 		eventTree.Fill()
 
+if __name__ == '__main__':
+	
+	#Create a new ROOT file
+	if args.test:
+
+		output = ROOT.TFile('inputs/VBF_HToInv_2018_test.root', 'RECREATE')
+
+	else:
+	
+		output = ROOT.TFile('inputs/VBF_HToInv_2018.root', 'RECREATE')
+
+	#Create a new ROOT TTree
+	eventTree = ROOT.TTree('eventTree', 'eventTree')
+	
+	#Initialize the variables and create branches	
+	declare_branches(eventTree)
+
+	t1 = time.time()
+
+	f = file('inputs/MiniAOD_files2018.txt', 'r')
+
+	for i, filename in enumerate(f.readlines()):
+	
+		t2 = time.time()
+
+		if args.test:
+
+			if i == 1: break
+
+		print('Working on file {0:<5d} t = {1:.2f}'.format(i+1, t2-t1))
+		
+		writeTree(filename)
+	
 	#Save the output root file
 	output.Write()
 
-if __name__ == '__main__':
+	#inputFile = 'root://cmsxrootd.fnal.gov///store/mc/RunIIAutumn18MiniAOD/VBF_HToInvisible_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FDBE8CDB-175D-D942-8046-37E10DD9D6CE.root'
 
-	inputFile = 'root://cmsxrootd.fnal.gov///store/mc/RunIIAutumn18MiniAOD/VBF_HToInvisible_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FDBE8CDB-175D-D942-8046-37E10DD9D6CE.root'
-
-	writeTree(inputFile)
 
 	
 

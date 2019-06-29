@@ -112,7 +112,16 @@ def writeTree(inputFile):
 			jet_phi[i] = jet.phi()
 			jet_px[i] = jet.px()
 			jet_py[i] = jet.py()
-			jet_pz[i] = jet.pz()
+			jet_pz[i] = jet.pz()	
+			
+			#Getting b-tag information for each jet
+			tags = jet.getPairDiscri()
+
+			for tag in tags:
+
+				if tag.first == 'pfCombinedSecondaryVertexV2BJetTags':
+	
+					jet_btag_CSVv2[i] = tag.second
 
 			minPhi_jetMET[0] = minJetMETPhi(jets, mets) #Minimum delta_phi between jets and MET
 	
@@ -219,7 +228,14 @@ def writeTree(inputFile):
 if __name__ == '__main__':
 
 	#Create a new ROOT file
-	output = ROOT.TFile('VBF_HToInv_2017_all.root', 'RECREATE')
+
+	if args.test:
+		
+		output = ROOT.TFile('VBF_HToInv_2017_test.root', 'RECREATE')
+	
+	else:
+	
+		output = ROOT.TFile('VBF_HToInv_2017.root', 'RECREATE')
 
 	#Create a new ROOT TTree
 	eventTree = ROOT.TTree('eventTree', 'eventTree')
@@ -235,12 +251,12 @@ if __name__ == '__main__':
 	
 		t2 = time.time()
 
-		print('Working on file {0:<5d} t = {1:.2f}'.format(i+1, t2-t1))
-
 		if args.test:
 
 			if i == 1: break
 
+		print('Working on file {0:<5d} t = {1:.2f}'.format(i+1, t2-t1))
+		
 		writeTree(filename)
 	
 	#Save the output root file

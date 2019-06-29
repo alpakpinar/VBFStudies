@@ -19,6 +19,7 @@ jet_phi = array('f', max_num*[0.])
 jet_px = array('f', max_num*[0.])
 jet_py = array('f', max_num*[0.])
 jet_pz = array('f', max_num*[0.])
+jet_btag_CSVv2 = array('f', max_num*[0.])
 
 #Electron information
 
@@ -88,6 +89,7 @@ def declare_branches(tree):
 	tree.Branch('jet_px', jet_px, 'jet_px[nJet]/F')	
 	tree.Branch('jet_py', jet_py, 'jet_py[nJet]/F')	
 	tree.Branch('jet_pz', jet_pz, 'jet_pz[nJet]/F')	
+	tree.Branch('jet_btag_CSVv2', jet_btag_CSVv2, 'jet_btag_CSVv2[nJet]/F')	
 
 	tree.Branch('nElectron', nElectron, 'nElectron/I')
 	tree.Branch('electron_pt', electron_pt, 'electron_pt[nElectron]/F')

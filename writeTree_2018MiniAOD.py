@@ -113,6 +113,15 @@ def writeTree(inputFile):
 			jet_py[i] = jet.py()
 			jet_pz[i] = jet.pz()
 
+			#Getting b-tag information for each jet
+			tags = jet.getPairDiscri()
+
+			for tag in tags:
+
+				if tag.first == 'pfCombinedSecondaryVertexV2BJetTags':
+	
+					jet_btag_CSVv2[i] = tag.second
+			
 			minPhi_jetMET[0] = minJetMETPhi(jets, mets) #Minimum delta_phi between jets and MET
 	
 		if jet_pt[0] < 50: continue

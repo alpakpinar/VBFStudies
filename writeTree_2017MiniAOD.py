@@ -4,7 +4,7 @@ import argparse
 import os 
 from math import pi 
 
-from vbf_tree_2017 import * 
+from lib.vbf_tree_2017 import * 
 
 # load FWLite C++ libraries
 ROOT.gSystem.Load("libFWCoreFWLite.so");

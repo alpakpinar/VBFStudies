@@ -3,7 +3,7 @@ import time
 import argparse
 from math import pi 
 
-from vbf_tree_2018 import * 
+from lib.vbf_tree_2018 import * 
 
 # load FWLite C++ libraries
 ROOT.gSystem.Load("libFWCoreFWLite.so");

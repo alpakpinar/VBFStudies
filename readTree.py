@@ -3,6 +3,8 @@ import ROOT
 import argparse
 from math import sqrt
 
+from lib.histos import declareHistos
+
 def getFileType():
 
 	parser = argparse.ArgumentParser()
@@ -23,7 +25,19 @@ def deltaR(prt1, prt2):
 	
 def readTree(inputFile):
 
-	f = ROOT.TFile.Open(inputFile)
+	f = ROOT.TFile.Open(inputFile, 'UPDATE')
+	
+	#Define the histograms
+
+	nJets_hist = ROOT.TH1D('nJets_hist', 'Number of Jets (RECO)', 15, 0, 15)
+	nJets_hist.GetXaxis().SetTitle('Number of Jets')
+	nJets_hist.GetYaxis().SetTitle('Number of Events')
+
+	mjj_hist = ROOT.TH1F('mjj_hist', 'Invariant Mass of Two Leading Jets (RECO)', 50, 0, 500)
+	mjj_hist.GetXaxis().SetTitle('Invariant Mass (GeV)')
+	mjj_hist.GetYaxis().SetTitle('Number of Events')
+	
+	print('Histograms declared')
 
 	event_count_before = 0
 	event_count_after = 0
@@ -48,6 +62,8 @@ def readTree(inputFile):
 		jet_pz = event.jet_pz
 		jet_btag_CSVv2 = event.jet_btag_CSVv2
 
+		nJets_hist.Fill(nJet)
+
 		if nJet > 1:
 		
 			totalEnergy = jet_energy[0] + jet_energy[1]
@@ -56,6 +72,8 @@ def readTree(inputFile):
 			totalPz = jet_pz[0] + jet_pz[1]			
 			
 			mjj = sqrt(totalEnergy**2 - totalPx**2 - totalPy**2 - totalPz**2) #Invariant mass of two leading jets
+
+			mjj_hist.Fill(mjj)
 
 		minPhi_jetMET = event.minPhi_jetMET
 	
@@ -131,6 +149,11 @@ def readTree(inputFile):
 		#Add mjj > 500 selection here!
 		event_count_after += 1
 	
+	nJets_hist.Write('nJets_hist')
+	mjj_hist.Write('mjj_hist')
+	
+	f.Close()
+
 	print('\n')			
 	print('*******************')
 	print('Event Yield Results')
@@ -156,6 +179,7 @@ if __name__ == '__main__':
 		inputFile = 'inputs/VBF_HToInv_' + str(file_type.year) + '.root'
 		print('Starting job')
 		print('File: {}'.format(inputFile))
+
 
 	#inputFile = 'inputs/VBF_HToInv_2017_test.root'
 

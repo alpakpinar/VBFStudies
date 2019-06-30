@@ -10,9 +10,31 @@ def getFileType():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-y', '--year', help = 'The production year for MiniAOD file (2017 or 2018)', type = int)
 	parser.add_argument('-t', '--test', help = 'Run over the test file', action = 'store_true')
+	parser.add_argument('-c', '--clean', help = 'Clean the ROOT file by deleting all previous histograms', action = 'store_true')
 	args = parser.parse_args()
 
 	return args
+
+def cleanROOTFile(inputFile, histos):
+	
+	'''
+	Removes the first ten versions of the histograms from the ROOT file.
+	Called only if -c option is specified while running the script.
+	'''
+	print('Cleaning the ROOT file')
+
+	f = ROOT.TFile(inputFile, 'UPDATE')
+
+	for histo in histos.keys():
+
+		for i in range(10):
+			
+			hist = histo + ';' + str(i+1)
+			ROOT.gDirectory.Delete(hist)	
+		
+	f.Close()
+	
+	print('Cleaning done')
 
 def deltaR(prt1, prt2):
 	
@@ -27,9 +49,6 @@ def readTree(inputFile):
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
 	
-	#Define the histograms
-
-	histos = declareHistos()
 	
 	print('Histograms declared')
 
@@ -173,7 +192,16 @@ if __name__ == '__main__':
 		inputFile = 'inputs/VBF_HToInv_' + str(file_type.year) + '.root'
 		print('Starting job')
 		print('File: {}'.format(inputFile))
+	
+	#Define the histograms
 
+	histos = declareHistos()
+
+	#Clean the ROOT file if needed
+
+	if file_type.clean:
+
+		cleanROOTFile(inputFile, histos)
 
 	#inputFile = 'inputs/VBF_HToInv_2017_test.root'
 

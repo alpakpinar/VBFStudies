@@ -70,9 +70,6 @@ def writeTree(inputFile):
 
 	for i, event in enumerate(events):
 
-		if args.test:
-			if i == 100: break
-
 		event.getByLabel(electronLabel, electrons)
 		event.getByLabel(muonLabel, muons)
 		event.getByLabel(tauLabel, taus)

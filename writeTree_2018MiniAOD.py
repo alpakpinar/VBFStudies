@@ -14,7 +14,7 @@ ROOT.FWLiteEnabler.enable()
 from DataFormats.FWLite import Handle, Events	
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-t', '--test', help = 'Only go over the first 100 events for testing', action = 'store_true')
+parser.add_argument('-t', '--test', help = 'Only go over the first file for testing', action = 'store_true')
 args = parser.parse_args()
 
 def minJetMETPhi(jets, mets):

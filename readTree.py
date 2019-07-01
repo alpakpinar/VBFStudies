@@ -44,6 +44,44 @@ def deltaR(prt1, prt2):
 	phi_diff = phi1 - phi2
 	
 	return sqrt((eta_diff)**2 + (phi_diff)**2) 
+
+def applyVBFSelections(event):
+
+	'''
+	Applies VBF selections for a given event.
+	Returns True if event passes the cuts, otherwise returns False.
+	'''
+		
+	if event.met < 200: return False
+
+	if not (event.jet_pt[0] > 80 and event.jet_pt[1] > 40): return False
+
+	if event.minPhi_jetMET < 0.5: return False
+
+	if event.jet_eta[0] * event.jet_eta[1] > 0: return False
+
+	if abs(event.jet_eta[0] - event.jet_eta[1]) < 2.5: return False
+
+	num_bJets = 0
+
+	for val in event.jet_btag_CSVv2:
+		
+		if val > 0.8484: #2017 requirements			
+			num_bJets += 1	
+
+	if num_bJets != 0: return False #b-jet veto
+
+	totalEnergy = event.jet_energy[0] + event.jet_energy[1]
+	totalPx = event.jet_px[0] + event.jet_px[1]			
+	totalPy = event.jet_py[0] + event.jet_py[1]			
+	totalPz = event.jet_pz[0] + event.jet_pz[1]			
+	
+	mjj = sqrt(totalEnergy**2 - totalPx**2 - totalPy**2 - totalPz**2) #Invariant mass of two leading jets
+
+	if mjj < 500: return False
+
+	return True
+
 	
 def readTree(inputFile):
 
@@ -59,10 +97,6 @@ def readTree(inputFile):
 		event_count_before += 1
 		
 		# Reading the branches of eventTree		
-		met = event.met
-		met_phi = event.met_phi
-		met_eta = event.met_eta
-
 		nJet = event.nJet		
 		jet_pt = event.jet_pt
 		jet_eta = event.jet_eta
@@ -71,7 +105,6 @@ def readTree(inputFile):
 		jet_px = event.jet_px
 		jet_py = event.jet_py
 		jet_pz = event.jet_pz
-		jet_btag_CSVv2 = event.jet_btag_CSVv2
 
 		histos['nJets_hist'].Fill(nJet)
 		histos['leadingJetPt_hist'].Fill(jet_pt[0])
@@ -88,8 +121,6 @@ def readTree(inputFile):
 
 			histos['mjj_hist'].Fill(mjj)
 
-		minPhi_jetMET = event.minPhi_jetMET
-	
 		nElectron = event.nElectron
 		electron_pt = event.electron_pt
 		electron_phi = event.electron_phi
@@ -148,33 +179,9 @@ def readTree(inputFile):
 
 		event_count_afterL1HLT += 1
 		
-		######################
-		#VBF cuts
-		
-		if met < 200: continue
-
-		if not (jet_pt[0] > 80 and jet_pt[1] > 40): continue
-
-		if minPhi_jetMET < 0.5: continue
-
-		if jet_eta[0] * jet_eta[1] > 0: continue
-
-		if abs(jet_eta[0] - jet_eta[1]) < 2.5: continue
+		if applyVBFSelections(event):
 	
-		num_bJets = 0
-
-		for val in jet_btag_CSVv2:
-			
-			if val > 0.8484: #2017 requirements			
-				num_bJets += 1	
-
-		if num_bJets != 0: continue #b-jet veto
-
-		if mjj < 500: continue
-
-		######################
-
-		event_count_after += 1
+			event_count_after += 1
 	
 	histos['nJets_hist'].Write('nJets_hist')
 	histos['mjj_hist'].Write('mjj_hist')

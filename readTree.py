@@ -176,52 +176,15 @@ def readTree(inputFile):
 		nParticles = event.nParticles
 		pdgId = event.pdgId
 
-		#Getting L1 level information
-
-		L1_met = event.L1_met
-		L1_met_eta = event.L1_met_eta
-		L1_met_phi = event.L1_met_phi
-
-		L1_nJet = event.L1_nJet
-		L1_jet_pt = event.L1_jet_pt
-		L1_jet_energy = event.L1_jet_energy
-		L1_jet_eta = event.L1_jet_eta
-		L1_jet_phi = event.L1_jet_phi
-		L1_jet_px = event.L1_jet_px
-		L1_jet_py = event.L1_jet_py	
-		L1_jet_pz = event.L1_jet_pz
-	
-		#if L1_nJet > 1:
-		#
-		#	L1_totalEnergy = L1_jet_energy[0] + L1_jet_energy[1]
-		#	L1_totalPx = L1_jet_px[0] + L1_jet_px[1]			
-		#	L1_totalPy = L1_jet_py[0] + L1_jet_py[1]			
-		#	L1_totalPz = L1_jet_pz[0] + L1_jet_pz[1]			
-		#	
-		#	L1_mjj = sqrt(L1_totalEnergy**2 - L1_totalPx**2 - L1_totalPy**2 - L1_totalPz**2) #Invariant mass of two leading jets at L1 level
-		#
-		#	#L1 seed selection
-		#
-		#	if not jet_pt[0] > 115 and jet_pt[1] > 40 and L1_mjj > 620: continue
-
-			
-		if applyL1Selection(event):
+		if applyL1Selection(event): #L1 selection only
 
 			event_count_afterL1 += 1
 		
-		######################
-		#HLT selection
-		#HLT_DiJet110_35_Mjj650_PFMET110_v2 = event.HLT_DiJet110_35_Mjj650_PFMET110_v2
-
-		#if HLT_DiJet110_35_Mjj650_PFMET110_v2 == 0: continue
-		
-		######################		
-
-		if applyHLTSelection(event, 'HLT_DiJet110_35_Mjj650_PFMET110_v2'):
+		if applyHLTSelection(event, 'HLT_DiJet110_35_Mjj650_PFMET110_v2'): #L1 + HLT selection
 			
 			event_count_afterL1HLT += 1
 		
-		if applyVBFSelections(event):
+		if applyVBFSelections(event): #VBF selections only
 	
 			event_count_after += 1
 	
@@ -236,10 +199,10 @@ def readTree(inputFile):
 	print('*******************')
 	print('Event Yield Results')
 	print('*******************\n')
-	print('Total number of events read                                  : {0:6d}'.format(event_count_before))
-	print('Total number of events passed L1 seed                        : {0:6d}        Passing Ratio: {1:6.2f}%'.format(event_count_afterL1, event_count_afterL1*100/event_count_before))
-	print('Total number of events passed L1 seed + HLT                  : {0:6d}        Passing Ratio: {1:6.2f}%'.format(event_count_afterL1HLT, event_count_afterL1HLT*100/event_count_before))
-	print('Total number of events passed L1 seed + HLT + VBF selections : {0:6d}        Passing Ratio: {1:6.2f}%\n'.format(event_count_after, event_count_after*100/event_count_before)) 
+	print('Total number of events read                   : {0:6d}'.format(event_count_before))
+	print('Total number of events passed L1 seed         : {0:6d}        Passing Ratio: {1:6.2f}%'.format(event_count_afterL1, event_count_afterL1*100/event_count_before))
+	print('Total number of events passed L1 seed + HLT   : {0:6d}        Passing Ratio: {1:6.2f}%'.format(event_count_afterL1HLT, event_count_afterL1HLT*100/event_count_before))
+	print('Total number of events passed VBF selections  : {0:6d}        Passing Ratio: {1:6.2f}%\n'.format(event_count_after, event_count_after*100/event_count_before)) 
 	print('Job finished')
 
 

@@ -82,6 +82,43 @@ def applyVBFSelections(event):
 
 	return True
 
+def applyL1Selection(event):
+	
+	'''
+	Applies L1 selection to a given event.
+	Returns True if event passes the L1 trigger, otherwise returns False.
+	'''
+
+	if event.L1_nJet < 2: return False
+
+	else:
+		
+		L1_totalEnergy = event.L1_jet_energy[0] + event.L1_jet_energy[1]
+		L1_totalPx = event.L1_jet_px[0] + event.L1_jet_px[1]			
+		L1_totalPy = event.L1_jet_py[0] + event.L1_jet_py[1]			
+		L1_totalPz = event.L1_jet_pz[0] + event.L1_jet_pz[1]			
+		
+		L1_mjj = sqrt(L1_totalEnergy**2 - L1_totalPx**2 - L1_totalPy**2 - L1_totalPz**2) #Invariant mass of two leading jets at L1 level
+
+		if not (event.L1_jet_pt[0] > 115 and event.L1_jet_pt[1] > 40 and L1_mjj > 620): return False #Simulating the L1 trigger
+
+	return True
+
+def applyHLTSelection(event, HLT_path):
+
+	'''
+	Applies L1 + HLT trigger selections for a given event.
+	Returns True if event passes the L1 trigger and HLT trigger specified, otherwise returns False.
+	'''
+	
+	if applyL1Selection(event):
+	
+		if getattr(event, HLT_path) == 1: return True
+
+		else: return False
+	
+	return False
+
 	
 def readTree(inputFile):
 
@@ -154,30 +191,35 @@ def readTree(inputFile):
 		L1_jet_py = event.L1_jet_py	
 		L1_jet_pz = event.L1_jet_pz
 	
-		if L1_nJet > 1:
-		
-			L1_totalEnergy = L1_jet_energy[0] + L1_jet_energy[1]
-			L1_totalPx = L1_jet_px[0] + L1_jet_px[1]			
-			L1_totalPy = L1_jet_py[0] + L1_jet_py[1]			
-			L1_totalPz = L1_jet_pz[0] + L1_jet_pz[1]			
+		#if L1_nJet > 1:
+		#
+		#	L1_totalEnergy = L1_jet_energy[0] + L1_jet_energy[1]
+		#	L1_totalPx = L1_jet_px[0] + L1_jet_px[1]			
+		#	L1_totalPy = L1_jet_py[0] + L1_jet_py[1]			
+		#	L1_totalPz = L1_jet_pz[0] + L1_jet_pz[1]			
+		#	
+		#	L1_mjj = sqrt(L1_totalEnergy**2 - L1_totalPx**2 - L1_totalPy**2 - L1_totalPz**2) #Invariant mass of two leading jets at L1 level
+		#
+		#	#L1 seed selection
+		#
+		#	if not jet_pt[0] > 115 and jet_pt[1] > 40 and L1_mjj > 620: continue
+
 			
-			L1_mjj = sqrt(L1_totalEnergy**2 - L1_totalPx**2 - L1_totalPy**2 - L1_totalPz**2) #Invariant mass of two leading jets at L1 level
-		
-			#L1 seed selection
-		
-			if not jet_pt[0] > 115 and jet_pt[1] > 40 and L1_mjj > 620: continue
+		if applyL1Selection(event):
 
 			event_count_afterL1 += 1
 		
 		######################
 		#HLT selection
-		HLT_DiJet110_35_Mjj650_PFMET110_v2 = event.HLT_DiJet110_35_Mjj650_PFMET110_v2
+		#HLT_DiJet110_35_Mjj650_PFMET110_v2 = event.HLT_DiJet110_35_Mjj650_PFMET110_v2
 
-		if HLT_DiJet110_35_Mjj650_PFMET110_v2 == 0: continue
+		#if HLT_DiJet110_35_Mjj650_PFMET110_v2 == 0: continue
 		
 		######################		
 
-		event_count_afterL1HLT += 1
+		if applyHLTSelection(event, 'HLT_DiJet110_35_Mjj650_PFMET110_v2'):
+			
+			event_count_afterL1HLT += 1
 		
 		if applyVBFSelections(event):
 	

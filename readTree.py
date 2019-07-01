@@ -52,6 +52,7 @@ def readTree(inputFile):
 	event_count_before = 0
 	event_count_after = 0
 	event_count_afterL1 = 0
+	event_count_afterL1HLT = 0
 
 	for event in f.eventTree:
 		
@@ -137,6 +138,17 @@ def readTree(inputFile):
 
 			event_count_afterL1 += 1
 		
+		######################
+		#HLT selection
+		HLT_DiJet110_35_Mjj650_PFMET110_v2 = event.HLT_DiJet110_35_Mjj650_PFMET110_v2
+
+		if HLT_DiJet110_35_Mjj650_PFMET110_v2 == 0: continue
+		
+		######################		
+
+		event_count_afterL1HLT += 1
+		
+		######################
 		#VBF cuts
 		
 		if met < 200: continue
@@ -158,7 +170,10 @@ def readTree(inputFile):
 
 		if num_bJets != 0: continue #b-jet veto
 
-		#Add mjj > 500 selection here!
+		if mjj < 500: continue
+
+		######################
+
 		event_count_after += 1
 	
 	histos['nJets_hist'].Write('nJets_hist')
@@ -172,9 +187,10 @@ def readTree(inputFile):
 	print('*******************')
 	print('Event Yield Results')
 	print('*******************\n')
-	print('Total number of events read                  : {0:6d}'.format(event_count_before))
-	print('Total number of events passed L1 seed        : {0:6d}        Passing Ratio: {1:6.2f}%'.format(event_count_afterL1, event_count_afterL1*100/event_count_before))
-	print('Total number of events passed VBF selections : {0:6d}        Passing Ratio: {1:6.2f}%\n'.format(event_count_after, event_count_after*100/event_count_before)) 
+	print('Total number of events read                                  : {0:6d}'.format(event_count_before))
+	print('Total number of events passed L1 seed                        : {0:6d}        Passing Ratio: {1:6.2f}%'.format(event_count_afterL1, event_count_afterL1*100/event_count_before))
+	print('Total number of events passed L1 seed + HLT                  : {0:6d}        Passing Ratio: {1:6.2f}%'.format(event_count_afterL1HLT, event_count_afterL1HLT*100/event_count_before))
+	print('Total number of events passed L1 seed + HLT + VBF selections : {0:6d}        Passing Ratio: {1:6.2f}%\n'.format(event_count_after, event_count_after*100/event_count_before)) 
 	print('Job finished')
 
 

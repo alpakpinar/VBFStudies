@@ -49,9 +49,6 @@ def readTree(inputFile):
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
 	
-	
-	print('Histograms declared')
-
 	event_count_before = 0
 	event_count_after = 0
 	event_count_afterL1 = 0
@@ -76,6 +73,8 @@ def readTree(inputFile):
 		jet_btag_CSVv2 = event.jet_btag_CSVv2
 
 		histos['nJets_hist'].Fill(nJet)
+		histos['leadingJetPt_hist'].Fill(jet_pt[0])
+		histos['trailingJetPt_hist'].Fill(jet_pt[1])
 
 		if nJet > 1:
 		
@@ -164,7 +163,9 @@ def readTree(inputFile):
 	
 	histos['nJets_hist'].Write('nJets_hist')
 	histos['mjj_hist'].Write('mjj_hist')
-	
+	histos['leadingJetPt_hist'].Write('leadingJetPt_hist')
+	histos['trailingJetPt_hist'].Write('trailingJetPt_hist')
+
 	f.Close()
 
 	print('\n')			

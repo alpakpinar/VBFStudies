@@ -60,6 +60,86 @@ def invMassTwoJets(event):
 
 	return mjj
 
+def calculateTriggerEff_MET(inputFile, trigger, MET_lowerBound, MET_upperBound):
+	
+	'''
+	Calculates and returns the efficiency (acceptance) of given trigger as a function of MET.
+	'''
+	f = ROOT.TFile.Open(inputFile, 'UPDATE')
+
+	event_count_afterVBF = 0
+	event_count_afterALL = 0 
+
+	for event in f.eventTree:
+
+		met = event.met
+	
+		if MET_lowerBound < met < MET_upperBound:
+			
+			if applyVBFSelections(event): #VBF selections only
+		
+				event_count_afterVBF += 1
+		
+			if applyAllSelections(event, trigger): #VBF + L1 + HLT selections
+				
+				event_count_afterALL += 1
+
+	f.Close()
+
+	print(event_count_afterVBF, event_count_afterALL)
+
+	try:
+		
+		eff = event_count_afterALL/event_count_afterVBF
+
+	except ZeroDivisionError:
+
+		eff = 0.0
+
+	return eff 
+
+
+def drawTriggerEff_MET(inputFile, trigger, MET_range = [75, 200], MET_step=5):
+
+	'''
+	Draws the efficiency graph of a given trigger as a function of MET.
+	MET values in the given MET_range will be considered. By default, this interval is [75,200]. 
+	Efficiencies will be calculated with a MET jump of 5 by defaultt, this can be changed by specifying MET_step option while calling this function.
+	'''
+
+	MET_values = array('f', [])
+	efficiencies = array('f', [])
+
+	for met in range(MET_range[0], MET_range[1] + MET_step, MET_step):
+
+		MET_values.append(met)
+		
+		eff = calculateTriggerEff_MET(inputFile, trigger, met, met + MET_step)
+
+		efficiencies.append(eff)
+
+	n = len(MET_values)
+
+	f = ROOT.TFile.Open(inputFile, 'UPDATE')
+
+	c = ROOT.TCanvas('c', 'c', 800, 600)
+	c.SetGrid()
+	
+	eff_graph = ROOT.TGraph(n, MET_values, efficiencies)
+
+	eff_graph.SetLineColor(4)
+	eff_graph.SetMarkerStyle(20)
+	eff_graph.SetTitle(trigger)
+	eff_graph.GetXaxis().SetTitle('MET (GeV)')
+	eff_graph.GetYaxis().SetTitle('Acceptance')
+
+	eff_graph.Draw('ACP')
+
+	c.SaveAs('TriggerEff_MET.png')
+
+	f.Write()
+	f.Close()
+
 def calculateTriggerEff_mjj(inputFile, trigger, mjj_lowerBound, mjj_upperBound):
 
 	'''
@@ -103,8 +183,8 @@ def drawTriggerEff_mjj(inputFile, trigger, mjj_range = [500, 800], mjj_step=20):
 
 	'''
 	Draws the efficiency graph of a given trigger as a function of invariant mass of two leading jets. 
-	Mjj values in the given mjj_range will be considered. By default, this interval is [50, 200].
-	Efficiencies will be calculated with a mjj jump of 20 by default, this can be changed by specifying mjj_step omjjion while calling this function.
+	Mjj values in the given mjj_range will be considered. By default, this interval is [500, 800].
+	Efficiencies will be calculated with a mjj jump of 20 by default, this can be changed by specifying mjj_step option while calling this function.
 	'''
 
 	mjj_values = array('f', [])
@@ -266,6 +346,6 @@ if __name__ == '__main__':
 
 	trigger = 'HLT_DiJet110_35_Mjj650_PFMET110_v2'
 
-	drawTriggerEff_mjj(inputFile, trigger)
+	drawTriggerEff_MET(inputFile, trigger)
 
  

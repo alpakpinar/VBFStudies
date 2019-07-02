@@ -2,3 +2,4 @@
 *.swp
 /*.root
 tmp/
+*.png

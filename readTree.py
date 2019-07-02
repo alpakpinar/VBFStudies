@@ -2,6 +2,7 @@ from __future__ import division
 import ROOT
 import argparse
 from math import sqrt
+from array import array
 
 from lib.histos import declareHistos
 from lib.selections import *
@@ -45,6 +46,101 @@ def deltaR(prt1, prt2):
 	phi_diff = phi1 - phi2
 	
 	return sqrt((eta_diff)**2 + (phi_diff)**2) 
+
+###########################
+
+def invMassTwoJets(event):
+	
+	totalEnergy = event.jet_energy[0] + event.jet_energy[1]
+	totalPx = event.jet_px[0] + event.jet_px[1]			
+	totalPy = event.jet_py[0] + event.jet_py[1]			
+	totalPz = event.jet_pz[0] + event.jet_pz[1]			
+	
+	mjj = sqrt(totalEnergy**2 - totalPx**2 - totalPy**2 - totalPz**2) #Invariant mass of two leading jets
+
+	return mjj
+
+def calculateTriggerEff_mjj(inputFile, trigger, mjj_lowerBound, mjj_upperBound):
+
+	'''
+	Calculates and returns the efficiency (acceptance) of given trigger as a function of invariant mass of two leading jets, mjj.
+	'''
+
+	f = ROOT.TFile.Open(inputFile, 'UPDATE')
+
+	event_count_afterVBF = 0
+	event_count_afterALL = 0 
+
+	for event in f.eventTree:
+
+		mjj = invMassTwoJets(event) 
+
+		if mjj_lowerBound < mjj < mjj_upperBound:
+
+			if applyVBFSelections(event): #VBF selections only
+		
+				event_count_afterVBF += 1
+		
+			if applyAllSelections(event, trigger): #VBF + L1 + HLT selections
+				
+				event_count_afterALL += 1
+
+	f.Close()
+
+	print(event_count_afterVBF, event_count_afterALL)
+
+	try:
+		
+		eff = event_count_afterALL/event_count_afterVBF
+
+	except ZeroDivisionError:
+
+		eff = 0.0
+
+	return eff 
+
+def drawTriggerEff_mjj(inputFile, trigger, mjj_range = [500, 800], mjj_step=20):
+
+	'''
+	Draws the efficiency graph of a given trigger as a function of invariant mass of two leading jets. 
+	Mjj values in the given mjj_range will be considered. By default, this interval is [50, 200].
+	Efficiencies will be calculated with a mjj jump of 20 by default, this can be changed by specifying mjj_step omjjion while calling this function.
+	'''
+
+	mjj_values = array('f', [])
+	efficiencies = array('f', [])
+
+	for mjj in range(mjj_range[0], mjj_range[1]+mjj_step, mjj_step):
+
+		mjj_values.append(float(mjj))
+		
+		eff = calculateTriggerEff_mjj(inputFile, trigger, mjj, mjj + mjj_step)
+
+		efficiencies.append(eff)
+
+	n = len(mjj_values)
+
+	f = ROOT.TFile.Open(inputFile, 'UPDATE')
+
+	c = ROOT.TCanvas('c', 'c', 800, 600)
+	c.SetGrid()
+	
+	eff_graph = ROOT.TGraph(n, mjj_values, efficiencies)
+
+	eff_graph.SetLineColor(4)
+	eff_graph.SetMarkerStyle(20)
+	eff_graph.SetTitle(trigger)
+	eff_graph.GetXaxis().SetTitle('M_{jj} (GeV)')
+	eff_graph.GetYaxis().SetTitle('Acceptance')
+
+	eff_graph.Draw('ACP')
+
+	c.SaveAs('TriggerEff.png')
+
+	f.Write()
+	f.Close()
+
+#############################
 
 def readTree(inputFile):
 
@@ -166,6 +262,10 @@ if __name__ == '__main__':
 
 	#inputFile = 'inputs/VBF_HToInv_2017_test.root'
 
-	readTree(inputFile) 
+	#readTree(inputFile) 
+
+	trigger = 'HLT_DiJet110_35_Mjj650_PFMET110_v2'
+
+	drawTriggerEff_mjj(inputFile, trigger)
 
  

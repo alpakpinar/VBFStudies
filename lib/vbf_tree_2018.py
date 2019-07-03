@@ -78,6 +78,10 @@ L1_met = array('f', [0.])
 L1_met_eta = array('f', [0.])
 L1_met_phi = array('f', [0.])
 
+#Branch for lepton veto information
+
+containsLepton = array('i', [0]) 
+
 def declare_branches(tree):
 	
 	print('######## Creating branches ########')
@@ -138,6 +142,8 @@ def declare_branches(tree):
 	tree.Branch('L1_met', L1_met, 'L1_met/F')
 	tree.Branch('L1_met_eta', L1_met_eta, 'L1_met_eta/F')
 	tree.Branch('L1_met_phi', L1_met_phi, 'L1_met_phi/F')
+	
+	tree.Branch('containsLepton', containsLepton, 'containsLepton/I')
 	
 	print('######## Branches declared ########')
 

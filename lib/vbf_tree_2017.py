@@ -78,6 +78,8 @@ L1_met = array('f', [0.])
 L1_met_eta = array('f', [0.])
 L1_met_phi = array('f', [0.])
 
+#Branch for lepton veto information
+containsLepton = array('i', [0]) 
 
 def declare_branches(tree):
 	
@@ -127,7 +129,6 @@ def declare_branches(tree):
 	tree.Branch('HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12', HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12, 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12/I')
 	tree.Branch('HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12', HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12, 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12/I')
 	
-
 	tree.Branch('L1_nJet', L1_nJet, 'L1_nJet/I')
 	tree.Branch('L1_jet_pt', L1_jet_pt, 'L1_jet_pt[L1_nJet]/F')
 	tree.Branch('L1_jet_energy', L1_jet_energy, 'L1_jet_energy[L1_nJet]/F')
@@ -141,6 +142,8 @@ def declare_branches(tree):
 	tree.Branch('L1_met_eta', L1_met_eta, 'L1_met_eta/F')
 	tree.Branch('L1_met_phi', L1_met_phi, 'L1_met_phi/F')
 	
+	tree.Branch('containsLepton', containsLepton, 'containsLepton/I')
+
 	print('######## Branches declared ########')
 
 

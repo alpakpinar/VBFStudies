@@ -36,6 +36,8 @@ def applyVBFSelections(event):
 
 	if mjj < 500: return False
 
+	if event.containsLepton != 0: return False #Lepton veto
+
 	return True
 
 def applyL1Selection(event):

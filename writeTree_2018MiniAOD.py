@@ -15,6 +15,8 @@ from DataFormats.FWLite import Handle, Events
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', '--test', help = 'Only go over the first file for testing', action = 'store_true')
+parser.add_argument('-s', '--shortTest', help = 'Only go over the first 100 events in the first file for testing', action = 'store_true')
+
 args = parser.parse_args()
 
 def minJetMETPhi(jets, mets):
@@ -75,6 +77,10 @@ def writeTree(inputFile):
 
 	for i, event in enumerate(events):
 
+		if args.shortTest:
+
+			if i == 100: break
+
 		event.getByLabel(electronLabel, electrons)
 		event.getByLabel(muonLabel, muons)
 		event.getByLabel(tauLabel, taus)
@@ -129,6 +135,10 @@ def writeTree(inputFile):
 	
 		if jet_pt[0] < 50: continue
 	
+		############################
+		#LEPTON ID REQUIREMENTS FOR 2018 SHOULD BE ADDED!
+		############################
+
 		electrons_ = electrons.product()
 
 		nElectron[0] = len(electrons_)
@@ -158,6 +168,14 @@ def writeTree(inputFile):
 			tau_pt[i] = tau.pt()
 			tau_eta[i] = tau.eta()
 			tau_phi[i] = tau.phi()
+
+		if nElectron[0] + nMuon[0] + nTau[0] != 0:
+
+			containsLepton[0] = 1
+
+		else: containsLepton[0] = 0
+		
+		###########################
 
 		genParticles_ = genParticles.product()
 
@@ -256,6 +274,10 @@ if __name__ == '__main__':
 
 		output = ROOT.TFile('inputs/VBF_HToInv_2018_test.root', 'RECREATE')
 
+	elif args.shortTest:
+		
+		output = ROOT.TFile('inputs/VBF_HToInv_2018_shortTest.root', 'RECREATE')
+
 	else:
 	
 		output = ROOT.TFile('inputs/VBF_HToInv_2018.root', 'RECREATE')
@@ -274,7 +296,7 @@ if __name__ == '__main__':
 	
 		t2 = time.time()
 
-		if args.test:
+		if args.test or args.shortTest:
 
 			if i == 1: break
 

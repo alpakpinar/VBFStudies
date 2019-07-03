@@ -136,9 +136,7 @@ def writeTree(inputFile):
 		if jet_pt[0] < 50: continue
 
 		###################
-		#LEPTON ID REQUIREMENTS SHOULD BE ADDED!
-		###################
-	
+
 		electrons_ = electrons.product()
 
 		nElectron[0] = 0
@@ -158,7 +156,7 @@ def writeTree(inputFile):
 
 		for mu in muons_:
 
-			if (mu.isGlobalMuon() or mu.isTrackerMuon()) and mu.isPFMuon(): #Iso requirement will be added 
+			if (mu.isGlobalMuon() or mu.isTrackerMuon()) and mu.isPFMuon() and mu.pt() > 5: #Iso requirement will be added 
 	
 				muon_pt[nMuon[0]] = mu.pt()
 				muon_eta[nMuon[0]] = mu.eta()
@@ -177,6 +175,14 @@ def writeTree(inputFile):
 				tau_eta[nTau[0]] = tau.eta()
 				tau_phi[nTau[0]] = tau.phi()
 				nTau[0] += 1
+
+		#Filling out the branch for lepton veto
+
+		if nElectron[0] + nMuon[0] + nTau[0] != 0:
+
+			containsLepton[0] = 1
+
+		else: containsLepton[0] = 0
 
 		##################
 

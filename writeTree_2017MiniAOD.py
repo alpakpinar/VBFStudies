@@ -136,33 +136,42 @@ def writeTree(inputFile):
 	
 		electrons_ = electrons.product()
 
-		nElectron[0] = len(electrons_)
+		nElectron[0] = 0
 	
-		for i, el in enumerate(electrons_):
+		for el in electrons_:
 	
-			electron_pt[i] = el.pt()
-			electron_eta[i] = el.eta()
-			electron_phi[i] = el.phi()
-		
+			if el.electronID('cutBasedElectronID-Spring15-25ns-V1-standalone-loose') == 1. and el.pt() > 10 and abs(el.eta()) < 2.5:
+	
+				electron_pt[nElectron[0]] = el.pt()
+				electron_eta[nElectron[0]] = el.eta()
+				electron_phi[nElectron[0]] = el.phi()
+				nElectron[0] += 1		
+
 		muons_ = muons.product()
 
-		nMuon[0] = len(muons_)
+		nMuon[0] = 0
 
-		for i, mu in enumerate(muons_):
+		for mu in muons_:
+
+			if (mu.isGlobalMuon() or mu.isTrackerMuon()) and mu.isPFMuon(): #Iso requirement will be added 
 	
-			muon_pt[i] = mu.pt()
-			muon_eta[i] = mu.eta()
-			muon_phi[i] = mu.phi()
+				muon_pt[nMuon[0]] = mu.pt()
+				muon_eta[nMuon[0]] = mu.eta()
+				muon_phi[nMuon[0]] = mu.phi()
+				nMuon[0] += 1
 
 		taus_ = taus.product()
 
-		nTau[0] = len(taus_)
+		nTau[0] = 0
 
-		for i, tau in enumerate(taus_):
+		for tau in taus_:
+
+			if tau.pt() > 20 and abs(tau.eta()) < 2.3: #decayModeFindingNewDMs already implemented by MiniAOD
 	
-			tau_pt[i] = tau.pt()
-			tau_eta[i] = tau.eta()
-			tau_phi[i] = tau.phi()
+				tau_pt[nTau[0]] = tau.pt()
+				tau_eta[nTau[0]] = tau.eta()
+				tau_phi[nTau[0]] = tau.phi()
+				nTau[0] += 1
 
 		##################
 

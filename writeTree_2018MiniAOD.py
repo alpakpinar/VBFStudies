@@ -18,6 +18,12 @@ parser.add_argument('-t', '--test', help = 'Only go over the first file for test
 args = parser.parse_args()
 
 def minJetMETPhi(jets, mets):
+	
+	'''
+	Calculates the minimum phi difference between four leading jets and MET.
+	If there are less than four jets in the event, it calculates the minimum phi difference by looking at all the jets.
+	'''
+	
 	jets_ = jets.product()
 	met = mets.product()[0]
 	phiDiffList = []	
@@ -185,7 +191,32 @@ def writeTree(inputFile):
 					HLT_DiJet110_35_Mjj650_PFMET130_v9[0] = 1
 				else:
 					HLT_DiJet110_35_Mjj650_PFMET130_v9[0] = 0 
+			
+			elif names.triggerNames()[i] == 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v20'
+				if triggerBits_.accept(i):
+					HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v20[0] = 1
+				else:
+					HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v20[0] = 0 
 		
+			elif names.triggerNames()[i] == 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v20'
+				if triggerBits_.accept(i):
+					HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v20[0] = 1
+				else:
+					HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v20[0] = 0 
+
+			elif names.triggerNames()[i] == 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v19'
+				if triggerBits_.accept(i):
+					HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v19[0] = 1
+				else:
+					HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v19[0] = 0 
+			
+			elif names.triggerNames()[i] == 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v19'
+				if triggerBits_.accept(i):
+					HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v19[0] = 1
+				else:
+					HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v19[0] = 0 
+
+
 		#Filling L1 level information
 		bxVector_jet = l1Jets.product()
 		bxVector_met = l1EtSums.product()	

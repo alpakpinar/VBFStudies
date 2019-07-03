@@ -19,6 +19,12 @@ parser.add_argument('-t', '--test', help = 'Only go over the first file for test
 args = parser.parse_args()
 
 def minJetMETPhi(jets, mets):
+
+	'''
+	Calculates the minimum phi difference between four leading jets and MET.
+	If there are less than four jets in the event, it calculates the minimum phi difference by looking at all the jets.
+	'''
+
 	jets_ = jets.product()
 	met = mets.product()[0]
 	phiDiffList = []	
@@ -123,6 +129,10 @@ def writeTree(inputFile):
 			minPhi_jetMET[0] = minJetMETPhi(jets, mets) #Minimum delta_phi between jets and MET
 	
 		if jet_pt[0] < 50: continue
+
+		###################
+		#LEPTON ID REQUIREMENTS SHOULD BE ADDED!
+		###################
 	
 		electrons_ = electrons.product()
 
@@ -154,6 +164,8 @@ def writeTree(inputFile):
 			tau_eta[i] = tau.eta()
 			tau_phi[i] = tau.phi()
 
+		##################
+
 		genParticles_ = genParticles.product()
 
 		nParticles[0] = len(genParticles_)
@@ -170,6 +182,8 @@ def writeTree(inputFile):
 		names = event.object().triggerNames(triggerBits_)
 
 		for i in range(triggerBits_.size()):
+
+			#VBF DiJet triggers
 
 			if names.triggerNames()[i] == 'HLT_DiJet110_35_Mjj650_PFMET110_v2':
 				if triggerBits_.accept(i):
@@ -188,6 +202,32 @@ def writeTree(inputFile):
 					HLT_DiJet110_35_Mjj650_PFMET130_v2[0] = 1
 				else:
 					HLT_DiJet110_35_Mjj650_PFMET130_v2[0] = 0 
+
+			#MET triggers
+			
+			elif names.triggerNames()[i] == 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13': 
+				if triggerBits_.accept(i):
+					HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13[0] = 1
+				else:
+					HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13[0] = 0 
+		
+			elif names.triggerNames()[i] == 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13': 
+				if triggerBits_.accept(i):
+					HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13[0] = 1
+				else:
+					HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13[0] = 0 
+
+			elif names.triggerNames()[i] == 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12': 
+				if triggerBits_.accept(i):
+					HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12[0] = 1
+				else:
+					HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12[0] = 0 
+			
+			elif names.triggerNames()[i] == 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12': 
+				if triggerBits_.accept(i):
+					HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12[0] = 1
+				else:
+					HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12[0] = 0 
 
 		#Filling L1 level information
 		bxVector_jet = l1Jets.product()

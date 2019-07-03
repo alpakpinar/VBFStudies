@@ -56,6 +56,13 @@ HLT_DiJet110_35_Mjj650_PFMET110_v2 = array('i', [0])
 HLT_DiJet110_35_Mjj650_PFMET120_v2 = array('i', [0])
 HLT_DiJet110_35_Mjj650_PFMET130_v2 = array('i', [0])
 
+#2017 MET Triggers
+
+HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13 = array('i', [0])
+HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13 = array('i', [0])
+HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12 = array('i', [0])
+HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12 = array('i', [0])
+
 #L1 Level Information for jets and MET
 
 L1_nJet = array('i', [0])
@@ -115,7 +122,12 @@ def declare_branches(tree):
 	tree.Branch('HLT_DiJet110_35_Mjj650_PFMET110_v2', HLT_DiJet110_35_Mjj650_PFMET110_v2, 'HLT_DiJet110_35_Mjj650_PFMET110_v2/I')
 	tree.Branch('HLT_DiJet110_35_Mjj650_PFMET120_v2', HLT_DiJet110_35_Mjj650_PFMET120_v2, 'HLT_DiJet110_35_Mjj650_PFMET120_v2/I')
 	tree.Branch('HLT_DiJet110_35_Mjj650_PFMET130_v2', HLT_DiJet110_35_Mjj650_PFMET130_v2, 'HLT_DiJet110_35_Mjj650_PFMET130_v2/I')
+	tree.Branch('HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13', HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13, 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13/I')
+	tree.Branch('HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13', HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13, 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13/I')
+	tree.Branch('HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12', HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12, 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12/I')
+	tree.Branch('HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12', HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12, 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12/I')
 	
+
 	tree.Branch('L1_nJet', L1_nJet, 'L1_nJet/I')
 	tree.Branch('L1_jet_pt', L1_jet_pt, 'L1_jet_pt[L1_nJet]/F')
 	tree.Branch('L1_jet_energy', L1_jet_energy, 'L1_jet_energy[L1_nJet]/F')

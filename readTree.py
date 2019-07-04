@@ -82,23 +82,25 @@ def drawTriggerEff_mjj(inputFile, trigger):
 
 		if event.mjj < 500: continue
 
-		mjj_hist_afterVBFCuts.Fill(mjj)
+		mjj_hist_afterVBFCuts.Fill(event.mjj)
 
 		print('Filled the first one')		
 
-		trigger_bit = event.trigger
+		if trigger == 'HLT_DiJet110_35_Mjj650_PFMET110_v2':
+		
+			trigger_bit = event.HLT_DiJet110_35_Mjj650_PFMET110_v2
 
 		if trigger_bit == 1:
 
-			mjj_hist_afterVBFCutsAndTrigger.Fill(mjj)
+			mjj_hist_afterVBFCutsAndTrigger.Fill(event.mjj)
 			
 			print('Filled the second one')
 
 	#Check if the two histograms are consistent
 
-	if ROOT.TEfficiency.CheckConsistency(mjj_hist_afterVBFCuts, mjj_hist_afterVBFCutsAndTrigger):
+	if ROOT.TEfficiency.CheckConsistency(mjj_hist_afterVBFCutsAndTrigger, mjj_hist_afterVBFCuts):
 
-		eff_graph = ROOT.TEfficiency(mjj_hist_afterVBFCuts, mjj_hist_afterVBFCutsAndTrigger)
+		eff_graph = ROOT.TEfficiency(mjj_hist_afterVBFCutsAndTrigger, mjj_hist_afterVBFCuts)
 
 		eff_graph.Write('eff_graph')
 

@@ -12,6 +12,7 @@ def getFileType():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-y', '--year', help = 'The production year for MiniAOD file (2017 or 2018)', type = int)
 	parser.add_argument('-t', '--test', help = 'Run over the test file', action = 'store_true')
+	parser.add_argument('-s', '--shortTest', help = 'Run over the short test file', action = 'store_true')
 	parser.add_argument('-c', '--clean', help = 'Clean the ROOT file by deleting all previous histograms', action = 'store_true')
 	args = parser.parse_args()
 
@@ -49,255 +50,61 @@ def deltaR(prt1, prt2):
 
 ###########################
 
-def invMassTwoJets(event):
-	
-	totalEnergy = event.jet_energy[0] + event.jet_energy[1]
-	totalPx = event.jet_px[0] + event.jet_px[1]			
-	totalPy = event.jet_py[0] + event.jet_py[1]			
-	totalPz = event.jet_pz[0] + event.jet_pz[1]			
-	
-	mjj = sqrt(totalEnergy**2 - totalPx**2 - totalPy**2 - totalPz**2) #Invariant mass of two leading jets
-
-	return mjj
-
-def calculateTriggerEff_leadingJetEta(inputFile, trigger, eta_lowerBound, eta_upperBound):
+def drawTriggerEff_mjj(inputFile, trigger):
 
 	'''
-	Calculates the efficiency (acceptance) of a given trigger as a function of eta.
+	Constructs the trigger efficiency graph for a given trigger, as a functtion of invariant mass of two leading jets, mjj.
 	'''
+	
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
 
-	event_count_afterVBF = 0
-	event_count_afterALL = 0 
+	mjj_array = array('f', [500., 530., 560., 600., 640., 680., 730., 790., 880., 1000.]) 
 
+	mjj_hist_afterVBFCuts = ROOT.TH1F('mjj_hist_afterVBFCuts', 'mjj_hist_afterVBFCuts', len(mjj_array)-1, mjj_array)	
+
+	mjj_hist_afterVBFCutsAndTrigger = ROOT.TH1F('mjj_hist_afterVBFCutsAndTrigger', 'mjj_hist_afterVBFCutsAndTrigger', len(mjj_array)-1, mjj_array)
+
+	#Filling the two histograms
+	
 	for event in f.eventTree:
 
-		leadingJetEta = event.jet_eta[0]
+		if not (event.containsLepton == 0 and event.contains_bJet == 0): continue #Lepton and b-jet veto in VBF cuts
 
-		if eta_lowerBound < leadingJetEta < eta_upperBound:
+		if event.met < 200: continue
+
+		if not (event.jet_pt[0] > 80 and event.jet_pt[1] > 40): continue
+
+		if event.minPhi_jetMET < 0.5: continue
+
+		if event.jet_eta[0] * event.jet_eta[1] > 0: continue
+
+		if abs(event.jet_eta[0] - event.jet_eta[1]) < 2.5: continue
+
+		if event.mjj < 500: continue
+
+		mjj_hist_afterVBFCuts.Fill(mjj)
+
+		print('Filled the first one')		
+
+		trigger_bit = event.trigger
+
+		if trigger_bit == 1:
+
+			mjj_hist_afterVBFCutsAndTrigger.Fill(mjj)
 			
-			if applyVBFSelections(event): #VBF selections only
+			print('Filled the second one')
+
+	#Check if the two histograms are consistent
+
+	if ROOT.TEfficiency.CheckConsistency(mjj_hist_afterVBFCuts, mjj_hist_afterVBFCutsAndTrigger):
+
+		eff_graph = ROOT.TEfficiency(mjj_hist_afterVBFCuts, mjj_hist_afterVBFCutsAndTrigger)
+
+		eff_graph.Write('eff_graph')
+
+		print('Efficiency graph constructed!')
 		
-				event_count_afterVBF += 1
-		
-			if applyAllSelections(event, trigger): #VBF + L1 + HLT selections
-				
-				event_count_afterALL += 1
-
-	f.Close()
-
-	print(event_count_afterVBF, event_count_afterALL)
-
-	try:
-		
-		eff = event_count_afterALL/event_count_afterVBF
-
-	except ZeroDivisionError:
-
-		eff = 0.0
-
-	return eff 
-
-def drawTriggerEff_leadingJetEta(inputFile, trigger, eta_range = [0., 2.4], eta_step = 0.1):
-
-	'''
-	Draws the efficiency graph of a given trigger as a function of leading jet eta.
-	Eta values in the given eta_range will be considered. By default, this interval is [0, 2.4]
-	Efficiencies will be calculated with a eta jump of 0.1 by default, this can be changed by specifying eta_step option while calling this function.
-	'''
-	eta_values = array('f', [])
-	efficiencies = array('f', [])
-
-	for eta in range(eta_range[0], eta_range[1]+eta_step, eta_step):
-
-		eta_values.append(eta)
-
-		eff = calculateTriggerEff_leadingJetEta(inputFile, trigger, eta, eta + eta_step)
-
-		efficiencies.append(eff)
-
-	n = len(eta_values)
-
-	f = ROOT.TFile.Open(inputFile, 'UPDATE')
-
-	c = ROOT.TCanvas('c', 'c', 800, 600)
-	c.SetGrid()
-	
-	eff_graph = ROOT.TGraph(n, eta_values, efficiencies)
-
-	eff_graph.SetLineColor(4)
-	eff_graph.SetMarkerStyle(20)
-	eff_graph.SetTitle(trigger)
-	eff_graph.GetXaxis().SetTitle('#Eta (GeV)')
-	eff_graph.GetYaxis().SetTitle('Acceptance')
-
-	eff_graph.Draw('ACP')
-
-	c.SaveAs('TriggerEff_leadingJetEta.png')
-
-	f.Write()
-	f.Close()
-	
-
-def calculateTriggerEff_MET(inputFile, trigger, MET_lowerBound, MET_upperBound):
-	
-	'''
-	Calculates and returns the efficiency (acceptance) of given trigger as a function of MET.
-	'''
-	f = ROOT.TFile.Open(inputFile, 'UPDATE')
-
-	event_count_afterVBF = 0
-	event_count_afterALL = 0 
-
-	for event in f.eventTree:
-
-		met = event.met
-	
-		if MET_lowerBound < met < MET_upperBound:
-			
-			if applyVBFSelections(event): #VBF selections only
-		
-				event_count_afterVBF += 1
-		
-			if applyAllSelections(event, trigger): #VBF + L1 + HLT selections
-				
-				event_count_afterALL += 1
-
-	f.Close()
-
-	print(event_count_afterVBF, event_count_afterALL)
-
-	try:
-		
-		eff = event_count_afterALL/event_count_afterVBF
-
-	except ZeroDivisionError:
-
-		eff = 0.0
-
-	return eff 
-
-
-def drawTriggerEff_MET(inputFile, trigger, MET_range = [75, 200], MET_step=5):
-
-	'''
-	Draws the efficiency graph of a given trigger as a function of MET.
-	MET values in the given MET_range will be considered. By default, this interval is [75,200]. 
-	Efficiencies will be calculated with a MET jump of 5 by default, this can be changed by specifying MET_step option while calling this function.
-	'''
-
-	MET_values = array('f', [])
-	efficiencies = array('f', [])
-
-	for met in range(MET_range[0], MET_range[1] + MET_step, MET_step):
-
-		MET_values.append(met)
-		
-		eff = calculateTriggerEff_MET(inputFile, trigger, met, met + MET_step)
-
-		efficiencies.append(eff)
-
-	n = len(MET_values)
-
-	f = ROOT.TFile.Open(inputFile, 'UPDATE')
-
-	c = ROOT.TCanvas('c', 'c', 800, 600)
-	c.SetGrid()
-	
-	eff_graph = ROOT.TGraph(n, MET_values, efficiencies)
-
-	eff_graph.SetLineColor(4)
-	eff_graph.SetMarkerStyle(20)
-	eff_graph.SetTitle(trigger)
-	eff_graph.GetXaxis().SetTitle('MET (GeV)')
-	eff_graph.GetYaxis().SetTitle('Acceptance')
-
-	eff_graph.Draw('ACP')
-
-	c.SaveAs('TriggerEff_MET.png')
-
-	f.Write()
-	f.Close()
-
-def calculateTriggerEff_mjj(inputFile, trigger, mjj_lowerBound, mjj_upperBound):
-
-	'''
-	Calculates and returns the efficiency (acceptance) of given trigger as a function of invariant mass of two leading jets, mjj.
-	'''
-
-	f = ROOT.TFile.Open(inputFile, 'UPDATE')
-
-	event_count_afterVBF = 0
-	event_count_afterALL = 0 
-
-	for event in f.eventTree:
-
-		mjj = invMassTwoJets(event) 
-
-		if mjj_lowerBound < mjj < mjj_upperBound:
-
-			if applyVBFSelections(event): #VBF selections only
-		
-				event_count_afterVBF += 1
-		
-			if applyAllSelections(event, trigger): #VBF + L1 + HLT selections
-				
-				event_count_afterALL += 1
-
-	f.Close()
-
-	print(event_count_afterVBF, event_count_afterALL)
-
-	try:
-		
-		eff = event_count_afterALL/event_count_afterVBF
-
-	except ZeroDivisionError:
-
-		eff = 0.0
-
-	return eff 
-
-def drawTriggerEff_mjj(inputFile, trigger, mjj_range = [500, 800], mjj_step=20):
-
-	'''
-	Draws the efficiency graph of a given trigger as a function of invariant mass of two leading jets. 
-	Mjj values in the given mjj_range will be considered. By default, this interval is [500, 800].
-	Efficiencies will be calculated with a mjj jump of 20 by default, this can be changed by specifying mjj_step option while calling this function.
-	'''
-
-	mjj_values = array('f', [])
-	efficiencies = array('f', [])
-
-	for mjj in range(mjj_range[0], mjj_range[1]+mjj_step, mjj_step):
-
-		mjj_values.append(float(mjj))
-		
-		eff = calculateTriggerEff_mjj(inputFile, trigger, mjj, mjj + mjj_step)
-
-		efficiencies.append(eff)
-
-	n = len(mjj_values)
-
-	f = ROOT.TFile.Open(inputFile, 'UPDATE')
-
-	c = ROOT.TCanvas('c', 'c', 800, 600)
-	c.SetGrid()
-	
-	eff_graph = ROOT.TGraph(n, mjj_values, efficiencies)
-
-	eff_graph.SetLineColor(4)
-	eff_graph.SetMarkerStyle(20)
-	eff_graph.SetTitle(trigger)
-	eff_graph.GetXaxis().SetTitle('M_{jj} (GeV)')
-	eff_graph.GetYaxis().SetTitle('Acceptance')
-
-	eff_graph.Draw('ACP')
-
-	c.SaveAs('TriggerEff_mjj.png')
-
-	f.Write()
-	f.Close()
+		print('Job finished')
 
 #############################
 
@@ -403,6 +210,12 @@ if __name__ == '__main__':
 		print('Starting job')
 		print('File: {}'.format(inputFile))
 
+	elif file_type.shortTest:
+		
+		inputFile = 'inputs/VBF_HToInv_' + str(file_type.year) + '_shortTest.root'
+		print('Starting job')
+		print('File: {}'.format(inputFile))
+	
 	else:
  
 		inputFile = 'inputs/VBF_HToInv_' + str(file_type.year) + '.root'
@@ -425,10 +238,7 @@ if __name__ == '__main__':
 
 	trigger = 'HLT_DiJet110_35_Mjj650_PFMET110_v2'
 
-	drawTriggerEff_MET(inputFile, trigger)
-	drawTriggerEff_leadingJetEta(inputFile, trigger)
 	drawTriggerEff_mjj(inputFile, trigger)
-
 
 
  

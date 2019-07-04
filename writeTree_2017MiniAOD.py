@@ -170,6 +170,15 @@ def writeTree(inputFile):
 
 		else: contains_bJet = 0
 
+		try:
+
+			absEtaDiff_leadingTwoJets[0] = abs(jet_eta[0] - jet_eta[1])
+
+		except IndexError:
+
+			print('Event contains less than 2 jets!')
+			absEtaDiff_leadingTwoJets[0] = 0
+
 		minPhi_jetMET[0] = minJetMETPhi(jets, mets) #Minimum delta_phi between jets and MET
 	
 		if jet_pt[0] < 50: continue

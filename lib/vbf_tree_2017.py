@@ -11,7 +11,6 @@ met_eta = array('f', [0.])
 #Jet information
 
 nJet = array('i', [0])
-minPhi_jetMET = array('f', [0.])
 jet_pt = array('f', max_num*[0.]) 
 jet_energy = array('f', max_num*[0.]) 
 jet_eta = array('f', max_num*[0.]) 
@@ -20,7 +19,10 @@ jet_px = array('f', max_num*[0.])
 jet_py = array('f', max_num*[0.])
 jet_pz = array('f', max_num*[0.])
 jet_btag_CSVv2 = array('f', max_num*[0.])
+
+minPhi_jetMET = array('f', [0.])
 mjj = array('f', [0.])
+absEtaDiff_leadingTwoJets = array('f', [0.])
 
 #Electron information
 
@@ -92,7 +94,6 @@ def declare_branches(tree):
 	tree.Branch('met_eta', met_eta, 'met_eta/F')
 	
 	tree.Branch('nJet', nJet, 'nJet/I')
-	tree.Branch('minPhi_jetMET', minPhi_jetMET, 'minPhi_jetMET/F')
 	tree.Branch('jet_pt', jet_pt, 'jet_pt[nJet]/F')
 	tree.Branch('jet_energy', jet_energy, 'jet_energy[nJet]/F')
 	tree.Branch('jet_eta', jet_eta, 'jet_eta[nJet]/F')
@@ -101,7 +102,10 @@ def declare_branches(tree):
 	tree.Branch('jet_py', jet_py, 'jet_py[nJet]/F')	
 	tree.Branch('jet_pz', jet_pz, 'jet_pz[nJet]/F')	
 	tree.Branch('jet_btag_CSVv2', jet_btag_CSVv2, 'jet_btag_CSVv2[nJet]/F')	
+	
+	tree.Branch('minPhi_jetMET', minPhi_jetMET, 'minPhi_jetMET/F')
 	tree.Branch('mjj', mjj, 'mjj/F')	
+	tree.Branch('absEtaDiff_leadingTwoJets', absEtaDiff_leadingTwoJets, 'absEtaDiff_leadingTwoJets/F')	
 
 	tree.Branch('nElectron', nElectron, 'nElectron/I')
 	tree.Branch('electron_pt', electron_pt, 'electron_pt[nElectron]/F')

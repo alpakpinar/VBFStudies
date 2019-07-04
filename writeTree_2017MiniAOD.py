@@ -155,8 +155,22 @@ def writeTree(inputFile):
 				if tag.first == 'pfCombinedSecondaryVertexV2BJetTags':
 	
 					jet_btag_CSVv2[i] = tag.second
+	
+		num_bJets = 0
 
-			minPhi_jetMET[0] = minJetMETPhi(jets, mets) #Minimum delta_phi between jets and MET
+		for val in jet_btag_CSVv2:
+
+			if val > 0.8484: #2017 requirements
+
+				num_bJets += 1 
+
+		if num_bJets != 0:
+			
+			contains_bJet = 1
+
+		else: contains_bJet = 0
+
+		minPhi_jetMET[0] = minJetMETPhi(jets, mets) #Minimum delta_phi between jets and MET
 	
 		if jet_pt[0] < 50: continue
 

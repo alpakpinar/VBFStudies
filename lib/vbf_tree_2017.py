@@ -79,8 +79,9 @@ L1_met = array('f', [0.])
 L1_met_eta = array('f', [0.])
 L1_met_phi = array('f', [0.])
 
-#Branch for lepton veto information
+#Branch for veto information
 containsLepton = array('i', [0]) 
+contains_bJet = array('i', [0])
 
 def declare_branches(tree):
 	
@@ -145,6 +146,7 @@ def declare_branches(tree):
 	tree.Branch('L1_met_phi', L1_met_phi, 'L1_met_phi/F')
 	
 	tree.Branch('containsLepton', containsLepton, 'containsLepton/I')
+	tree.Branch('contains_bJet', contains_bJet, 'contains_bJet/I')
 
 	print('######## Branches declared ########')
 

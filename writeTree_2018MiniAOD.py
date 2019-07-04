@@ -19,6 +19,30 @@ parser.add_argument('-s', '--shortTest', help = 'Only go over the first 100 even
 
 args = parser.parse_args()
 
+def invMassTwoJets(jets_):
+	
+	'''
+	Calculates the invariant mass of two leading jets in the event.
+	If there are less than two jets in the event, returns 0. 
+	'''
+
+	try:
+	
+		leadingJet = jets_[0]
+		trailingJet = jets_[1]
+		
+		total_p4 = leadingJet.p4() + trailingJet.p4()
+
+		mjj = total_p4.M()
+
+		return mjj
+
+	except IndexError:
+		
+		print('Event has less than 2 jets!')
+		
+		return 0
+
 def minJetMETPhi(jets, mets):
 	
 	'''
@@ -111,6 +135,7 @@ def writeTree(inputFile):
 		jets_ = jets.product()
 
 		nJet[0] = len(jets_)
+		mjj[0] = invMassTwoJets(jets_)
 
 		for i, jet in enumerate(jets_):
 

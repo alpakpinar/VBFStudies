@@ -11,11 +11,6 @@ def declareHistos():
 	nJets_hist.GetYaxis().SetTitle('Number of Events')
 	histos['nJets_hist'] = nJets_hist
 
-	mjj_hist = ROOT.TH1F('mjj_hist', 'Invariant Mass of Two Leading Jets (RECO)', 50, 0, 1500)
-	mjj_hist.GetXaxis().SetTitle('Invariant Mass (GeV)')
-	mjj_hist.GetYaxis().SetTitle('Number of Events')
-	histos['mjj_hist'] = mjj_hist	
-	
 	leadingJetPt_hist = ROOT.TH1F('leadingJetPt_hist', 'Leading Jet p_{T} (RECO)', 50, 0, 500)
 	leadingJetPt_hist.GetXaxis().SetTitle('p_{T} (GeV)')
 	leadingJetPt_hist.GetYaxis().SetTitle('Number of Events')

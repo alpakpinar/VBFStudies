@@ -50,10 +50,50 @@ def deltaR(prt1, prt2):
 
 ###########################
 
+def drawTriggerEff_MET(inputFile, trigger):
+
+	'''
+	Constructs the trigger efficiency graph for a given trigger, as a function of MET.
+	'''
+	
+	f = ROOT.TFile.Open(inputFile, 'UPDATE')
+
+	met_array = array('f', [100., 120., 140., 170., 200., 240., 290., 350., 420., 500.]) 
+
+	met_hist = ROOT.TH1F('met_hist', 'met_hist', len(met_array)-1, met_array)
+	histos['met_hist'] = met_hist
+
+	met_hist_afterVBFCuts = ROOT.TH1F('met_hist_afterVBFCuts', 'met_hist_afterVBFCuts', len(met_array)-1, met_array)	
+	histos['met_hist_afterVBFCuts'] = met_hist_afterVBFCuts
+
+	met_hist_afterVBFCutsAndTrigger = ROOT.TH1F('met_hist_afterVBFCutsAndTrigger', 'met_hist_afterVBFCutsAndTrigger', len(met_array)-1, met_array)	
+	histos['met_hist_afterVBFCutsAndTrigger'] = met_hist_afterVBFCutsAndTrigger
+
+	vbfCuts = 'containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5'
+
+	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
+
+	f.eventTree.Draw('met>>met_hist')
+	f.eventTree.Draw('met>>met_hist_afterVBFCuts', vbfCuts, '')
+	f.eventTree.Draw('met>>met_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
+	
+	#Check if the two histograms are consistent
+
+	if ROOT.TEfficiency.CheckConsistency(met_hist_afterVBFCutsAndTrigger, met_hist_afterVBFCuts):
+
+		eff_graph = ROOT.TEfficiency(met_hist_afterVBFCutsAndTrigger, met_hist_afterVBFCuts)
+
+		eff_graph.Write('eff_graph_' + trigger + '_MET')
+
+		print('Efficiency graph for MET is constructed!')
+	
+	f.Write()
+	f.Close()
+
 def drawTriggerEff_mjj(inputFile, trigger):
 
 	'''
-	Constructs the trigger efficiency graph for a given trigger, as a functtion of invariant mass of two leading jets, mjj.
+	Constructs the trigger efficiency graph for a given trigger, as a function of invariant mass of two leading jets, mjj.
 	'''
 	
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
@@ -61,10 +101,13 @@ def drawTriggerEff_mjj(inputFile, trigger):
 	mjj_array = array('f', [500., 530., 560., 600., 640., 680., 730., 790., 880., 1000.]) 
 
 	mjj_hist = ROOT.TH1F('mjj_hist', 'mjj_hist', len(mjj_array)-1, mjj_array)
+	histos['mjj_hist'] = mjj_hist
 
 	mjj_hist_afterVBFCuts = ROOT.TH1F('mjj_hist_afterVBFCuts', 'mjj_hist_afterVBFCuts', len(mjj_array)-1, mjj_array)	
-
+	histos['mjj_hist_afterVBFCuts'] = mjj_hist_afterVBFCuts
+	
 	mjj_hist_afterVBFCutsAndTrigger = ROOT.TH1F('mjj_hist_afterVBFCutsAndTrigger', 'mjj_hist_afterVBFCutsAndTrigger', len(mjj_array)-1, mjj_array)
+	histos['mjj_hist_afterVBFCutsAndTrigger'] = mjj_hist_afterVBFCutsAndTrigger
 
 	vbfCuts = 'containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5'
 
@@ -80,11 +123,9 @@ def drawTriggerEff_mjj(inputFile, trigger):
 
 		eff_graph = ROOT.TEfficiency(mjj_hist_afterVBFCutsAndTrigger, mjj_hist_afterVBFCuts)
 
-		eff_graph.Write('eff_graph')
+		eff_graph.Write('eff_graph_' + trigger + '_mjj')
 
-		print('Efficiency graph constructed!')
-		
-		print('Job finished')
+		print('Efficiency graph for mjj is constructed!')
 	
 	f.Write()
 	f.Close()
@@ -223,5 +264,6 @@ if __name__ == '__main__':
 
 	drawTriggerEff_mjj(inputFile, trigger)
 
+	drawTriggerEff_MET(inputFile, trigger)
 
  

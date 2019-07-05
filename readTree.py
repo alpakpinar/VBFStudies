@@ -60,42 +60,20 @@ def drawTriggerEff_mjj(inputFile, trigger):
 
 	mjj_array = array('f', [500., 530., 560., 600., 640., 680., 730., 790., 880., 1000.]) 
 
+	mjj_hist = ROOT.TH1F('mjj_hist', 'mjj_hist', len(mjj_array)-1, mjj_array)
+
 	mjj_hist_afterVBFCuts = ROOT.TH1F('mjj_hist_afterVBFCuts', 'mjj_hist_afterVBFCuts', len(mjj_array)-1, mjj_array)	
 
 	mjj_hist_afterVBFCutsAndTrigger = ROOT.TH1F('mjj_hist_afterVBFCutsAndTrigger', 'mjj_hist_afterVBFCutsAndTrigger', len(mjj_array)-1, mjj_array)
 
-	#Filling the two histograms
+	vbfCuts = 'containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5'
+
+	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
+
+	f.eventTree.Draw('mjj>>mjj_hist')
+	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCuts', vbfCuts, '')
+	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
 	
-	for event in f.eventTree:
-
-		if not (event.containsLepton == 0 and event.contains_bJet == 0): continue #Lepton and b-jet veto in VBF cuts
-
-		if event.met < 200: continue
-
-		if not (event.jet_pt[0] > 80 and event.jet_pt[1] > 40): continue
-
-		if event.minPhi_jetMET < 0.5: continue
-
-		if event.jet_eta[0] * event.jet_eta[1] > 0: continue
-
-		if abs(event.jet_eta[0] - event.jet_eta[1]) < 2.5: continue
-
-		if event.mjj < 500: continue
-
-		mjj_hist_afterVBFCuts.Fill(event.mjj)
-
-		print('Filled the first one')		
-
-		if trigger == 'HLT_DiJet110_35_Mjj650_PFMET110_v2':
-		
-			trigger_bit = event.HLT_DiJet110_35_Mjj650_PFMET110_v2
-
-		if trigger_bit == 1:
-
-			mjj_hist_afterVBFCutsAndTrigger.Fill(event.mjj)
-			
-			print('Filled the second one')
-
 	#Check if the two histograms are consistent
 
 	if ROOT.TEfficiency.CheckConsistency(mjj_hist_afterVBFCutsAndTrigger, mjj_hist_afterVBFCuts):
@@ -107,6 +85,9 @@ def drawTriggerEff_mjj(inputFile, trigger):
 		print('Efficiency graph constructed!')
 		
 		print('Job finished')
+	
+	f.Write()
+	f.Close()
 
 #############################
 

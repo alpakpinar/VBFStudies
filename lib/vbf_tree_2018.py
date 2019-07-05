@@ -48,6 +48,14 @@ tau_energy = array('f', max_num*[0.])
 tau_eta = array('f', max_num*[0.]) 
 tau_phi = array('f', max_num*[0.])
 
+#Photon information
+
+nPhoton = array('i', [0])
+photon_pt = array('f', max_num*[0.]) 
+photon_energy = array('f', max_num*[0.]) 
+photon_eta = array('f', max_num*[0.]) 
+photon_phi = array('f', max_num*[0.])
+
 #Gen-particles
 
 nParticles = array('i', [0])
@@ -84,6 +92,7 @@ L1_met_phi = array('f', [0.])
 #Branch for lepton veto information
 
 containsLepton = array('i', [0]) 
+containsPhoton = array('i', [0])
 contains_bJet = array('i' [0])
 
 def declare_branches(tree):
@@ -126,6 +135,12 @@ def declare_branches(tree):
 	tree.Branch('tau_phi', tau_phi, 'tau_phi[nTau]/F')
 	tree.Branch('tau_eta', tau_eta, 'tau_eta[nTau]/F')
 	tree.Branch('tau_energy', tau_energy, 'tau_energy[nTau]/F')
+	
+	tree.Branch('nPhoton', nPhoton, 'nPhoton/I')
+	tree.Branch('photon_pt', photon_pt, 'photon_pt[nPhoton]/F')
+	tree.Branch('photon_phi', photon_phi, 'photon_phi[nPhoton]/F')
+	tree.Branch('photon_eta', photon_eta, 'photon_eta[nPhoton]/F')
+	tree.Branch('photon_energy', photon_energy, 'photon_energy[nPhoton]/F')
 
 	tree.Branch('nParticles', nParticles, 'nParticles/I')
 	tree.Branch('pdgId', pdgId, 'pdgId[nParticles]/I')
@@ -152,6 +167,7 @@ def declare_branches(tree):
 	tree.Branch('L1_met_phi', L1_met_phi, 'L1_met_phi/F')
 	
 	tree.Branch('containsLepton', containsLepton, 'containsLepton/I')
+	tree.Branch('containsPhoton', containsPhoton, 'containsPhoton/I')
 	tree.Branch('contains_bJet', contains_bJet, 'contains_bJet/I')
 	
 	print('######## Branches declared ########')

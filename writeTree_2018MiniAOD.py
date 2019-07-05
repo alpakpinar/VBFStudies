@@ -182,47 +182,69 @@ def writeTree(inputFile):
 		minPhi_jetMET[0] = minJetMETPhi(jets, mets) #Minimum delta_phi between jets and MET
 		
 		if jet_pt[0] < 50: continue
-	
-		############################
-		#LEPTON ID REQUIREMENTS FOR 2018 SHOULD BE ADDED!
-		############################
 
+		################################
+	
 		electrons_ = electrons.product()
 
-		nElectron[0] = len(electrons_)
+		nElectron[0] = 0
 	
-		for i, el in enumerate(electrons_):
+		for el in electrons_:
+
+			if el.electronID('cutBasedElectronID-Fall17-94X-V2-loose') == 1 and el.pt() > 10 and abs(el.eta()) < 2.5:
 	
-			electron_pt[i] = el.pt()
-			electron_eta[i] = el.eta()
-			electron_phi[i] = el.phi()
-		
+				electron_pt[nElectron[0]] = el.pt()
+				electron_eta[nElectron[0]] = el.eta()
+				electron_phi[nElectron[0]] = el.phi()
+				nElectron[0] += 1		
+
 		muons_ = muons.product()
 
-		nMuon[0] = len(muons_)
+		nMuon[0] = 0
 
-		for i, mu in enumerate(muons_):
+		for mu in muons_:
 	
-			muon_pt[i] = mu.pt()
-			muon_eta[i] = mu.eta()
-			muon_phi[i] = mu.phi()
+			if (mu.isGlobalMuon() or mu.isTrackerMuon()) and mu.isPFMuon() and mu.pt() > 5: #Iso requirement will be added 
+
+				muon_pt[nMuon[0]] = mu.pt()
+				muon_eta[nMuon[0]] = mu.eta()
+				muon_phi[nMuon[0]] = mu.phi()
+				nMuon[0] += 1
 
 		taus_ = taus.product()
 
-		nTau[0] = len(taus_)
+		nTau[0] = 0
 
-		for i, tau in enumerate(taus_):
-	
-			tau_pt[i] = tau.pt()
-			tau_eta[i] = tau.eta()
-			tau_phi[i] = tau.phi()
+		for tau in taus_:
+		
+			if tau.pt() > 20 and abs(tau.eta()) < 2.3: #decayModeFindingNewDMs already implemented by MiniAOD	
+
+				tau_pt[nTau[0]] = tau.pt()
+				tau_eta[nTau[0]] = tau.eta()
+				tau_phi[nTau[0]] = tau.phi()
+				nTau[0] += 1
 
 		if nElectron[0] + nMuon[0] + nTau[0] != 0:
 
 			containsLepton[0] = 1
 
 		else: containsLepton[0] = 0
+	
+		nPhoton[0] = 0
 		
+		for ph in photons_:
+
+			if ph.photonID('cutBasedPhotonID-Fall17-94X-V1-loose') == 1 and abs(ph.eta()) < 2.5 and ph.pt() > 15:
+
+				photon_pt[nPhoton[0]] = ph.pt()
+				photon_eta[nPhoton[0]] = ph.eta()
+				photon_phi[nPhoton[0]] = ph.phi()
+				nPhoton[0] += 1
+	
+		if nPhoton[0] != 0: containsPhoton[0] = 1
+
+		else: containsPhoton[0] = 0
+	
 		###########################
 
 		genParticles_ = genParticles.product()

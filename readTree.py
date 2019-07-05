@@ -69,7 +69,7 @@ def drawTriggerEff_MET(inputFile, trigger):
 	met_hist_afterVBFCutsAndTrigger = ROOT.TH1F('met_hist_afterVBFCutsAndTrigger', 'met_hist_afterVBFCutsAndTrigger', len(met_array)-1, met_array)	
 	histos['met_hist_afterVBFCutsAndTrigger'] = met_hist_afterVBFCutsAndTrigger
 
-	vbfCuts = 'containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5'
+	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5'
 
 	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
 

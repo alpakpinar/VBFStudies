@@ -232,6 +232,21 @@ def writeTree(inputFile):
 
 		else: containsLepton[0] = 0
 
+		nPhoton[0] = 0
+		
+		for ph in photons_:
+
+			if ph.photonID('cutBasedPhotonID-Fall17-94X-V1-loose') == 1 and abs(ph.eta()) < 2.5 and ph.pt() > 15:
+
+				photon_pt[nPhoton[0]] = ph.pt()
+				photon_eta[nPhoton[0]] = ph.eta()
+				photon_phi[nPhoton[0]] = ph.phi()
+				nPhoton[0] += 1
+	
+		if nPhoton[0] != 0: containsPhoton[0] = 1
+
+		else: containsPhoton[0] = 0
+		
 		##################
 
 		genParticles_ = genParticles.product()

@@ -90,9 +90,19 @@ L1_met_eta = array('f', [0.])
 L1_met_phi = array('f', [0.])
 
 #Branch for veto information
+
 containsLepton = array('i', [0]) 
 containsPhoton = array('i', [0]) 
 contains_bJet = array('i', [0])
+
+#MET filters
+
+Flag_BadPFMuonFilter = array('i'. [0]) 
+Flag_goodVertices = array('i', [0])
+Flag_globalSuperTightHalo2016Filter = array('i', [0])
+Flag_HBHENoiseFilter = array('i', [0])
+Flag_HBHENoiseIsoFilter = array('i', [0])
+Flag_EcalDeadCellTriggerPrimitiveFilter = array('i', [0])
 
 def declare_branches(tree):
 	
@@ -167,6 +177,13 @@ def declare_branches(tree):
 	tree.Branch('containsLepton', containsLepton, 'containsLepton/I')
 	tree.Branch('containsPhoton', containsPhoton, 'containsPhoton/I')
 	tree.Branch('contains_bJet', contains_bJet, 'contains_bJet/I')
+
+	tree.Branch('Flag_BadPFMuonFilter', Flag_BadPFMuonFilter, 'Flag_BadPFMuonFilter/I')
+	tree.Branch('Flag_goodVertices', Flag_goodVertices, 'Flag_goodVertices/I')
+	tree.Branch('Flag_globalSuperTightHalo2016Filter', Flag_globalSuperTightHalo2016Filter, 'Flag_globalSuperTightHalo2016Filter/I')
+	tree.Branch('Flag_HBHENoiseFilter', Flag_HBHENoiseFilter, 'Flag_HBHENoiseFilter/I')
+	tree.Branch('Flag_HBHENoiseIsoFilter', Flag_HBHENoiseIsoFilter, 'Flag_HBHENoiseIsoFilter/I')
+	tree.Branch('Flag_EcalDeadCellTriggerPrimitiveFilter', Flag_EcalDeadCellTriggerPrimitiveFilter, 'Flag_EcalDeadCellTriggerPrimitiveFilter/I')
 
 	print('######## Branches declared ########')
 

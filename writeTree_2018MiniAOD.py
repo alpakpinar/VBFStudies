@@ -335,6 +335,53 @@ def writeTree(inputFile):
 			L1_jet_py[i] = jet.py()			
 			L1_jet_pz[i] = jet.pz()			
 		
+		########################
+
+		#MET cleaning filters		
+
+		filters_ = filters.product()
+	
+		filterNames = event.object().triggerNames(filters_)
+	
+		for i in range(filters_.size()):
+
+			if filterNames.triggerNames()[i] == 'Flag_BadPFMuonFilter':
+
+				if filters_.accept(i): Flag_BadPFMuonFilter[0] = 1
+
+				else: Flag_BadPFMuonFilter[0] = 0
+			
+			elif filterNames.triggerNames()[i] == 'Flag_goodVertices':
+
+				if filters_.accept(i): Flag_goodVertices[0] = 1
+
+				else: Flag_goodVertices[0] = 0
+
+			elif filterNames.triggerNames()[i] == 'Flag_globalSuperTightHalo2016Filter':
+
+				if filters_.accept(i): Flag_globalSuperTightHalo2016Filter[0] = 1
+
+				else: Flag_globalSuperTightHalo2016Filter[0] = 0
+
+			elif filterNames.triggerNames()[i] == 'Flag_HBHENoiseFilter':
+
+				if filters_.accept(i): Flag_HBHENoiseFilter[0] = 1
+
+				else: Flag_HBHENoiseFilter[0] = 0
+
+			elif filterNames.triggerNames()[i] == 'Flag_HBHENoiseIsoFilter':
+
+				if filters_.accept(i): Flag_HBHENoiseIsoFilter[0] = 1
+
+				else: Flag_HBHENoiseIsoFilter[0] = 0
+
+			elif filterNames.triggerNames()[i] == 'Flag_EcalDeadCellTriggerPrimitiveFilter':
+
+				if filters_.accept(i): Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 1
+
+				else: Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 0
+	
+	
 		eventTree.Fill()
 
 if __name__ == '__main__':

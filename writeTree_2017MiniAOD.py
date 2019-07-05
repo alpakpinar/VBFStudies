@@ -88,6 +88,8 @@ def writeTree(inputFile):
 	genParticles, genParticlesLabel = Handle('std::vector<reco::GenParticle>'), 'prunedGenParticles'
 
 	triggerBits, triggerBitLabel = Handle("edm::TriggerResults"), ("TriggerResults","","HLT")
+	filters, filterLabel = Handle("edm::TriggerResults") 
+
 	triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStandAlone>"), "slimmedPatTrigger"
 	triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"), "patTrigger"
 	l1Jets, l1JetLabel  = Handle("BXVector<l1t::Jet>"), "caloStage2Digis:Jet"
@@ -114,6 +116,7 @@ def writeTree(inputFile):
 		event.getByLabel(genParticlesLabel, genParticles)
 
 		event.getByLabel(triggerBitLabel, triggerBits)
+		event.getByLabel(filterLabel, filters)
 		event.getByLabel(triggerObjectLabel, triggerObjects)
 		event.getByLabel(triggerPrescaleLabel, triggerPrescales)
 		event.getByLabel(l1JetLabel, l1Jets)
@@ -341,7 +344,54 @@ def writeTree(inputFile):
 			L1_jet_px[i] = jet.px()			
 			L1_jet_py[i] = jet.py()			
 			L1_jet_pz[i] = jet.pz()			
-		
+
+		########################
+
+		#MET cleaning filters		
+
+		filters_ = filters.product()
+	
+		filterNames = event.object().triggerNames(filters_)
+	
+		for i in range(filters_.size()):
+
+			if filterNames.triggerNames()[i] == 'Flag_BadPFMuonFilter':
+
+				if filters_.accept(i): Flag_BadPFMuonFilter[0] = 1
+
+				else: Flag_BadPFMuonFilter[0] = 0
+			
+			elif filterNames.triggerNames()[i] == 'Flag_goodVertices':
+
+				if filters_.accept(i): Flag_goodVertices[0] = 1
+
+				else: Flag_goodVertices[0] = 0
+
+			elif filterNames.triggerNames()[i] == 'Flag_globalSuperTightHalo2016Filter':
+
+				if filters_.accept(i): Flag_globalSuperTightHalo2016Filter[0] = 1
+
+				else: Flag_globalSuperTightHalo2016Filter[0] = 0
+
+			elif filterNames.triggerNames()[i] == 'Flag_HBHENoiseFilter':
+
+				if filters_.accept(i): Flag_HBHENoiseFilter[0] = 1
+
+				else: Flag_HBHENoiseFilter[0] = 0
+
+			elif filterNames.triggerNames()[i] == 'Flag_HBHENoiseIsoFilter':
+
+				if filters_.accept(i): Flag_HBHENoiseIsoFilter[0] = 1
+
+				else: Flag_HBHENoiseIsoFilter[0] = 0
+
+			elif filterNames.triggerNames()[i] == 'Flag_EcalDeadCellTriggerPrimitiveFilter':
+
+				if filters_.accept(i): Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 1
+
+				else: Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 0
+
+	
 		eventTree.Fill()
 
 

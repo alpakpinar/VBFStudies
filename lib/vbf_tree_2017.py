@@ -97,7 +97,7 @@ contains_bJet = array('i', [0])
 
 #MET filters
 
-Flag_BadPFMuonFilter = array('i'. [0]) 
+Flag_BadPFMuonFilter = array('i', [0]) 
 Flag_goodVertices = array('i', [0])
 Flag_globalSuperTightHalo2016Filter = array('i', [0])
 Flag_HBHENoiseFilter = array('i', [0])

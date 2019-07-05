@@ -88,7 +88,7 @@ def writeTree(inputFile):
 	genParticles, genParticlesLabel = Handle('std::vector<reco::GenParticle>'), 'prunedGenParticles'
 
 	triggerBits, triggerBitLabel = Handle("edm::TriggerResults"), ("TriggerResults","","HLT")
-	filters, filterLabel = Handle("edm::TriggerResults") 
+	filters, filterLabel = Handle("edm::TriggerResults"), 'TriggerResults' 
 
 	triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStandAlone>"), "slimmedPatTrigger"
 	triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"), "patTrigger"
@@ -234,6 +234,8 @@ def writeTree(inputFile):
 			containsLepton[0] = 1
 
 		else: containsLepton[0] = 0
+
+		photons_ = photons.product()
 
 		nPhoton[0] = 0
 		

@@ -88,6 +88,8 @@ def writeTree(inputFile):
 	genParticles, genParticlesLabel = Handle('std::vector<reco::GenParticle>'), 'prunedGenParticles'
 
 	triggerBits, triggerBitLabel = Handle("edm::TriggerResults"), ("TriggerResults","","HLT")
+	filters, filterLabel = Handle("edm::TriggerResults"), 'TriggerResults' 
+	
 	triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStandAlone>"), "slimmedPatTrigger"
 	triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"), "patTrigger"
 	l1Jets, l1JetLabel  = Handle("BXVector<l1t::Jet>"), "caloStage2Digis:Jet"
@@ -114,6 +116,8 @@ def writeTree(inputFile):
 		event.getByLabel(genParticlesLabel, genParticles)
 
 		event.getByLabel(triggerBitLabel, triggerBits)
+		event.getByLabel(filterLabel, filters)
+
 		event.getByLabel(triggerObjectLabel, triggerObjects)
 		event.getByLabel(triggerPrescaleLabel, triggerPrescales)
 		event.getByLabel(l1JetLabel, l1Jets)
@@ -230,6 +234,8 @@ def writeTree(inputFile):
 
 		else: containsLepton[0] = 0
 	
+		photons_ = photons.product()
+
 		nPhoton[0] = 0
 		
 		for ph in photons_:
@@ -280,25 +286,25 @@ def writeTree(inputFile):
 				else:
 					HLT_DiJet110_35_Mjj650_PFMET130_v9[0] = 0 
 			
-			elif names.triggerNames()[i] == 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v20'
+			elif names.triggerNames()[i] == 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v20':
 				if triggerBits_.accept(i):
 					HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v20[0] = 1
 				else:
 					HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v20[0] = 0 
 		
-			elif names.triggerNames()[i] == 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v20'
+			elif names.triggerNames()[i] == 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v20':
 				if triggerBits_.accept(i):
 					HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v20[0] = 1
 				else:
 					HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v20[0] = 0 
 
-			elif names.triggerNames()[i] == 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v19'
+			elif names.triggerNames()[i] == 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v19':
 				if triggerBits_.accept(i):
 					HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v19[0] = 1
 				else:
 					HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v19[0] = 0 
 			
-			elif names.triggerNames()[i] == 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v19'
+			elif names.triggerNames()[i] == 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v19':
 				if triggerBits_.accept(i):
 					HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v19[0] = 1
 				else:

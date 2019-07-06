@@ -430,6 +430,7 @@ if __name__ == '__main__':
 	#Save the output root file
 	output.Write()
 
+	output.Close()
 	#inputFile = 'root://cmsxrootd.fnal.gov///store/mc/RunIIAutumn18MiniAOD/VBF_HToInvisible_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FDBE8CDB-175D-D942-8046-37E10DD9D6CE.root'
 
 

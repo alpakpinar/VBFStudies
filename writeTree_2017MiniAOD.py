@@ -241,7 +241,7 @@ def writeTree(inputFile):
 		
 		for ph in photons_:
 
-			if ph.photonID('cutBasedPhotonID-Fall17-94X-V1-loose') == 1 and abs(ph.eta()) < 2.5 and ph.pt() > 15:
+			if ph.photonID('PhotonCutBasedIDLoose') == 1 and abs(ph.eta()) < 2.5 and ph.pt() > 15:
 
 				photon_pt[nPhoton[0]] = ph.pt()
 				photon_eta[nPhoton[0]] = ph.eta()

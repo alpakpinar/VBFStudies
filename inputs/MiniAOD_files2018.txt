@@ -32,6 +32,3 @@ root://cmsxrootd.fnal.gov///store/mc/RunIIAutumn18MiniAOD/VBF_HToInvisible_M125_
 root://cmsxrootd.fnal.gov///store/mc/RunIIAutumn18MiniAOD/VBF_HToInvisible_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/30000/5D46314A-06FB-4E4D-BEAA-0045C7AE52C1.root
 root://cmsxrootd.fnal.gov///store/mc/RunIIAutumn18MiniAOD/VBF_HToInvisible_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/30000/29C46EB2-F4B7-AB4D-AAE7-BD3560A236D3.root
 root://cmsxrootd.fnal.gov///store/mc/RunIIAutumn18MiniAOD/VBF_HToInvisible_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/30000/112D662E-D827-9B4D-B3D2-75C41946D202.root
-
-
-

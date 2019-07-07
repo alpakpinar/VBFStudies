@@ -393,8 +393,8 @@ def writeTree(inputFile):
 
 				else: Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 0
 
-	
 		eventTree.Fill()
+
 
 
 if __name__ == '__main__':
@@ -410,11 +410,18 @@ if __name__ == '__main__':
 		output = ROOT.TFile('inputs/VBF_HToInv_2017_shortTest.root', 'RECREATE')
 
 	else:
+		
+		output = ROOT.TFile('inputs/VBF_HToInv_2017_all_newTest.root', 'RECREATE')
 	
-		output = ROOT.TFile('inputs/VBF_HToInv_2017.root', 'RECREATE')
+		#output = ROOT.TFile('inputs/VBF_HToInv_2017.root', 'RECREATE')
 
 	#Create a new ROOT TTree
 	eventTree = ROOT.TTree('eventTree', 'eventTree')
+
+	#####################
+	#eventTree.AutoSave()
+	#output.SaveSelf()
+	#####################
 	
 	#Initialize the variables and create branches	
 	declare_branches(eventTree)
@@ -429,14 +436,19 @@ if __name__ == '__main__':
 
 		if args.test or args.shortTest:
 
-			if i == 1: break
+			if i == 3: break
 
 		print('Working on file {0:<5d} t = {1:.2f}'.format(i+1, t2-t1))
 		
 		writeTree(filename)
+
+		if i%10 == 0:
 	
-	#Save the output root file
-	output.Write()
+			output.cd() #Go to the file directory
+			
+			#Save the output root file
+			#eventTree.Write('eventTree')
+			output.Write()
 
 	output.Close()
 	#inputFile = 'root://cmsxrootd.fnal.gov///store/mc/RunIISummer17MiniAOD/VBF_HToInvisible_M125_13TeV_powheg_pythia8/MINIAODSIM/NZSFlatPU28to62_92X_upgrade2017_realistic_v10-v1/50000/CE13A08A-579E-E711-B9BB-001E67E5E8B6.root'	

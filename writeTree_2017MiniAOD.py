@@ -38,16 +38,15 @@ def invMassTwoJets(jets_):
 		
 		return 0
 
-def minJetMETPhi(jets, mets):
+def minJetMETPhi(jets_, mets_):
 
 	'''
 	Calculates the minimum phi difference between four leading jets and MET.
 	If there are less than four jets in the event, it calculates the minimum phi difference by looking at all the jets.
 	'''
 
-	jets_ = jets.product()
-	met = mets.product()[0]
 	phiDiffList = []	
+	met = mets_[0]
 
 	if len(jets_) <= 4:
 		for j in jets_:
@@ -82,14 +81,13 @@ def writeTree(inputFile, tree, args):
 	mets, metLabel = Handle('std::vector<pat::MET>'), 'slimmedMETs'
 	genParticles, genParticlesLabel = Handle('std::vector<reco::GenParticle>'), 'prunedGenParticles'
 
-	triggerBits, triggerBitLabel = Handle("edm::TriggerResults"), ("TriggerResults","","HLT")
-	filters, filterLabel = Handle("edm::TriggerResults"), 'TriggerResults' 
+	triggerBits, triggerBitLabel = Handle('edm::TriggerResults'), ('TriggerResults','','HLT')
+	filterLabel = 'TriggerResults'
 
 	triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStandAlone>"), "slimmedPatTrigger"
-	triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"), "patTrigger"
 	l1Jets, l1JetLabel  = Handle("BXVector<l1t::Jet>"), "caloStage2Digis:Jet"
 	l1EtSums, l1EtSumLabel  = Handle("BXVector<l1t::EtSum>"), "caloStage2Digis:EtSum"
-
+	
 	events = Events(inputFile)
 
 	print('Took the input file successfully')
@@ -111,22 +109,23 @@ def writeTree(inputFile, tree, args):
 		event.getByLabel(genParticlesLabel, genParticles)
 
 		event.getByLabel(triggerBitLabel, triggerBits)
-		event.getByLabel(filterLabel, filters)
+		#event.getByLabel(filterLabel, filters)
 		event.getByLabel(triggerObjectLabel, triggerObjects)
-		event.getByLabel(triggerPrescaleLabel, triggerPrescales)
 		event.getByLabel(l1JetLabel, l1Jets)
 		event.getByLabel(l1EtSumLabel, l1EtSums)
 
 		t2 = time.time()
 
-#		if numEvent % 100 == 0 and numEvent != 0:		
-#			print('Analyzing event # %d , Time: %.2f' % (numEvent , t2-t1))
+		if numEvent % 1000 == 0 and numEvent != 0:		
+			print('Analyzing event # %d , Time: %.2f' % (numEvent , t2-t1))
 	
 		#Storing kinemaic values of interest	
 		
-		met[0] = mets.product()[0].pt()
-		met_phi[0] = mets.product()[0].phi()
-		met_eta[0] = mets.product()[0].eta()
+		mets_ = mets.product()
+
+		met[0] = mets_[0].pt()
+		met_phi[0] = mets_[0].phi()
+		met_eta[0] = mets_[0].eta()
 
 		if met[0] < 50: continue
 
@@ -177,7 +176,7 @@ def writeTree(inputFile, tree, args):
 			print('Event contains less than 2 jets!')
 			absEtaDiff_leadingTwoJets[0] = 0
 
-		minPhi_jetMET[0] = minJetMETPhi(jets, mets) #Minimum delta_phi between jets and MET
+		minPhi_jetMET[0] = minJetMETPhi(jets_, mets_) #Minimum delta_phi between jets and MET
 	
 		if jet_pt[0] < 50: continue
 
@@ -247,7 +246,7 @@ def writeTree(inputFile, tree, args):
 
 		else: containsPhoton[0] = 0
 		
-		##################
+		#########################
 
 		genParticles_ = genParticles.product()
 
@@ -260,40 +259,24 @@ def writeTree(inputFile, tree, args):
 		
 		triggerBits_ = triggerBits.product()
 
-		#print(type(triggerBits_))
-
-		#print('Number of trigger paths: %d' % triggerBits_.size())
-
 		names = event.object().triggerNames(triggerBits_)
-
-		##########################
-	
-		#print(type(names))
-
-		#print(triggerBits_.size())
-
-		if numEvent < 2:
 		
-			print(names.triggerNames())
-
-			for name in names.triggerNames():
-
-				print(name)
-
-		##########################		
+		##########################
 
 		for k in range(triggerBits_.size()):
 
 			#VBF DiJet triggers
 
-			if names.triggerNames()[k] == 'HLT_DiJet110_35_Mjj650_PFMET110_v2':
+			if names.triggerName(k) == 'HLT_DiJet110_35_Mjj650_PFMET110_v2':
+				print('Inside the first if')		
+	
 				if triggerBits_.accept(k):
 					HLT_DiJet110_35_Mjj650_PFMET110_v2[0] = 1
-					print('In the if statement!')
+					print('In the second if statement!')
 					print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
 				else:
 					HLT_DiJet110_35_Mjj650_PFMET110_v2[0] = 0 
-					print('In the if statement!')
+					print('In the second if statement!')
 					print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
  
 
@@ -339,7 +322,7 @@ def writeTree(inputFile, tree, args):
 		bxVector_jet = l1Jets.product()
 		bxVector_met = l1EtSums.product()	
 	
-		bx=0 #Check!
+		bx=0 
 
 		for i in range(bxVector_met.size(bx)):
 
@@ -369,48 +352,48 @@ def writeTree(inputFile, tree, args):
 
 		#Cleaning filters		
 
-		filters_ = filters.product()
-	
-		filterNames = event.object().triggerNames(filters_)
-	
-		for numFilter in range(filters_.size()):
-
-			if filterNames.triggerNames()[numFilter] == 'Flag_BadPFMuonFilter':
-
-				if filters_.accept(numFilter): Flag_BadPFMuonFilter[0] = 1
-
-				else: Flag_BadPFMuonFilter[0] = 0
-			
-			elif filterNames.triggerNames()[numFilter] == 'Flag_goodVertices':
-
-				if filters_.accept(numFilter): Flag_goodVertices[0] = 1
-
-				else: Flag_goodVertices[0] = 0
-
-			elif filterNames.triggerNames()[numFilter] == 'Flag_globalSuperTightHalo2016Filter':
-
-				if filters_.accept(numFilter): Flag_globalSuperTightHalo2016Filter[0] = 1
-
-				else: Flag_globalSuperTightHalo2016Filter[0] = 0
-
-			elif filterNames.triggerNames()[numFilter] == 'Flag_HBHENoiseFilter':
-
-				if filters_.accept(numFilter): Flag_HBHENoiseFilter[0] = 1
-
-				else: Flag_HBHENoiseFilter[0] = 0
-
-			elif filterNames.triggerNames()[numFilter] == 'Flag_HBHENoiseIsoFilter':
-
-				if filters_.accept(numFilter): Flag_HBHENoiseIsoFilter[0] = 1
-
-				else: Flag_HBHENoiseIsoFilter[0] = 0
-
-			elif filterNames.triggerNames()[numFilter] == 'Flag_EcalDeadCellTriggerPrimitiveFilter':
-
-				if filters_.accept(numFilter): Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 1
-
-				else: Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 0
-
+#		filters_ = filters.product()
+#	
+#		filterNames = event.object().triggerNames(filters_)
+#	
+#		for numFilter in range(filters_.size()):
+#
+#			if filterNames.triggerNames()[numFilter] == 'Flag_BadPFMuonFilter':
+#
+#				if filters_.accept(numFilter): Flag_BadPFMuonFilter[0] = 1
+#
+#				else: Flag_BadPFMuonFilter[0] = 0
+#			
+#			elif filterNames.triggerNames()[numFilter] == 'Flag_goodVertices':
+#
+#				if filters_.accept(numFilter): Flag_goodVertices[0] = 1
+#
+#				else: Flag_goodVertices[0] = 0
+#
+#			elif filterNames.triggerNames()[numFilter] == 'Flag_globalSuperTightHalo2016Filter':
+#
+#				if filters_.accept(numFilter): Flag_globalSuperTightHalo2016Filter[0] = 1
+#
+#				else: Flag_globalSuperTightHalo2016Filter[0] = 0
+#
+#			elif filterNames.triggerNames()[numFilter] == 'Flag_HBHENoiseFilter':
+#
+#				if filters_.accept(numFilter): Flag_HBHENoiseFilter[0] = 1
+#
+#				else: Flag_HBHENoiseFilter[0] = 0
+#
+#			elif filterNames.triggerNames()[numFilter] == 'Flag_HBHENoiseIsoFilter':
+#
+#				if filters_.accept(numFilter): Flag_HBHENoiseIsoFilter[0] = 1
+#
+#				else: Flag_HBHENoiseIsoFilter[0] = 0
+#
+#			elif filterNames.triggerNames()[numFilter] == 'Flag_EcalDeadCellTriggerPrimitiveFilter':
+#
+#				if filters_.accept(numFilter): Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 1
+#
+#				else: Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 0
+#
 		tree.Fill()
 
 def main():
@@ -419,7 +402,7 @@ def main():
 	parser.add_argument('-t', '--test', help = 'Only go over the first file for testing', action = 'store_true')
 	parser.add_argument('-s', '--shortTest', help = 'Only go over the first 100 events in the first file for testing', action = 'store_true')
 	args = parser.parse_args()
-
+	
 	#Create a new ROOT file
 
 	if args.test:
@@ -438,11 +421,6 @@ def main():
 
 	#Create a new ROOT TTree
 	eventTree = ROOT.TTree('eventTree', 'eventTree')
-
-	#####################
-	#eventTree.AutoSave()
-	#output.SaveSelf()
-	#####################
 	
 	#Initialize the variables and create branches	
 	declare_branches(eventTree)
@@ -450,6 +428,7 @@ def main():
 	t1 = time.time()
 
 	f = file('inputs/MiniAOD_files2017.txt', 'r')
+
 
 	for numFile, filename in enumerate(f.readlines()):
 	
@@ -459,14 +438,10 @@ def main():
 
 			if numFile == 1: break
 
-		################Testing
-		#print('Printing the content!')
-		#output.cd()
-		#output.ls()
-		################
-
 		print('Working on file {0:<5d} t = {1:.2f}'.format(numFile+1, t2-t1))
-		
+	
+		print('Filename: {}'.format(filename))
+	
 		writeTree(filename, eventTree, args)
 
 		output.ls()
@@ -476,7 +451,6 @@ def main():
 			output.cd() #Go to the file directory
 			
 			#Save the output root file
-			#eventTree.Write('eventTree')
 			output.Write()
 
 	output.Close()
@@ -484,7 +458,7 @@ def main():
 
 
 if __name__ == '__main__':
-
+	
 	main()
 
 	

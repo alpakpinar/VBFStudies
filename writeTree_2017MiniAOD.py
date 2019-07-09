@@ -13,12 +13,7 @@ ROOT.FWLiteEnabler.enable()
 
 # load FWlite python libraries
 from DataFormats.FWLite import Handle, Events	
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-t', '--test', help = 'Only go over the first file for testing', action = 'store_true')
-parser.add_argument('-s', '--shortTest', help = 'Only go over the first 100 events in the first file for testing', action = 'store_true')
-args = parser.parse_args()
-
+	
 def invMassTwoJets(jets_):
 	
 	'''
@@ -77,7 +72,7 @@ def minJetMETPhi(jets, mets):
 	return min(phiDiffList)
 
 
-def writeTree(inputFile):
+def writeTree(inputFile, tree, args):
 	
 	electrons, electronLabel = Handle('std::vector<pat::Electron>'), 'slimmedElectrons'
 	muons, muonLabel = Handle('std::vector<pat::Muon>'), 'slimmedMuons'
@@ -101,11 +96,11 @@ def writeTree(inputFile):
 
 	t1 = time.time()
 
-	for i, event in enumerate(events):
+	for numEvent, event in enumerate(events):
 
 		if args.shortTest:
 			
-			if i == 100: break
+			if numEvent == 100: break
 
 		event.getByLabel(electronLabel, electrons)
 		event.getByLabel(muonLabel, muons)
@@ -124,8 +119,8 @@ def writeTree(inputFile):
 
 		t2 = time.time()
 
-		if i % 100 == 0 and i != 0:		
-			print('Analyzing event # %d , Time: %.2f' % (i , t2-t1))
+#		if numEvent % 100 == 0 and numEvent != 0:		
+#			print('Analyzing event # %d , Time: %.2f' % (numEvent , t2-t1))
 	
 		#Storing kinemaic values of interest	
 		
@@ -258,61 +253,84 @@ def writeTree(inputFile):
 
 		nParticles[0] = len(genParticles_)
 	
-		for i, prt in enumerate(genParticles_):
+		for j, prt in enumerate(genParticles_):
 
-			pdgId[i] = prt.pdgId()
+			pdgId[j] = prt.pdgId()
 			#mothers[i] = prt.mother()
 		
 		triggerBits_ = triggerBits.product()
+
+		#print(type(triggerBits_))
 
 		#print('Number of trigger paths: %d' % triggerBits_.size())
 
 		names = event.object().triggerNames(triggerBits_)
 
-		for i in range(triggerBits_.size()):
+		##########################
+	
+		#print(type(names))
+
+		#print(triggerBits_.size())
+
+		if numEvent < 2:
+		
+			print(names.triggerNames())
+
+			for name in names.triggerNames():
+
+				print(name)
+
+		##########################		
+
+		for k in range(triggerBits_.size()):
 
 			#VBF DiJet triggers
 
-			if names.triggerNames()[i] == 'HLT_DiJet110_35_Mjj650_PFMET110_v2':
-				if triggerBits_.accept(i):
+			if names.triggerNames()[k] == 'HLT_DiJet110_35_Mjj650_PFMET110_v2':
+				if triggerBits_.accept(k):
 					HLT_DiJet110_35_Mjj650_PFMET110_v2[0] = 1
+					print('In the if statement!')
+					print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
 				else:
 					HLT_DiJet110_35_Mjj650_PFMET110_v2[0] = 0 
+					print('In the if statement!')
+					print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
  
-			elif names.triggerNames()[i] == 'HLT_DiJet110_35_Mjj650_PFMET120_v2':
-				if triggerBits_.accept(i):
+
+			elif names.triggerNames()[k] == 'HLT_DiJet110_35_Mjj650_PFMET120_v2':
+				if triggerBits_.accept(k):
 					HLT_DiJet110_35_Mjj650_PFMET120_v2[0] = 1
 				else:
 					HLT_DiJet110_35_Mjj650_PFMET120_v2[0] = 0 
 			
-			elif names.triggerNames()[i] == 'HLT_DiJet110_35_Mjj650_PFMET130_v2':
-				if triggerBits_.accept(i):
+			elif names.triggerNames()[k] == 'HLT_DiJet110_35_Mjj650_PFMET130_v2':
+				if triggerBits_.accept(k):
 					HLT_DiJet110_35_Mjj650_PFMET130_v2[0] = 1
 				else:
 					HLT_DiJet110_35_Mjj650_PFMET130_v2[0] = 0 
 
 			#MET triggers
 			
-			elif names.triggerNames()[i] == 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13': 
-				if triggerBits_.accept(i):
+			elif names.triggerNames()[k] == 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13': 
+				if triggerBits_.accept(k):
 					HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13[0] = 1
 				else:
 					HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13[0] = 0 
 		
-			elif names.triggerNames()[i] == 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13': 
-				if triggerBits_.accept(i):
+			elif names.triggerNames()[k] == 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13': 
+				if triggerBits_.accept(k):
 					HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13[0] = 1
 				else:
 					HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13[0] = 0 
 
-			elif names.triggerNames()[i] == 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12': 
-				if triggerBits_.accept(i):
+			elif names.triggerNames()[k] == 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12': 
+				if triggerBits_.accept(k):
 					HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12[0] = 1
 				else:
 					HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12[0] = 0 
 			
-			elif names.triggerNames()[i] == 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12': 
-				if triggerBits_.accept(i):
+			elif names.triggerNames()[k] == 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12': 
+				if triggerBits_.accept(k):
 					HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12[0] = 1
 				else:
 					HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12[0] = 0 
@@ -349,55 +367,58 @@ def writeTree(inputFile):
 
 		########################
 
-		#MET cleaning filters		
+		#Cleaning filters		
 
 		filters_ = filters.product()
 	
 		filterNames = event.object().triggerNames(filters_)
 	
-		for i in range(filters_.size()):
+		for numFilter in range(filters_.size()):
 
-			if filterNames.triggerNames()[i] == 'Flag_BadPFMuonFilter':
+			if filterNames.triggerNames()[numFilter] == 'Flag_BadPFMuonFilter':
 
-				if filters_.accept(i): Flag_BadPFMuonFilter[0] = 1
+				if filters_.accept(numFilter): Flag_BadPFMuonFilter[0] = 1
 
 				else: Flag_BadPFMuonFilter[0] = 0
 			
-			elif filterNames.triggerNames()[i] == 'Flag_goodVertices':
+			elif filterNames.triggerNames()[numFilter] == 'Flag_goodVertices':
 
-				if filters_.accept(i): Flag_goodVertices[0] = 1
+				if filters_.accept(numFilter): Flag_goodVertices[0] = 1
 
 				else: Flag_goodVertices[0] = 0
 
-			elif filterNames.triggerNames()[i] == 'Flag_globalSuperTightHalo2016Filter':
+			elif filterNames.triggerNames()[numFilter] == 'Flag_globalSuperTightHalo2016Filter':
 
-				if filters_.accept(i): Flag_globalSuperTightHalo2016Filter[0] = 1
+				if filters_.accept(numFilter): Flag_globalSuperTightHalo2016Filter[0] = 1
 
 				else: Flag_globalSuperTightHalo2016Filter[0] = 0
 
-			elif filterNames.triggerNames()[i] == 'Flag_HBHENoiseFilter':
+			elif filterNames.triggerNames()[numFilter] == 'Flag_HBHENoiseFilter':
 
-				if filters_.accept(i): Flag_HBHENoiseFilter[0] = 1
+				if filters_.accept(numFilter): Flag_HBHENoiseFilter[0] = 1
 
 				else: Flag_HBHENoiseFilter[0] = 0
 
-			elif filterNames.triggerNames()[i] == 'Flag_HBHENoiseIsoFilter':
+			elif filterNames.triggerNames()[numFilter] == 'Flag_HBHENoiseIsoFilter':
 
-				if filters_.accept(i): Flag_HBHENoiseIsoFilter[0] = 1
+				if filters_.accept(numFilter): Flag_HBHENoiseIsoFilter[0] = 1
 
 				else: Flag_HBHENoiseIsoFilter[0] = 0
 
-			elif filterNames.triggerNames()[i] == 'Flag_EcalDeadCellTriggerPrimitiveFilter':
+			elif filterNames.triggerNames()[numFilter] == 'Flag_EcalDeadCellTriggerPrimitiveFilter':
 
-				if filters_.accept(i): Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 1
+				if filters_.accept(numFilter): Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 1
 
 				else: Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 0
 
-		eventTree.Fill()
+		tree.Fill()
 
+def main():
 
-
-if __name__ == '__main__':
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-t', '--test', help = 'Only go over the first file for testing', action = 'store_true')
+	parser.add_argument('-s', '--shortTest', help = 'Only go over the first 100 events in the first file for testing', action = 'store_true')
+	args = parser.parse_args()
 
 	#Create a new ROOT file
 
@@ -411,9 +432,9 @@ if __name__ == '__main__':
 
 	else:
 		
-		output = ROOT.TFile('inputs/VBF_HToInv_2017_all_newTest.root', 'RECREATE')
+		#output = ROOT.TFile('inputs/VBF_HToInv_2017_first10Files_newTest.root', 'RECREATE')
 	
-		#output = ROOT.TFile('inputs/VBF_HToInv_2017.root', 'RECREATE')
+		output = ROOT.TFile('inputs/VBF_HToInv_2017_new.root', 'RECREATE')
 
 	#Create a new ROOT TTree
 	eventTree = ROOT.TTree('eventTree', 'eventTree')
@@ -430,19 +451,27 @@ if __name__ == '__main__':
 
 	f = file('inputs/MiniAOD_files2017.txt', 'r')
 
-	for i, filename in enumerate(f.readlines()):
+	for numFile, filename in enumerate(f.readlines()):
 	
 		t2 = time.time()
 
 		if args.test or args.shortTest:
 
-			if i == 3: break
+			if numFile == 1: break
 
-		print('Working on file {0:<5d} t = {1:.2f}'.format(i+1, t2-t1))
+		################Testing
+		#print('Printing the content!')
+		#output.cd()
+		#output.ls()
+		################
+
+		print('Working on file {0:<5d} t = {1:.2f}'.format(numFile+1, t2-t1))
 		
-		writeTree(filename)
+		writeTree(filename, eventTree, args)
 
-		if i%10 == 0:
+		output.ls()
+
+		if numFile%10 == 0:
 	
 			output.cd() #Go to the file directory
 			
@@ -452,7 +481,11 @@ if __name__ == '__main__':
 
 	output.Close()
 	#inputFile = 'root://cmsxrootd.fnal.gov///store/mc/RunIISummer17MiniAOD/VBF_HToInvisible_M125_13TeV_powheg_pythia8/MINIAODSIM/NZSFlatPU28to62_92X_upgrade2017_realistic_v10-v1/50000/CE13A08A-579E-E711-B9BB-001E67E5E8B6.root'	
-	
+
+
+if __name__ == '__main__':
+
+	main()
 
 	
 

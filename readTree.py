@@ -68,8 +68,10 @@ def drawTriggerEff_MET(inputFile, trigger):
 
 	met_hist_afterVBFCutsAndTrigger = ROOT.TH1F('met_hist_afterVBFCutsAndTrigger', 'met_hist_afterVBFCutsAndTrigger', len(met_array)-1, met_array)	
 	histos['met_hist_afterVBFCutsAndTrigger'] = met_hist_afterVBFCutsAndTrigger
+	
+	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5'
 
-	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5 && Flag_BadPFMuonFilter == 1 && Flag_goodVertices == 1 && Flag_globalSuperTightHalo2016Filter == 1 && Flag_HBHENoiseFilter == 1 && Flag_HBHENoiseIsoFilter == 1 && Flag_EcalDeadCellTriggerPrimitiveFilter == 1'
+	#vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5 && Flag_BadPFMuonFilter == 1 && Flag_goodVertices == 1 && Flag_globalSuperTightHalo2016Filter == 1 && Flag_HBHENoiseFilter == 1 && Flag_HBHENoiseIsoFilter == 1 && Flag_EcalDeadCellTriggerPrimitiveFilter == 1'
 
 	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
 
@@ -108,8 +110,10 @@ def drawTriggerEff_mjj(inputFile, trigger):
 	
 	mjj_hist_afterVBFCutsAndTrigger = ROOT.TH1F('mjj_hist_afterVBFCutsAndTrigger', 'mjj_hist_afterVBFCutsAndTrigger', len(mjj_array)-1, mjj_array)
 	histos['mjj_hist_afterVBFCutsAndTrigger'] = mjj_hist_afterVBFCutsAndTrigger
+	
+	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5'
 
-	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5 && Flag_BadPFMuonFilter == 1 && Flag_goodVertices == 1 && Flag_globalSuperTightHalo2016Filter == 1 && Flag_HBHENoiseFilter == 1 && Flag_HBHENoiseIsoFilter == 1 && Flag_EcalDeadCellTriggerPrimitiveFilter == 1'
+	#vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5 && Flag_BadPFMuonFilter == 1 && Flag_goodVertices == 1 && Flag_globalSuperTightHalo2016Filter == 1 && Flag_HBHENoiseFilter == 1 && Flag_HBHENoiseIsoFilter == 1 && Flag_EcalDeadCellTriggerPrimitiveFilter == 1'
 
 	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
 
@@ -260,10 +264,11 @@ if __name__ == '__main__':
 
 	#readTree(inputFile) 
 
-	trigger = 'HLT_DiJet110_35_Mjj650_PFMET110_v2'
+	triggers = ['HLT_DiJet110_35_Mjj650_PFMET110_v2', 'HLT_DiJet110_35_Mjj650_PFMET120_v2', 'HLT_DiJet110_35_Mjj650_PFMET130_v2', 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13', 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13', 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12', 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12']
 
-	drawTriggerEff_mjj(inputFile, trigger)
+	for trigger in triggers:
 
-	drawTriggerEff_MET(inputFile, trigger)
+		drawTriggerEff_mjj(inputFile, trigger)
 
- 
+		drawTriggerEff_MET(inputFile, trigger)
+

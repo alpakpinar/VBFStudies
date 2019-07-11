@@ -268,16 +268,16 @@ def writeTree(inputFile, tree, args):
 			#VBF DiJet triggers
 
 			if names.triggerName(k) == 'HLT_DiJet110_35_Mjj650_PFMET110_v2':
-				print('Inside the first if')		
+				#print('Inside the first if')		
 	
 				if triggerBits_.accept(k):
 					HLT_DiJet110_35_Mjj650_PFMET110_v2[0] = 1
-					print('In the second if statement!')
-					print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
+					#print('In the second if statement!')
+					#print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
 				else:
 					HLT_DiJet110_35_Mjj650_PFMET110_v2[0] = 0 
-					print('In the second if statement!')
-					print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
+					#print('In the second if statement!')
+					#print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
  
 
 			elif names.triggerNames()[k] == 'HLT_DiJet110_35_Mjj650_PFMET120_v2':

@@ -5,57 +5,57 @@ def applyVBFSelections(tree):
 
 	'''
 	Applies VBF selections and tracks the number of events throughout each cut.
-	Returns the dictionary of event counts at different stages in the cut flow.
+	Returns the list of labels and event counts at different stages in the cut flow.
 	'''
-	keys = ['total', 'METCut', 'LeadingJetPtCut', 'TrailingJetPtCut', 'MinPhiJetMETCut', 'NegEtaProductCut', 'EtaDiffCut', 'bJetCut', 'LeptonVeto', 'PhotonVeto', 'mjjCut']
+	labels = ['total', 'METCut', 'LeadJetPt', 'TrailJetPt', 'MinPhiJetMET', 'NegEtaProd', 'EtaDiff', 'bJetCut', 'LeptonVeto', 'PhotonVeto', 'mjjCut']
 
- 	eventCounter = {key:0 for key in keys}
+ 	eventCounter = [0 for key in keys] 
 
 	for event in tree:
 
-		eventCounter['total'] += 1
+		eventCounter[0] += 1
 	
 		if event.met < 200: continue
 
-		eventCounter['METCut'] += 1
+		eventCounter[1] += 1
 
 		if event.jet_pt[0] < 80: continue
 
-		eventCounter['LeadingJetPtCut'] += 1
+		eventCounter[2] += 1
 
 		if event.jet_pt[1] < 40: continue
 		
-		eventCounter['TrailingJetPtCut'] += 1
+		eventCounter[3] += 1
 
 		if event.minPhi_jetMET < 0.5: continue
 
-		eventCounter['MinPhiJetMETCut'] += 1
+		eventCounter[4] += 1
 
 		if event.jet_eta[0] * event.jet_eta[1] > 0: continue
 
-		eventCounter['NegEtaProductCut'] += 1
+		eventCounter[5] += 1
 
 		if abs(event.jet_eta[0] - event.jet_eta[1]) < 2.5: continue
 
-		eventCounter['EtaDiffCut'] += 1
+		eventCounter[6] += 1
 
 		if event.contains_bJet != 0: continue
 
-		eventCounter['bJetCut'] += 1
+		eventCounter[7] += 1
 
 		if event.containsLepton != 0: continue
 
-		eventCounter['LeptonVeto'] += 1
+		eventCounter[8] += 1
 
 		if event.containsPhoton != 0: continue
 
-		eventCounter['PhotonVeto'] += 1
+		eventCounter[9] += 1
 		
 		if event.mjj < 500: continue
 
-		eventCounter['mjjCut'] += 1
+		eventCounter[10] += 1
 
-	return eventCounter
+	return labels, eventCounter
 
 def applyL1Selection(event):
 	

@@ -84,7 +84,6 @@ def writeTree(inputFile, tree, args):
 	triggerBits, triggerBitLabel = Handle('edm::TriggerResults'), ('TriggerResults','','HLT')
 	filterLabel = 'TriggerResults'
 
-	triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStandAlone>"), "slimmedPatTrigger"
 	l1Jets, l1JetLabel  = Handle("BXVector<l1t::Jet>"), "caloStage2Digis:Jet"
 	l1EtSums, l1EtSumLabel  = Handle("BXVector<l1t::EtSum>"), "caloStage2Digis:EtSum"
 	
@@ -110,7 +109,6 @@ def writeTree(inputFile, tree, args):
 
 		event.getByLabel(triggerBitLabel, triggerBits)
 		#event.getByLabel(filterLabel, filters)
-		event.getByLabel(triggerObjectLabel, triggerObjects)
 		event.getByLabel(l1JetLabel, l1Jets)
 		event.getByLabel(l1EtSumLabel, l1EtSums)
 
@@ -273,11 +271,11 @@ def writeTree(inputFile, tree, args):
 				if triggerBits_.accept(k):
 					HLT_DiJet110_35_Mjj650_PFMET110_v5[0] = 1
 					print('In the second if statement!')
-					print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
+					print(HLT_DiJet110_35_Mjj650_PFMET110_v5[0])
 				else:
 					HLT_DiJet110_35_Mjj650_PFMET110_v5[0] = 0 
 					print('In the second if statement!')
-					print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
+					print(HLT_DiJet110_35_Mjj650_PFMET110_v5[0])
  
 
 			elif names.triggerNames()[k] == 'HLT_DiJet110_35_Mjj650_PFMET120_v5':

@@ -129,27 +129,26 @@ def drawTriggerEff_MET(inputFile, trigger, count):
 	
 	f.Close()
 
-def drawTriggerEff_mjj(inputFile, trigger):
+def drawTriggerEff_mjj(inputFile, trigger, count):
 
 	'''
 	Constructs the trigger efficiency graph for a given trigger, as a function of invariant mass of two leading jets, mjj.
 	'''
 
-	eff_graphs_mjj = {}
-	
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
 
 	mjj_array = array('f', [500., 520., 540., 570., 600., 640., 680., 730., 790., 880., 1000.]) 
 
 	mjj_hist = ROOT.TH1F('mjj_hist', 'mjj_hist', len(mjj_array)-1, mjj_array)
-	histos['mjj_hist'] = mjj_hist
 
 	mjj_hist_afterVBFCuts = ROOT.TH1F('mjj_hist_afterVBFCuts', 'mjj_hist_afterVBFCuts', len(mjj_array)-1, mjj_array)	
-	histos['mjj_hist_afterVBFCuts'] = mjj_hist_afterVBFCuts
+	mjj_hist_afterVBFCuts.SetLineColor(ROOT.kRed)
 	
-	mjj_hist_afterVBFCutsAndTrigger = ROOT.TH1F('mjj_hist_afterVBFCutsAndTrigger', 'mjj_hist_afterVBFCutsAndTrigger', len(mjj_array)-1, mjj_array)
-	histos['mjj_hist_afterVBFCutsAndTrigger_' + trigger] = mjj_hist_afterVBFCutsAndTrigger
-	
+	mjj_hist_withTriggers[trigger] = ROOT.TH1F('mjj_hist_afterVBFCutsAndTrigger', 'mjj_hist_afterVBFCutsAndTrigger', len(mjj_array)-1, mjj_array)
+	mjj_hist_withTriggers[trigger].SetLineColor(ROOT.kBlack)
+
+	mjj_hist_afterVBFCutsAndTrigger = mjj_hist_withTriggers[trigger]
+
 	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5'
 
 	#vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5 && Flag_BadPFMuonFilter == 1 && Flag_goodVertices == 1 && Flag_globalSuperTightHalo2016Filter == 1 && Flag_HBHENoiseFilter == 1 && Flag_HBHENoiseIsoFilter == 1 && Flag_EcalDeadCellTriggerPrimitiveFilter == 1'
@@ -309,11 +308,13 @@ if __name__ == '__main__':
 	
 	eff_graphs_MET = {}
 	met_hist_withTriggers = {}	
-
+	
+	eff_graphs_mjj = {}
+	mjj_hist_withTriggers = {}
 
 	for count, trigger in enumerate(triggers):
 
-		#drawTriggerEff_mjj(inputFile, trigger, count)
+		drawTriggerEff_mjj(inputFile, trigger, count)
 
 		drawTriggerEff_MET(inputFile, trigger, count)
 

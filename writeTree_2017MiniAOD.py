@@ -401,7 +401,6 @@ def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-t', '--test', help = 'Only go over the first file for testing', action = 'store_true')
 	parser.add_argument('-s', '--shortTest', help = 'Only go over the first 100 events in the first file for testing', action = 'store_true')
-	parser.add_argument('-l', '--local', help = 'Read from local files', action = 'store_true')
 	args = parser.parse_args()
 	
 	#Create a new ROOT file
@@ -415,10 +414,8 @@ def main():
 		output = ROOT.TFile('inputs/VBF_HToInv_2017_shortTest.root', 'RECREATE')
 
 	else:
-		
-		#output = ROOT.TFile('inputs/VBF_HToInv_2017_first10Files_newTest.root', 'RECREATE')
 	
-		output = ROOT.TFile('inputs/VBF_HToInv_2017_new.root', 'RECREATE')
+		output = ROOT.TFile('inputs/VBF_HToInv_2017.root', 'RECREATE')
 
 	#Create a new ROOT TTree
 	eventTree = ROOT.TTree('eventTree', 'eventTree')
@@ -428,57 +425,28 @@ def main():
 	
 	t1 = time.time()
 
-	if args.local:
+	f = file('inputs/MiniAOD_files2017.txt', 'r')
 
-		inputDir = 'inputs/ROOT_MCFiles'
+	for numFile, filename in enumerate(f.readlines()):
+	
+		t2 = time.time()
 
-		for numFile, inputFile in enumerate(os.listdir(inputDir)):
+		if args.test or args.shortTest:
 
-			t2 = time.time()
+			if numFile == 1: break
 
-			if args.test or args.shortTest:
+		print('Working on file {0:<5d} t = {1:.2f}'.format(numFile+1, t2-t1))
+	
+		print('Filename: {}'.format(filename))
+	
+		writeTree(filename, eventTree, args)
 
-				if numFile == 1: break
-
-			filename = os.path.join(inputDir, inputFile)
-
-			print('Working on file {0:<5d} t = {1:.2f}'.format(numFile+1, t2-t1))
-		
-			print('Filename: {}'.format(filename))
-		
-			writeTree(filename, eventTree, args)
-
-			if numFile%10 == 0:
-		
-				output.cd() #Go to the file directory
-				
-				#Save the output root file
-				output.Write()				
-
-	else:
-
-		f = file('inputs/MiniAOD_files2017.txt', 'r')
-
-		for numFile, filename in enumerate(f.readlines()):
-		
-			t2 = time.time()
-
-			if args.test or args.shortTest:
-
-				if numFile == 1: break
-
-			print('Working on file {0:<5d} t = {1:.2f}'.format(numFile+1, t2-t1))
-		
-			print('Filename: {}'.format(filename))
-		
-			writeTree(filename, eventTree, args)
-
-			if numFile%10 == 0:
-		
-				output.cd() #Go to the file directory
-				
-				#Save the output root file
-				output.Write()
+		if numFile%10 == 0:
+	
+			output.cd() #Go to the file directory
+			
+			#Save the output root file
+			output.Write()
 
 	output.Close()
 	#inputFile = 'root://cmsxrootd.fnal.gov///store/mc/RunIISummer17MiniAOD/VBF_HToInvisible_M125_13TeV_powheg_pythia8/MINIAODSIM/NZSFlatPU28to62_92X_upgrade2017_realistic_v10-v1/50000/CE13A08A-579E-E711-B9BB-001E67E5E8B6.root'	

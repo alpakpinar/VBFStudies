@@ -9,7 +9,7 @@ def applyVBFSelections(tree):
 	'''
 	labels = ['total', 'METCut', 'LeadJetPt', 'TrailJetPt', 'MinPhiJetMET', 'NegEtaProd', 'EtaDiff', 'bJetCut', 'LeptonVeto', 'PhotonVeto', 'mjjCut']
 
- 	eventCounter = [0 for key in keys] 
+ 	eventCounter = [0 for label in labels] 
 
 	for event in tree:
 

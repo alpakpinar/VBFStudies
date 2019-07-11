@@ -14,6 +14,7 @@ def getFileType():
 	parser.add_argument('-t', '--test', help = 'Run over the test file', action = 'store_true')
 	parser.add_argument('-s', '--shortTest', help = 'Run over the short test file', action = 'store_true')
 	parser.add_argument('-c', '--clean', help = 'Clean the ROOT file by deleting all previous histograms', action = 'store_true')
+	parser.add_argument('-n', '--noWrite', help = 'Do not write the efficiency graphs and histograms to the ROOT file', action = 'store_true')
 	args = parser.parse_args()
 
 	return args
@@ -61,7 +62,7 @@ def deltaR(prt1, prt2):
 
 ###########################
 
-def drawTriggerEff_MET(inputFile, trigger, count):
+def drawTriggerEff_MET(inputFile, trigger, args):
 
 	'''
 	Constructs the trigger efficiency graph for a given trigger, as a function of MET.
@@ -124,15 +125,17 @@ def drawTriggerEff_MET(inputFile, trigger, count):
 
 		print('Efficiency graph for ' + trigger + ' with respect to MET is constructed!')
 
-	met_hist.Write('met_hist')
-	met_hist_afterVBFCuts.Write('met_hist_afterVBFCuts')
-	met_hist_withTriggers[trigger].Write('met_hist_afterVBFCutsAndTrigger_' + trigger)
+	if not args.noWrite:
+
+		met_hist.Write('met_hist')
+		met_hist_afterVBFCuts.Write('met_hist_afterVBFCuts')
+		met_hist_withTriggers[trigger].Write('met_hist_afterVBFCutsAndTrigger_' + trigger)
 	
 	f.Close()
 
 	return met_hist_withTriggers[trigger], eff_graphs_MET[trigger]
 
-def drawTriggerEff_mjj(inputFile, trigger, count):
+def drawTriggerEff_mjj(inputFile, trigger, args):
 
 	'''
 	Constructs the trigger efficiency graph for a given trigger, as a function of invariant mass of two leading jets, mjj.
@@ -174,8 +177,11 @@ def drawTriggerEff_mjj(inputFile, trigger, count):
 		eff_graphs_mjj[trigger].Write('eff_graph_' + trigger + '_mjj')
 
 		print('Efficiency graph for ' + trigger + ' with respect to mjj is constructed!')
+
+	if not args.noWrite:
 	
-	f.Write()
+		f.Write()
+	
 	f.Close()
 
 	return mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger]
@@ -350,8 +356,10 @@ if __name__ == '__main__':
 
 	for count, trigger in enumerate(triggers):
 
-		mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, count)
+		mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type)
 
-		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, count)
+		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type)
+
+	print(met_hist_withTriggers)
 
 	drawCompGraph_MET(triggers[0], triggers[3], met_hist_withTriggers)

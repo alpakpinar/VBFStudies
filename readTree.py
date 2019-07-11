@@ -111,6 +111,9 @@ def drawTriggerEff_MET(inputFile, trigger, args):
 	f.eventTree.Draw('met>>met_hist_afterVBFCuts', vbfCuts, '')
 	f.eventTree.Draw('met>>met_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
 	
+	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
+	print('Events passing VBF cuts + {}: {}'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
+	
 	#Check if the two histograms are consistent
 
 	if ROOT.TEfficiency.CheckConsistency(met_hist_afterVBFCutsAndTrigger, met_hist_afterVBFCuts):
@@ -167,7 +170,8 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
 
 	####
-	print(f.eventTree.GetEntries(vbfAndTriggerCuts))
+	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
+	print('Events passing VBF cuts + {}: {}'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
 	####	
 
 	#Check if the two histograms are consistent
@@ -196,7 +200,7 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 
 #############################
 
-def drawCompGraph_MET(trigger1, trigger2, met_hist_withTriggers):
+def drawCompGraph_MET(trigger1, trigger2, legendLabel1, legendLabel2,  met_hist_withTriggers):
 
 	'''
 	Draws the VBF cuts + trigger acceptance graph for two triggers, as a function of MET.
@@ -205,28 +209,78 @@ def drawCompGraph_MET(trigger1, trigger2, met_hist_withTriggers):
 	ROOT.gStyle.SetOptStat(0)
 
 	hist1 = met_hist_withTriggers[trigger1]	
-	hist1.GetXaxis().SetTitle('MET (GeV)')
-	hist1.GetYaxis().SetTitle('Number of Events')
 	hist1.SetLineColor(ROOT.kBlack)
+	hist1.SetLineWidth(2)
 	
 	hist2 = met_hist_withTriggers[trigger2]	
 	hist2.SetLineColor(ROOT.kRed)
+	hist2.SetLineWidth(2)
+	hist2.GetXaxis().SetTitle('MET (GeV)')
+	hist2.GetYaxis().SetTitle('Number of Events')
 
-	legend = ROOT.TLegend(0.6, 0.6, 0.9, 0.9)
+	legend = ROOT.TLegend(0.6, 0.6, 0.85, 0.85)
 	legend.SetBorderSize(0)
 	
-	legend.AddEntry(hist1, trigger1, 'l')
-	legend.AddEntry(hist2, trigger2, 'l')
+	legend.AddEntry(hist1, legendLabel1, 'l')
+	legend.AddEntry(hist2, legendLabel2, 'l')
 
 	canv = ROOT.TCanvas('canv', 'canv')
 
-	hist1.Draw()
-	hist2.Draw('same')
+	hist2.Draw()
+	hist1.Draw('same')
 	legend.Draw('same')
 
 	filename = trigger1 + '_' + trigger2 + '_MET.png'
 	canv.Print(filename)
 
+##########################
+#TO BE TESTED
+##########################
+
+def drawCutFlow(inputFile):
+
+	'''
+	Draws the cut flow diagram for VBF cuts, given an input tree.
+	'''
+
+	f = ROOT.TFile.Open(inputFile, 'UPDATE')
+	tree = f.eventTree
+
+	eventCounts = applyVBFSelections(tree)	
+	
+	canv = ROOT.TCanvas('canv', 'canv', 800, 600)
+	canv.SetGrid()
+
+	cutFlowGraph = ROOT.TGraph(len(eventCounts.keys()))
+
+	cutFlowGraph.SetNameTitle('evtCounts', 'Event Counts After Each VBF Cut')
+
+	x_ax = cutFlowGraph.GetXaxis()
+	
+	x_ax.Set(len(eventCounts.keys()), 0, len(eventCounts.keys()))
+
+	for i in range(len(eventCounts.keys())):
+
+		cutFlowGraph.SetPoint(i, i, eventCounts[eventCounts.keys()[i]]*100/eventCounts[eventCounts.keys()[0]]) #Filling the graph with percentage of events passing through each cut
+		x_ax.SetBinLabel(i+1, eventCounts.keys()[i]) #Labeling the x-axis
+	
+	x_ax.LabelsOption("v")
+	x_ax.SetTitle('Cuts')
+	x_ax.SetTitleOffset(1.4)
+	x_ax.SetLabelSize(0.03)
+	
+	cutFlowGraph.GetYaxis().SetTitle('% Events Passing')
+
+	cutFlowGraph.SetMarkerStyle(20)
+	cutFlowGraph.Draw("AP")
+	
+	canv.Print('VBF_CutFlowDiagram2017.png')
+
+	f.Close()
+	
+############################
+#TO BE TESTED
+############################
 
 def readTree(inputFile):
 
@@ -356,7 +410,9 @@ if __name__ == '__main__':
 
 	#readTree(inputFile) 
 
-	triggers = ['HLT_DiJet110_35_Mjj650_PFMET110_v2', 'HLT_DiJet110_35_Mjj650_PFMET120_v2', 'HLT_DiJet110_35_Mjj650_PFMET130_v2', 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13', 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13', 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12', 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12']
+	triggers = ['HLT_DiJet110_35_Mjj650_PFMET110_v5', 'HLT_DiJet110_35_Mjj650_PFMET120_v5', 'HLT_DiJet110_35_Mjj650_PFMET130_v5', 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v16', 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v16', 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v15', 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v15']
+
+	legendLabels = ['VBF_MET110', 'VBF_MET120', 'VBF_MET130', 'METNoMu110', 'METNoMu120', 'METNoMu130', 'METNoMu140']
 	
 	eff_graphs_MET = {}
 	met_hist_withTriggers = {}	
@@ -370,4 +426,4 @@ if __name__ == '__main__':
 
 		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type)
 
-	drawCompGraph_MET(triggers[0], triggers[3], met_hist_withTriggers)
+	drawCompGraph_MET(triggers[0], triggers[3], legendLabels[0], legendLabels[3], met_hist_withTriggers)

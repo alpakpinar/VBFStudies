@@ -267,56 +267,56 @@ def writeTree(inputFile, tree, args):
 
 			#VBF DiJet triggers
 
-			if names.triggerName(k) == 'HLT_DiJet110_35_Mjj650_PFMET110_v2':
-				#print('Inside the first if')		
+			if names.triggerName(k) == 'HLT_DiJet110_35_Mjj650_PFMET110_v5':
+				print('Inside the first if')		
 	
 				if triggerBits_.accept(k):
-					HLT_DiJet110_35_Mjj650_PFMET110_v2[0] = 1
-					#print('In the second if statement!')
-					#print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
+					HLT_DiJet110_35_Mjj650_PFMET110_v5[0] = 1
+					print('In the second if statement!')
+					print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
 				else:
-					HLT_DiJet110_35_Mjj650_PFMET110_v2[0] = 0 
-					#print('In the second if statement!')
-					#print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
+					HLT_DiJet110_35_Mjj650_PFMET110_v5[0] = 0 
+					print('In the second if statement!')
+					print(HLT_DiJet110_35_Mjj650_PFMET110_v2[0])
  
 
-			elif names.triggerNames()[k] == 'HLT_DiJet110_35_Mjj650_PFMET120_v2':
+			elif names.triggerNames()[k] == 'HLT_DiJet110_35_Mjj650_PFMET120_v5':
 				if triggerBits_.accept(k):
-					HLT_DiJet110_35_Mjj650_PFMET120_v2[0] = 1
+					HLT_DiJet110_35_Mjj650_PFMET120_v5[0] = 1
 				else:
-					HLT_DiJet110_35_Mjj650_PFMET120_v2[0] = 0 
+					HLT_DiJet110_35_Mjj650_PFMET120_v5[0] = 0 
 			
-			elif names.triggerNames()[k] == 'HLT_DiJet110_35_Mjj650_PFMET130_v2':
+			elif names.triggerNames()[k] == 'HLT_DiJet110_35_Mjj650_PFMET130_v5':
 				if triggerBits_.accept(k):
-					HLT_DiJet110_35_Mjj650_PFMET130_v2[0] = 1
+					HLT_DiJet110_35_Mjj650_PFMET130_v5[0] = 1
 				else:
-					HLT_DiJet110_35_Mjj650_PFMET130_v2[0] = 0 
+					HLT_DiJet110_35_Mjj650_PFMET130_v5[0] = 0 
 
 			#MET triggers
 			
-			elif names.triggerNames()[k] == 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13': 
+			elif names.triggerNames()[k] == 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v16': 
 				if triggerBits_.accept(k):
-					HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13[0] = 1
+					HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v16[0] = 1
 				else:
-					HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v13[0] = 0 
+					HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v16[0] = 0 
 		
-			elif names.triggerNames()[k] == 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13': 
+			elif names.triggerNames()[k] == 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v16': 
 				if triggerBits_.accept(k):
-					HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13[0] = 1
+					HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v16[0] = 1
 				else:
-					HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v13[0] = 0 
+					HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v16[0] = 0 
 
-			elif names.triggerNames()[k] == 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12': 
+			elif names.triggerNames()[k] == 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v15': 
 				if triggerBits_.accept(k):
-					HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12[0] = 1
+					HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v15[0] = 1
 				else:
-					HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v12[0] = 0 
+					HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v15[0] = 0 
 			
-			elif names.triggerNames()[k] == 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12': 
+			elif names.triggerNames()[k] == 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v15': 
 				if triggerBits_.accept(k):
-					HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12[0] = 1
+					HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v15[0] = 1
 				else:
-					HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v12[0] = 0 
+					HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v15[0] = 0 
 
 		#Filling L1 level information
 		bxVector_jet = l1Jets.product()

@@ -246,24 +246,28 @@ def drawCutFlow(inputFile):
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
 	tree = f.eventTree
 
-	eventCounts = applyVBFSelections(tree)	
-	
+	labels, eventCounts = applyVBFSelections(tree)	
+
 	canv = ROOT.TCanvas('canv', 'canv', 800, 600)
 	canv.SetGrid()
 
-	cutFlowGraph = ROOT.TGraph(len(eventCounts.keys()))
+	cutFlowGraph = ROOT.TGraph(len(eventCounts))
 
 	cutFlowGraph.SetNameTitle('evtCounts', 'Event Counts After Each VBF Cut')
 
 	x_ax = cutFlowGraph.GetXaxis()
-	
-	x_ax.Set(len(eventCounts.keys()), 0, len(eventCounts.keys()))
 
-	for i in range(len(eventCounts.keys())):
+	x_ax.Set(len(eventCounts), 0, len(eventCounts))
 
-		cutFlowGraph.SetPoint(i, i, eventCounts[eventCounts.keys()[i]]*100/eventCounts[eventCounts.keys()[0]]) #Filling the graph with percentage of events passing through each cut
-		x_ax.SetBinLabel(i+1, eventCounts.keys()[i]) #Labeling the x-axis
-	
+	for i in range(len(eventCounts)):
+		
+		x_ax.SetBinLabel(i+1, labels[i]) #Labeling the x-axis
+
+		cutFlowGraph.SetPoint(i, i, eventCounts[i]*100/eventCounts[0]) #Filling the graph with percentage of events passing through each cut
+		print(x_ax.GetBinLabel(i+1))
+
+	print(x_ax.GetXmax())
+
 	x_ax.LabelsOption("v")
 	x_ax.SetTitle('Cuts')
 	x_ax.SetTitleOffset(1.4)
@@ -272,6 +276,7 @@ def drawCutFlow(inputFile):
 	cutFlowGraph.GetYaxis().SetTitle('% Events Passing')
 
 	cutFlowGraph.SetMarkerStyle(20)
+
 	cutFlowGraph.Draw("AP")
 	
 	canv.Print('VBF_CutFlowDiagram2017.png')
@@ -420,10 +425,12 @@ if __name__ == '__main__':
 	eff_graphs_mjj = {}
 	mjj_hist_withTriggers = {}
 
-	for count, trigger in enumerate(triggers):
+	#for count, trigger in enumerate(triggers):
 
-		mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type)
+	#	mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type)
 
-		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type)
+	#	met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type)
 
-	drawCompGraph_MET(triggers[0], triggers[3], legendLabels[0], legendLabels[3], met_hist_withTriggers)
+	#drawCompGraph_MET(triggers[0], triggers[3], legendLabels[0], legendLabels[3], met_hist_withTriggers)
+
+	drawCutFlow(inputFile)

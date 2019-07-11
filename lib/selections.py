@@ -1,44 +1,61 @@
 import ROOT
 from math import sqrt
 
-def applyVBFSelections(event):
+def applyVBFSelections(tree):
 
 	'''
-	Applies VBF selections for a given event.
-	Returns True if event passes the cuts, otherwise returns False.
+	Applies VBF selections and tracks the number of events throughout each cut.
+	Returns the dictionary of event counts at different stages in the cut flow.
 	'''
-		
-	if event.met < 200: return False
+	keys = ['total', 'METCut', 'LeadingJetPtCut', 'TrailingJetPtCut', 'MinPhiJetMETCut', 'NegEtaProductCut', 'EtaDiffCut', 'bJetCut', 'LeptonVeto', 'PhotonVeto', 'mjjCut']
 
-	if not (event.jet_pt[0] > 80 and event.jet_pt[1] > 40): return False
+ 	eventCounter = {key:0 for key in keys}
 
-	if event.minPhi_jetMET < 0.5: return False
+	for event in tree:
 
-	if event.jet_eta[0] * event.jet_eta[1] > 0: return False
-
-	if abs(event.jet_eta[0] - event.jet_eta[1]) < 2.5: return False
-
-	num_bJets = 0
-
-	for val in event.jet_btag_CSVv2:
-		
-		if val > 0.8484: #2017 requirements			
-			num_bJets += 1	
-
-	if num_bJets != 0: return False #b-jet veto
-
-	totalEnergy = event.jet_energy[0] + event.jet_energy[1]
-	totalPx = event.jet_px[0] + event.jet_px[1]			
-	totalPy = event.jet_py[0] + event.jet_py[1]			
-	totalPz = event.jet_pz[0] + event.jet_pz[1]			
+		eventCounter['total'] += 1
 	
-	mjj = sqrt(totalEnergy**2 - totalPx**2 - totalPy**2 - totalPz**2) #Invariant mass of two leading jets
+		if event.met < 200: continue
 
-	if mjj < 500: return False
+		eventCounter['METCut'] += 1
 
-	if event.containsLepton != 0: return False #Lepton veto
+		if event.jet_pt[0] < 80: continue
 
-	return True
+		eventCounter['LeadingJetPtCut'] += 1
+
+		if event.jet_pt[1] < 40: continue
+		
+		eventCounter['TrailingJetPtCut'] += 1
+
+		if event.minPhi_jetMET < 0.5: continue
+
+		eventCounter['MinPhiJetMETCut'] += 1
+
+		if event.jet_eta[0] * event.jet_eta[1] > 0: continue
+
+		eventCounter['NegEtaProductCut'] += 1
+
+		if abs(event.jet_eta[0] - event.jet_eta[1]) < 2.5: continue
+
+		eventCounter['EtaDiffCut'] += 1
+
+		if event.contains_bJet != 0: continue
+
+		eventCounter['bJetCut'] += 1
+
+		if event.containsLepton != 0: continue
+
+		eventCounter['LeptonVeto'] += 1
+
+		if event.containsPhoton != 0: continue
+
+		eventCounter['PhotonVeto'] += 1
+		
+		if event.mjj < 500: continue
+
+		eventCounter['mjjCut'] += 1
+
+	return eventCounter
 
 def applyL1Selection(event):
 	

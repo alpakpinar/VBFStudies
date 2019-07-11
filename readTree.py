@@ -102,8 +102,6 @@ def drawTriggerEff_MET(inputFile, trigger, args):
 	met_hist_afterVBFCutsAndTrigger.SetLineColor(ROOT.kBlack)
 
 	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5'
-	
-	print(met_hist_afterVBFCutsAndTrigger)
 
 	#vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5 && Flag_BadPFMuonFilter == 1 && Flag_goodVertices == 1 && Flag_globalSuperTightHalo2016Filter == 1 && Flag_HBHENoiseFilter == 1 && Flag_HBHENoiseIsoFilter == 1 && Flag_EcalDeadCellTriggerPrimitiveFilter == 1'
 
@@ -112,7 +110,6 @@ def drawTriggerEff_MET(inputFile, trigger, args):
 	f.eventTree.Draw('met>>met_hist')
 	f.eventTree.Draw('met>>met_hist_afterVBFCuts', vbfCuts, '')
 	f.eventTree.Draw('met>>met_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
-	print(met_hist_afterVBFCutsAndTrigger)
 	
 	#Check if the two histograms are consistent
 
@@ -132,11 +129,11 @@ def drawTriggerEff_MET(inputFile, trigger, args):
 		met_hist_afterVBFCuts.Write('met_hist_afterVBFCuts')
 		met_hist_afterVBFCutsAndTrigger.Write('met_hist_afterVBFCutsAndTrigger_' + trigger)
 	
-	print(met_hist_afterVBFCutsAndTrigger)
+	met_hist.SetDirectory(0)
+	met_hist_afterVBFCuts.SetDirectory(0)
+	met_hist_afterVBFCutsAndTrigger.SetDirectory(0)
 	
 	f.Close()
-
-	print(met_hist_afterVBFCutsAndTrigger)
 
 	return met_hist_afterVBFCutsAndTrigger, eff_graph_MET
 
@@ -168,7 +165,11 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	f.eventTree.Draw('mjj>>mjj_hist')
 	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCuts', vbfCuts, '')
 	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
-	
+
+	####
+	print(f.eventTree.GetEntries(vbfAndTriggerCuts))
+	####	
+
 	#Check if the two histograms are consistent
 
 	if ROOT.TEfficiency.CheckConsistency(mjj_hist_afterVBFCutsAndTrigger, mjj_hist_afterVBFCuts):
@@ -185,6 +186,10 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	
 		f.Write()
 	
+	mjj_hist.SetDirectory(0)
+	mjj_hist_afterVBFCuts.SetDirectory(0)
+	mjj_hist_afterVBFCutsAndTrigger.SetDirectory(0)
+	
 	f.Close()
 
 	return mjj_hist_afterVBFCutsAndTrigger, eff_graph_mjj
@@ -196,6 +201,8 @@ def drawCompGraph_MET(trigger1, trigger2, met_hist_withTriggers):
 	'''
 	Draws the VBF cuts + trigger acceptance graph for two triggers, as a function of MET.
 	'''
+
+	ROOT.gStyle.SetOptStat(0)
 
 	hist1 = met_hist_withTriggers[trigger1]	
 	hist1.GetXaxis().SetTitle('MET (GeV)')
@@ -362,7 +369,5 @@ if __name__ == '__main__':
 		mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type)
 
 		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type)
-
-	print(met_hist_withTriggers)
 
 	drawCompGraph_MET(triggers[0], triggers[3], met_hist_withTriggers)

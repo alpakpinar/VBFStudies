@@ -65,6 +65,7 @@ def drawTriggerEff_MET(inputFile, trigger, count):
 
 	'''
 	Constructs the trigger efficiency graph for a given trigger, as a function of MET.
+	Returns the MET histogram wih VBF cuts + trigger and efficiency plot.
 	'''
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
@@ -129,10 +130,13 @@ def drawTriggerEff_MET(inputFile, trigger, count):
 	
 	f.Close()
 
+	return met_hist_withTriggers[trigger], eff_graphs_MET[trigger]
+
 def drawTriggerEff_mjj(inputFile, trigger, count):
 
 	'''
 	Constructs the trigger efficiency graph for a given trigger, as a function of invariant mass of two leading jets, mjj.
+	Returns the mjj histogram wih VBF cuts + trigger and efficiency plot.
 	'''
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
@@ -174,7 +178,39 @@ def drawTriggerEff_mjj(inputFile, trigger, count):
 	f.Write()
 	f.Close()
 
+	return mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger]
+
 #############################
+
+def drawCompGraph_MET(trigger1, trigger2, met_hist_withTriggers):
+
+	'''
+	Draws the VBF cuts + trigger acceptance graph for two triggers, as a function of MET.
+	'''
+
+	hist1 = met_hist_withTriggers[trigger1]	
+	hist1.GetXaxis().SetTitle('MET (GeV)')
+	hist1.GetYaxis().SetTitle('Number of Events')
+	hist1.SetLineColor(ROOT.kBlack)
+	
+	hist2 = met_hist_withTriggers[trigger2]	
+	hist2.SetLineColor(ROOT.kRed)
+
+	legend = ROOT.TLegend(0.6, 0.6, 0.9, 0.9)
+	legend.SetBorderSize(0)
+	
+	legend.AddEntry(hist1, trigger1, 'l')
+	legend.AddEntry(hist2, trigger2, 'l')
+
+	canv = ROOT.TCanvas('canv', 'canv')
+
+	hist1.Draw()
+	hist2.Draw('same')
+	legend.Draw('same')
+
+	filename = trigger1 + '_' + trigger2 + '_MET.png'
+	canv.Print(filename)
+
 
 def readTree(inputFile):
 
@@ -314,7 +350,8 @@ if __name__ == '__main__':
 
 	for count, trigger in enumerate(triggers):
 
-		drawTriggerEff_mjj(inputFile, trigger, count)
+		mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, count)
 
-		drawTriggerEff_MET(inputFile, trigger, count)
+		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, count)
 
+	drawCompGraph_MET(triggers[0], triggers[3], met_hist_withTriggers)

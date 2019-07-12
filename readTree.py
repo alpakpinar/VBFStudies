@@ -114,6 +114,16 @@ def drawTriggerEff_MET(inputFile, trigger, args):
 	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
 	print('Events passing VBF cuts + {}: {}'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
 	
+	#Go to the directory for trigger efficiencies 
+	
+	try: f.GetKey('triggerEff_MET').IsFolder()
+
+	except ReferenceError:
+
+		f.mkdir('triggerEff_MET', 'triggerEff_MET') 
+
+	f.cd('triggerEff_MET')
+	
 	#Check if the two histograms are consistent
 
 	if ROOT.TEfficiency.CheckConsistency(met_hist_afterVBFCutsAndTrigger, met_hist_afterVBFCuts):
@@ -126,6 +136,16 @@ def drawTriggerEff_MET(inputFile, trigger, args):
 
 		print('Efficiency graph for ' + trigger + ' with respect to MET is constructed!')
 
+	f.cd()
+	
+	try: f.GetKey('metHistos').IsFolder()
+
+	except ReferenceError: 
+
+		f.mkdir('metHistos', 'metHistos') 
+	
+	f.cd('metHistos')
+
 	if not args.noWrite:
 
 		met_hist.Write('met_hist')
@@ -136,6 +156,8 @@ def drawTriggerEff_MET(inputFile, trigger, args):
 	met_hist_afterVBFCuts.SetDirectory(0)
 	met_hist_afterVBFCutsAndTrigger.SetDirectory(0)
 	
+	f.cd()
+
 	f.Close()
 
 	return met_hist_afterVBFCutsAndTrigger, eff_graph_MET
@@ -173,6 +195,16 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
 	print('Events passing VBF cuts + {}: {}'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
 	####	
+	
+	#Go to the directory for trigger efficiencies 
+	
+	try: f.GetKey('triggerEff_mjj').IsFolder()
+
+	except ReferenceError: 
+
+		f.mkdir('triggerEff_mjj', 'triggerEff_mjj') 
+
+	f.cd('triggerEff_mjj')
 
 	#Check if the two histograms are consistent
 
@@ -185,22 +217,36 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 		eff_graph_mjj.Write('eff_graph_' + trigger + '_mjj')
 
 		print('Efficiency graph for ' + trigger + ' with respect to mjj is constructed!')
+	
+	f.cd()
+	
+	try: f.GetKey('mjjHistos').IsFolder()
+
+	except ReferenceError: 
+
+		f.mkdir('mjjHistos', 'mjjHistos') 
+	
+	f.cd('mjjHistos')
 
 	if not args.noWrite:
 	
-		f.Write()
+		mjj_hist.Write('mjj_hist')
+		mjj_hist_afterVBFCuts.Write('mjj_hist_afterVBFCuts')
+		mjj_hist_afterVBFCutsAndTrigger.Write('mjj_hist_afterVBFCutsAndTrigger_' + trigger)
 	
 	mjj_hist.SetDirectory(0)
 	mjj_hist_afterVBFCuts.SetDirectory(0)
 	mjj_hist_afterVBFCutsAndTrigger.SetDirectory(0)
-	
+
+	f.cd()
+		
 	f.Close()
 
 	return mjj_hist_afterVBFCutsAndTrigger, eff_graph_mjj
 
 #############################
 
-def drawCompGraph_MET(trigger1, trigger2, legendLabel1, legendLabel2,  met_hist_withTriggers):
+def drawCompGraph_MET(trigger1, trigger2, label1, label2,  met_hist_withTriggers):
 
 	'''
 	Draws the VBF cuts + trigger acceptance graph for two triggers, as a function of MET.
@@ -221,8 +267,8 @@ def drawCompGraph_MET(trigger1, trigger2, legendLabel1, legendLabel2,  met_hist_
 	legend = ROOT.TLegend(0.6, 0.6, 0.85, 0.85)
 	legend.SetBorderSize(0)
 	
-	legend.AddEntry(hist1, legendLabel1, 'l')
-	legend.AddEntry(hist2, legendLabel2, 'l')
+	legend.AddEntry(hist1, label1, 'l')
+	legend.AddEntry(hist2, label2, 'l')
 
 	canv = ROOT.TCanvas('canv', 'canv')
 
@@ -230,7 +276,7 @@ def drawCompGraph_MET(trigger1, trigger2, legendLabel1, legendLabel2,  met_hist_
 	hist1.Draw('same')
 	legend.Draw('same')
 
-	filename = trigger1 + '_' + trigger2 + '_MET.png'
+	filename = label1 + '_' + label2 + '_MET.png'
 	canv.Print(filename)
 
 ##########################
@@ -425,12 +471,12 @@ if __name__ == '__main__':
 	eff_graphs_mjj = {}
 	mjj_hist_withTriggers = {}
 
-	#for count, trigger in enumerate(triggers):
+	for count, trigger in enumerate(triggers):
 
-	#	mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type)
+		mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type)
 
-	#	met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type)
+		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type)
 
 	#drawCompGraph_MET(triggers[0], triggers[3], legendLabels[0], legendLabels[3], met_hist_withTriggers)
 
-	drawCutFlow(inputFile)
+	#drawCutFlow(inputFile)

@@ -33,20 +33,17 @@ def deleteHistos(histo):
 def cleanROOTFile(inputFile, histos):
 	
 	'''
-	Removes the first 30 versions of the histograms from the ROOT file.
+	Removes the first 30 versions of the given histograms from the ROOT file.
 	Called only if -c option is specified while running the script.
 	'''
 	print('Cleaning the ROOT file')
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
 
-	for histo in histos.keys():
+	for histo in histos:
 
-		for i in range(30):
-			
-			hist = histo + ';' + str(i+1)
-			ROOT.gDirectory.Delete(hist)	
-	
+		deleteHistos(histo)
+
 	f.Close()
 	
 	print('Cleaning done')
@@ -449,19 +446,36 @@ if __name__ == '__main__':
 	
 	#Define the histograms
 
-	histos = declareHistos()
-
-	#Clean the ROOT file if needed
-
-	if file_type.clean:
-
-		cleanROOTFile(inputFile, histos)
+	#histos = declareHistos()
 
 	#inputFile = 'inputs/VBF_HToInv_2017_test.root'
 
 	#readTree(inputFile) 
 
 	triggers = ['HLT_DiJet110_35_Mjj650_PFMET110_v5', 'HLT_DiJet110_35_Mjj650_PFMET120_v5', 'HLT_DiJet110_35_Mjj650_PFMET130_v5', 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v16', 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v16', 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v15', 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v15']
+
+	histos = []
+	
+	##############################
+	#Clean the ROOT file if needed
+	##############################
+
+	if file_type.clean:
+		
+		for trigger in triggers:
+
+			histos.append('eff_graph_' + trigger + '_MET')
+			histos.append('eff_graph_' + trigger + '_mjj')
+			histos.append('met_hist_afterVBFCutsAndTrigger_' + trigger)
+			histos.append('met_hist_afterVBFCuts')
+			histos.append('met_hist')
+			histos.append('mjj_hist_afterVBFCutsAndTrigger_' + trigger)
+			histos.append('mjj_hist_afterVBFCuts')
+			histos.append('mjj_hist')
+
+		cleanROOTFile(inputFile, histos)
+
+	###############################
 
 	legendLabels = ['VBF_MET110', 'VBF_MET120', 'VBF_MET130', 'METNoMu110', 'METNoMu120', 'METNoMu130', 'METNoMu140']
 	
@@ -477,6 +491,6 @@ if __name__ == '__main__':
 
 		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type)
 
-	#drawCompGraph_MET(triggers[0], triggers[3], legendLabels[0], legendLabels[3], met_hist_withTriggers)
+	drawCompGraph_MET(triggers[0], triggers[3], legendLabels[0], legendLabels[3], met_hist_withTriggers)
 
 	#drawCutFlow(inputFile)

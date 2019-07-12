@@ -60,11 +60,12 @@ def deltaR(prt1, prt2):
 
 ###########################
 
-def drawTriggerEff_MET(inputFile, trigger, args):
+def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, trailingJetPtCut):
 
 	'''
 	Constructs the trigger efficiency graph for a given trigger, as a function of MET.
 	Returns the MET histogram wih VBF cuts + trigger and efficiency plot.
+	On top of default VBF cuts, applies the given mjj, leadingJetPt and trailingJetPt cuts.
 	'''
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
@@ -130,7 +131,9 @@ def drawTriggerEff_MET(inputFile, trigger, args):
 		
 		eff_graph_MET.SetTitle(trigger + ';MET (GeV);eff')
 
-		eff_graph_MET.Write('eff_graph_' + trigger + '_MET')
+		if not args.noWrite:
+		
+			eff_graph_MET.Write('eff_graph_' + trigger + '_MET')
 
 		print('Efficiency graph for ' + trigger + ' with respect to MET is constructed!\n')
 
@@ -160,6 +163,186 @@ def drawTriggerEff_MET(inputFile, trigger, args):
 
 	return met_hist_afterVBFCutsAndTrigger, eff_graph_MET
 
+def drawTriggerEff_trailingJetPt(inputFile, trigger, args, mjjCut, leadingJetPtCut):
+
+	'''
+    Constructs the trigger efficiency graph for a given trigger, as a function of trailing jet pt. 
+    Returns the trailing jet pt histogram wih VBF cuts + trigger and efficiency plot.
+	On top of default VBF cuts, applies the given mjj and leadingJetPt cuts.
+    '''
+
+	f = ROOT.TFile.Open(inputFile, 'UPDATE')
+
+	trailingJetPt_array = array('f', [80., 90., 100., 115., 130., 150., 180., 230.])
+
+	trailingJetPt_hist = ROOT.TH1F('trailingJetPt_hist', 'trailingJetPt_hist', len(trailingJetPt_array)-1, trailingJetPt_array)
+
+	trailingJetPt_hist_afterVBFCuts = ROOT.TH1F('trailingJetPt_hist_afterVBFCuts', 'trailingJetPt_hist_afterVBFCuts', len(trailingJetPt_array)-1, trailingJetPt_array)	
+	trailingJetPt_hist_afterVBFCuts.SetLineColor(ROOT.kRed)
+	
+	trailingJetPt_hist_afterVBFCutsAndTrigger = ROOT.TH1F('trailingJetPt_hist_afterVBFCutsAndTrigger', 'trailingJetPt_hist_afterVBFCutsAndTrigger', len(trailingJetPt_array)-1, trailingJetPt_array)
+	trailingJetPt_hist_afterVBFCutsAndTrigger.SetLineColor(ROOT.kBlack)
+
+	#Arrange the cuts
+
+	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && mjj > ' + str(mjjCut) + ' && jet_pt[0] > ' + str(leadingJetPtCut)
+
+	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
+
+	f.eventTree.Draw('jet_pt[0]>>trailingJetPt_hist')
+	f.eventTree.Draw('jet_pt[0]>>trailingJetPt_hist_afterVBFCuts', vbfCuts, '')
+	f.eventTree.Draw('jet_pt[0]>>trailingJetPt_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
+	
+	####
+	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
+	print('Events passing VBF cuts + {}: {}\n'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
+	####	
+	
+	#Go to the directory for trigger efficiencies 
+	
+	try: f.GetKey('triggerEff_trailingJetPt').IsFolder()
+
+	except ReferenceError: 
+
+		f.mkdir('triggerEff_trailingJetPt', 'triggerEff_trailingJetPt') 
+
+	f.cd('triggerEff_trailingJetPt')
+	
+	if ROOT.TEfficiency.CheckConsistency(trailingJetPt_hist_afterVBFCutsAndTrigger, trailingJetPt_hist_afterVBFCuts):
+
+		eff_graph_trailingJetPt = ROOT.TEfficiency(trailingJetPt_hist_afterVBFCutsAndTrigger, trailingJetPt_hist_afterVBFCuts)
+
+		eff_graph_trailingJetPt.SetTitle(trigger + ';trailingJetPt (GeV);eff')
+
+		if not args.noWrite:
+
+			eff_graph_trailingJetPt.Write('eff_graph_' + trigger + '_trailingJetPt')
+
+		canv = ROOT.TCanvas('canv', 'canv')
+	
+		eff_graph_mjj.Draw('AP')
+
+		canv.Print(trigger + '_trailingJetPt.png')
+	
+		print('Efficiency graph for ' + trigger + ' with respect to trailing jet pt is constructed!\n')
+	
+	f.cd()
+	
+	try: f.GetKey('trailingJetPtHistos').IsFolder()
+
+	except ReferenceError: 
+
+		f.mkdir('trailingJetPtHistos', 'trailingJetPtHistos') 
+	
+	f.cd('trailingJetPtHistos')
+
+	if not args.noWrite:
+	
+		trailingJetPt_hist.Write('trailingJetPt_hist')
+		trailingJetPt_hist_afterVBFCuts.Write('trailingJetPt_hist_afterVBFCuts')
+		trailingJetPt_hist_afterVBFCutsAndTrigger.Write('trailingJetPt_hist_afterVBFCutsAndTrigger_' + trigger)
+	
+	trailingJetPt_hist.SetDirectory(0)
+	trailingJetPt_hist_afterVBFCuts.SetDirectory(0)
+	trailingJetPt_hist_afterVBFCutsAndTrigger.SetDirectory(0)
+
+	f.cd()
+		
+	f.Close()
+
+	return trailingJetPt_hist_afterVBFCutsAndTrigger, eff_graph_trailingJetPt
+
+def drawTriggerEff_leadingJetPt(inputFile, trigger, args, mjjCut):
+
+	'''
+    Constructs the trigger efficiency graph for a given trigger, as a function of leading jet pt. 
+    Returns the leading jet pt histogram wih VBF cuts + trigger and efficiency plot.
+	On top of default VBF cuts, applies the given mjj cut.
+    '''
+
+	f = ROOT.TFile.Open(inputFile, 'UPDATE')
+
+	leadingJetPt_array = array('f', [80., 90., 100., 115., 130., 150., 180., 230.])
+
+	leadingJetPt_hist = ROOT.TH1F('leadingJetPt_hist', 'leadingJetPt_hist', len(leadingJetPt_array)-1, leadingJetPt_array)
+
+	leadingJetPt_hist_afterVBFCuts = ROOT.TH1F('leadingJetPt_hist_afterVBFCuts', 'leadingJetPt_hist_afterVBFCuts', len(leadingJetPt_array)-1, leadingJetPt_array)	
+	leadingJetPt_hist_afterVBFCuts.SetLineColor(ROOT.kRed)
+	
+	leadingJetPt_hist_afterVBFCutsAndTrigger = ROOT.TH1F('leadingJetPt_hist_afterVBFCutsAndTrigger', 'leadingJetPt_hist_afterVBFCutsAndTrigger', len(leadingJetPt_array)-1, leadingJetPt_array)
+	leadingJetPt_hist_afterVBFCutsAndTrigger.SetLineColor(ROOT.kBlack)
+
+	#Cuts are default VBF cuts and mjj cut provided
+
+	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && mjj > ' + str(mjjCut)
+
+	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
+
+	f.eventTree.Draw('jet_pt[0]>>leadingJetPt_hist')
+	f.eventTree.Draw('jet_pt[0]>>leadingJetPt_hist_afterVBFCuts', vbfCuts, '')
+	f.eventTree.Draw('jet_pt[0]>>leadingJetPt_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
+	
+	####
+	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
+	print('Events passing VBF cuts + {}: {}\n'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
+	####	
+	
+	#Go to the directory for trigger efficiencies 
+	
+	try: f.GetKey('triggerEff_leadingJetPt').IsFolder()
+
+	except ReferenceError: 
+
+		f.mkdir('triggerEff_leadingJetPt', 'triggerEff_leadingJetPt') 
+
+	f.cd('triggerEff_leadingJetPt')
+	
+	if ROOT.TEfficiency.CheckConsistency(leadingJetPt_hist_afterVBFCutsAndTrigger, leadingJetPt_hist_afterVBFCuts):
+
+		eff_graph_leadingJetPt = ROOT.TEfficiency(leadingJetPt_hist_afterVBFCutsAndTrigger, leadingJetPt_hist_afterVBFCuts)
+
+		eff_graph_leadingJetPt.SetTitle(trigger + ';leadingJetPt (GeV);eff')
+
+		if not args.noWrite:
+
+			eff_graph_leadingJetPt.Write('eff_graph_' + trigger + '_leadingJetPt')
+
+		canv = ROOT.TCanvas('canv', 'canv')
+	
+		eff_graph_mjj.Draw('AP')
+
+		canv.Print(trigger + '_leadingJetPt.png')
+	
+		print('Efficiency graph for ' + trigger + ' with respect to leading jet pt is constructed!\n')
+	
+	f.cd()
+	
+	try: f.GetKey('leadingJetPtHistos').IsFolder()
+
+	except ReferenceError: 
+
+		f.mkdir('leadingJetPtHistos', 'leadingJetPtHistos') 
+	
+	f.cd('leadingJetPtHistos')
+
+	if not args.noWrite:
+	
+		leadingJetPt_hist.Write('leadingJetPt_hist')
+		leadingJetPt_hist_afterVBFCuts.Write('leadingJetPt_hist_afterVBFCuts')
+		leadingJetPt_hist_afterVBFCutsAndTrigger.Write('leadingJetPt_hist_afterVBFCutsAndTrigger_' + trigger)
+	
+	leadingJetPt_hist.SetDirectory(0)
+	leadingJetPt_hist_afterVBFCuts.SetDirectory(0)
+	leadingJetPt_hist_afterVBFCutsAndTrigger.SetDirectory(0)
+
+	f.cd()
+		
+	f.Close()
+
+	return leadingJetPt_hist_afterVBFCutsAndTrigger, eff_graph_leadingJetPt
+	
+
+
 def drawTriggerEff_mjj(inputFile, trigger, args):
 
 	'''
@@ -179,7 +362,7 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	mjj_hist_afterVBFCutsAndTrigger = ROOT.TH1F('mjj_hist_afterVBFCutsAndTrigger', 'mjj_hist_afterVBFCutsAndTrigger', len(mjj_array)-1, mjj_array)
 	mjj_hist_afterVBFCutsAndTrigger.SetLineColor(ROOT.kBlack)
 
-	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5'
+	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5'
 
 	#vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5 && Flag_BadPFMuonFilter == 1 && Flag_goodVertices == 1 && Flag_globalSuperTightHalo2016Filter == 1 && Flag_HBHENoiseFilter == 1 && Flag_HBHENoiseIsoFilter == 1 && Flag_EcalDeadCellTriggerPrimitiveFilter == 1'
 
@@ -188,6 +371,23 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	f.eventTree.Draw('mjj>>mjj_hist')
 	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCuts', vbfCuts, '')
 	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
+
+	#Make the histograms bin-width divided
+
+	#for nBin in range(1, mjj_hist.GetNbinsX()+1):
+
+	#	mjj_orig = mjj_hist.GetBinContent(nBin)
+	#	mjj_binWidth = mjj_hist.GetBinWidth(nBin)
+	#	mjj_hist.SetBinContent(nBin, mjj_orig/mjj_binWidth)
+
+	#	mjj_afterVBF_orig = mjj_hist_afterVBFCuts.GetBinContent(nBin)
+	#	mjj_afterVBF_binWidth = mjj_hist_afterVBFCuts.GetBinWidth(nBin)
+	#	mjj_hist_afterVBFCuts.SetBinContent(nBin, mjj_afterVBF_orig/mjj_afterVBF_binWidth) 
+	#
+	#	mjj_afterVBFTrig_orig = mjj_hist_afterVBFCutsAndTrigger.GetBinContent(nBin)
+	#	mjj_afterVBFTrig_binWidth = mjj_hist_afterVBFCutsAndTrigger.GetBinWidth(nBin)
+	#	mjj_hist_afterVBFCutsAndTrigger.SetBinContent(nBin, mjj_afterVBFTrig_orig/mjj_afterVBFTrig_binWidth)
+		
 
 	####
 	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
@@ -212,8 +412,16 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 
 		eff_graph_mjj.SetTitle(trigger + ';mjj (GeV);eff')
 
-		eff_graph_mjj.Write('eff_graph_' + trigger + '_mjj')
+		if not args.noWrite:
 
+			eff_graph_mjj.Write('eff_graph_' + trigger + '_mjj700')
+
+		canv = ROOT.TCanvas('canv', 'canv')
+	
+		eff_graph_mjj.Draw('AP')
+
+		canv.Print(trigger + '_mjj.png')
+	
 		print('Efficiency graph for ' + trigger + ' with respect to mjj is constructed!\n')
 	
 	f.cd()
@@ -501,14 +709,14 @@ if __name__ == '__main__':
 
 		mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type)
 
-		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type)
+		#met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type)
 
 	#Draw all the comparison graphs 
 
-	for i in range(3):
+	#for i in range(3):
 
-		for j in range(3, 7):
+	#	for j in range(3, 7):
 
-			drawCompGraph_MET(triggers[i], triggers[j], legendLabels[i], legendLabels[j], met_hist_withTriggers)
+	#		drawCompGraph_MET(triggers[i], triggers[j], legendLabels[i], legendLabels[j], met_hist_withTriggers)
 
 	#drawCutFlow(inputFile)

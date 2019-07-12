@@ -1,5 +1,6 @@
 from __future__ import division
 import ROOT
+import os
 import argparse
 from math import sqrt
 from array import array
@@ -109,7 +110,7 @@ def drawTriggerEff_MET(inputFile, trigger, args):
 	f.eventTree.Draw('met>>met_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
 	
 	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
-	print('Events passing VBF cuts + {}: {}'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
+	print('Events passing VBF cuts + {}: {}\n'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
 	
 	#Go to the directory for trigger efficiencies 
 	
@@ -131,7 +132,7 @@ def drawTriggerEff_MET(inputFile, trigger, args):
 
 		eff_graph_MET.Write('eff_graph_' + trigger + '_MET')
 
-		print('Efficiency graph for ' + trigger + ' with respect to MET is constructed!')
+		print('Efficiency graph for ' + trigger + ' with respect to MET is constructed!\n')
 
 	f.cd()
 	
@@ -190,7 +191,7 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 
 	####
 	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
-	print('Events passing VBF cuts + {}: {}'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
+	print('Events passing VBF cuts + {}: {}\n'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
 	####	
 	
 	#Go to the directory for trigger efficiencies 
@@ -213,7 +214,7 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 
 		eff_graph_mjj.Write('eff_graph_' + trigger + '_mjj')
 
-		print('Efficiency graph for ' + trigger + ' with respect to mjj is constructed!')
+		print('Efficiency graph for ' + trigger + ' with respect to mjj is constructed!\n')
 	
 	f.cd()
 	
@@ -249,6 +250,10 @@ def drawCompGraph_MET(trigger1, trigger2, label1, label2,  met_hist_withTriggers
 	Draws the VBF cuts + trigger acceptance graph for two triggers, as a function of MET.
 	'''
 
+	print('Working on MET comparison plot')
+	print('Trigger1 : {}'.format(label1))
+	print('Trigger2 : {}'.format(label2))
+
 	ROOT.gStyle.SetOptStat(0)
 
 	hist1 = met_hist_withTriggers[trigger1]	
@@ -274,7 +279,14 @@ def drawCompGraph_MET(trigger1, trigger2, label1, label2,  met_hist_withTriggers
 	legend.Draw('same')
 
 	filename = label1 + '_' + label2 + '_MET.png'
-	canv.Print(filename)
+	dirName = 'pngImages/triggerCompPlots'
+
+	filePath = os.path.join(dirName, filename)
+
+	canv.Print(filePath)
+
+	print('MET comparison plot saved')
+	print('Filename: {}\n'.format(filePath))
 
 ##########################
 #TO BE TESTED
@@ -491,6 +503,12 @@ if __name__ == '__main__':
 
 		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type)
 
-	drawCompGraph_MET(triggers[0], triggers[3], legendLabels[0], legendLabels[3], met_hist_withTriggers)
+	#Draw all the comparison graphs 
+
+	for i in range(3):
+
+		for j in range(3, 7):
+
+			drawCompGraph_MET(triggers[i], triggers[j], legendLabels[i], legendLabels[j], met_hist_withTriggers)
 
 	#drawCutFlow(inputFile)

@@ -14,6 +14,28 @@ def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, traili
 
 	met_array = array('f', [200., 220., 240., 270., 300., 340., 380., 420., 500.]) 
 
+	outputDir = 'output/' + trigger
+
+	if not os.path.isdir(outputDir):
+	
+		os.mkdir(outputDir)
+
+	#Create the output ROOT file to save the histograms and efficiency graphs
+
+	if args.test:
+
+		fileName = trigger + '_mjj' + str(mjjCut) + '_leadingJetPt' + str(leadingJetPtCut) + '_trailingJetPt' + str(trailingJetPtCut) + '_test.root'
+		filePath = os.path.join(outputDir, fileName)
+
+		out = ROOT.TFile(filePath, 'RECREATE')
+
+	else:
+
+		fileName = trigger + '_mjj' + str(mjjCut) + '_leadingJetPt' + str(leadingJetPtCut) + '_trailingJetPt' + str(trailingJetPtCut) + '.root'
+		filePath = os.path.join(outputDir, fileName)
+
+		out = ROOT.TFile(filePath, 'RECREATE')
+
 	#if count == 0: #First time calling the function
 
 		#Clean the file (maybe to be implemented)
@@ -42,7 +64,7 @@ def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, traili
 	met_hist_afterVBFCutsAndTrigger = ROOT.TH1F('met_hist_afterVBFCutsAndTrigger', 'met_hist_afterVBFCutsAndTrigger', len(met_array)-1, met_array)	
 	met_hist_afterVBFCutsAndTrigger.SetLineColor(ROOT.kBlack)
 
-	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5'
+	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && mjj > ' + str(mjjCut) + ' && jet_pt[0] > ' + str(leadingJetPtCut) + ' && jet_pt[1] > ' + str(trailingJetPtCut) 
 
 	#vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5 && Flag_BadPFMuonFilter == 1 && Flag_goodVertices == 1 && Flag_globalSuperTightHalo2016Filter == 1 && Flag_HBHENoiseFilter == 1 && Flag_HBHENoiseIsoFilter == 1 && Flag_EcalDeadCellTriggerPrimitiveFilter == 1'
 
@@ -57,13 +79,13 @@ def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, traili
 	
 	#Go to the directory for trigger efficiencies 
 	
-	try: f.GetKey('triggerEff_MET').IsFolder()
+	try: out.GetKey('triggerEff_MET').IsFolder()
 
 	except ReferenceError:
 
-		f.mkdir('triggerEff_MET', 'triggerEff_MET') 
+		out.mkdir('triggerEff_MET', 'triggerEff_MET') 
 
-	f.cd('triggerEff_MET')
+	out.cd('triggerEff_MET')
 	
 	#Check if the two histograms are consistent
 
@@ -82,21 +104,21 @@ def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, traili
 		canv = ROOT.TCanvas('canv', 'canv')
 
 		pngDir = 'pngImages/triggerEffPlots'
-		fileName = trigger + '_MET.png'
+		file_name = trigger + '_MET.png'
 		
-		canv.Print(os.path.join(pngDir, fileName))
+		canv.Print(os.path.join(pngDir, file_name))
 
 		print('Efficiency graph for ' + trigger + ' with respect to MET is constructed!\n')
 
-	f.cd()
+	out.cd()
 	
-	try: f.GetKey('metHistos').IsFolder()
+	try: out.GetKey('metHistos').IsFolder()
 
 	except ReferenceError: 
 
-		f.mkdir('metHistos', 'metHistos') 
+		out.mkdir('metHistos', 'metHistos') 
 	
-	f.cd('metHistos')
+	out.cd('metHistos')
 
 	if not args.noWrite:
 
@@ -108,8 +130,9 @@ def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, traili
 	met_hist_afterVBFCuts.SetDirectory(0)
 	met_hist_afterVBFCutsAndTrigger.SetDirectory(0)
 	
-	f.cd()
+	out.cd()
 
+	out.Close()
 	f.Close()
 
 	return met_hist_afterVBFCutsAndTrigger, eff_graph_MET
@@ -308,6 +331,28 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	'''
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
+	
+	outputDir = 'output/' + trigger
+
+	if not os.path.isdir(outputDir):
+	
+		os.makedirs(outputDir)
+
+	#Create the output ROOT file to save the histograms and efficiency graphs
+
+	if args.test:
+
+		fileName = trigger + '_test.root'
+		filePath = os.path.join(outputDir, fileName)
+
+		out = ROOT.TFile(filePath, 'RECREATE')
+
+	else:
+
+		fileName = trigger + '.root'
+		filePath = os.path.join(outputDir, fileName)
+
+		out = ROOT.TFile(filePath, 'RECREATE')
 
 	mjj_array = array('f', [500., 520., 540., 570., 600., 640., 680., 730., 790., 880., 1000.]) 
 
@@ -353,13 +398,13 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	
 	#Go to the directory for trigger efficiencies 
 	
-	try: f.GetKey('triggerEff_mjj').IsFolder()
+	try: out.GetKey('triggerEff_mjj').IsFolder()
 
 	except ReferenceError: 
 
-		f.mkdir('triggerEff_mjj', 'triggerEff_mjj') 
+		out.mkdir('triggerEff_mjj', 'triggerEff_mjj') 
 
-	f.cd('triggerEff_mjj')
+	out.cd('triggerEff_mjj')
 
 	#Check if the two histograms are consistent
 
@@ -371,7 +416,7 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 
 		if not args.noWrite:
 
-			eff_graph_mjj.Write('eff_graph_' + trigger + '_mjj700')
+			eff_graph_mjj.Write('eff_graph_' + trigger + '_mjj')
 
 		canv = ROOT.TCanvas('canv', 'canv')
 	
@@ -384,15 +429,15 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	
 		print('Efficiency graph for ' + trigger + ' with respect to mjj is constructed!\n')
 	
-	f.cd()
+	out.cd()
 	
-	try: f.GetKey('mjjHistos').IsFolder()
+	try: out.GetKey('mjjHistos').IsFolder()
 
 	except ReferenceError: 
 
-		f.mkdir('mjjHistos', 'mjjHistos') 
+		out.mkdir('mjjHistos', 'mjjHistos') 
 	
-	f.cd('mjjHistos')
+	out.cd('mjjHistos')
 
 	if not args.noWrite:
 	
@@ -404,8 +449,9 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	mjj_hist_afterVBFCuts.SetDirectory(0)
 	mjj_hist_afterVBFCutsAndTrigger.SetDirectory(0)
 
-	f.cd()
-		
+	out.cd()
+	
+	out.Close()	
 	f.Close()
 
 	return mjj_hist_afterVBFCutsAndTrigger, eff_graph_mjj

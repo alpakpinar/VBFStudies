@@ -2,6 +2,7 @@ from __future__ import division
 import ROOT
 import os
 import argparse
+import numpy as np
 from math import sqrt
 from array import array
 
@@ -61,10 +62,12 @@ def deltaR(prt1, prt2):
 
 ###########################
 
-def drawCompGraph_MET(trigger1, trigger2, label1, label2, met_hist_withTriggers):
+def drawCompGraph_MET(dataFile, trigger1, trigger2, label1, label2, cuts):
 
 	'''
 	Draws the VBF cuts + trigger acceptance graph for two triggers, as a function of MET.
+	Takes the data from the input eventTree.
+	Cuts on mjj, leadingJetPt, trailingJetPt and met must be specified in the cuts list.
 	'''
 
 	print('Working on MET comparison plot')
@@ -72,12 +75,41 @@ def drawCompGraph_MET(trigger1, trigger2, label1, label2, met_hist_withTriggers)
 	print('Trigger2 : {}'.format(label2))
 
 	ROOT.gStyle.SetOptStat(0)
+	#ROOT.TH1.AddDirectory(False)
 
-	hist1 = met_hist_withTriggers[trigger1]	
+	met_array = np.arange(100., 500., 25.)  
+
+	outputDir = 'output/triggerComparisons'
+
+	fileName = label1 + '_' + label2 + '.root' 
+
+	outFile = os.path.join(outputDir, fileName) 
+
+	fin = ROOT.TFile(dataFile)
+
+	fout = ROOT.TFile(outFile, 'RECREATE')
+	
+	#Get the relevant cuts
+	mjjCut, leadingJetPtCut, trailingJetPtCut = cuts[0], cuts[1], cuts[2]
+
+	hist1 = ROOT.TH1F('hist1', trigger1, len(met_array) - 1, array('f', met_array))
+	hist2 = ROOT.TH1F('hist2', trigger2, len(met_array) - 1, array('f', met_array))
+
+	hist1.SetDirectory(0)
+	hist2.SetDirectory(0)
+
+	cuts1 = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && mjj > ' + str(mjjCut) + ' && jet_pt[0] > ' + str(leadingJetPtCut) + ' && jet_pt[1] > ' + str(trailingJetPtCut) + ' && ' + trigger1 + ' == 1' 
+
+	cuts2 = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && mjj > ' + str(mjjCut) + ' && jet_pt[0] > ' + str(leadingJetPtCut) + ' && jet_pt[1] > ' + str(trailingJetPtCut) + ' && ' + trigger2 + ' == 1' 
+
+	fin.cd()
+
+	fin.eventTree.Draw('met>>hist1', cuts1, '')
+	fin.eventTree.Draw('met>>hist2', cuts2, '')
+	
 	hist1.SetLineColor(ROOT.kBlack)
 	hist1.SetLineWidth(2)
 	
-	hist2 = met_hist_withTriggers[trigger2]	
 	hist2.SetLineColor(ROOT.kRed)
 	hist2.SetLineWidth(2)
 	hist2.GetXaxis().SetTitle('MET (GeV)')
@@ -104,6 +136,14 @@ def drawCompGraph_MET(trigger1, trigger2, label1, label2, met_hist_withTriggers)
 
 	print('MET comparison plot saved')
 	print('Filename: {}\n'.format(filePath))
+
+	fout.cd()
+	
+	hist1.Write('hist1')
+	hist2.Write('hist2')
+
+	fout.Close()
+	fin.Close()
 
 ##########################
 #TO BE TESTED
@@ -322,22 +362,22 @@ if __name__ == '__main__':
 	
 	cuts = [750, 160, 50] #Cuts that will be applied: mjj, leadingJetPt, trailingJetPt
 
-	for count, trigger in enumerate(triggers):
+	#for count, trigger in enumerate(triggers):
 
-		mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type)
+	#	mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type)
 
-		leadingJetPt_hist_withTriggers[trigger], eff_graphs_leadingJetPt[trigger] = drawTriggerEff_leadingJetPt(inputFile, trigger, file_type, cuts[0])
+	#	leadingJetPt_hist_withTriggers[trigger], eff_graphs_leadingJetPt[trigger] = drawTriggerEff_leadingJetPt(inputFile, trigger, file_type, cuts[0])
 
-		trailingJetPt_hist_withTriggers[trigger], eff_graphs_trailingJetPt[trigger] = drawTriggerEff_trailingJetPt(inputFile, trigger, file_type, cuts[0], cuts[1])
-		
-		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type, cuts[0], cuts[1], cuts[2])
+	#	trailingJetPt_hist_withTriggers[trigger], eff_graphs_trailingJetPt[trigger] = drawTriggerEff_trailingJetPt(inputFile, trigger, file_type, cuts[0], cuts[1])
+	#	
+	#	met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type, cuts[0], cuts[1], cuts[2])
 
 	#Draw all the comparison graphs 
 
-	#for i in range(3):
+	for i in range(3):
 
-	#	for j in range(3, 7):
+		for j in range(3, 7):
 
-	#		drawCompGraph_MET(triggers[i], triggers[j], legendLabels[i], legendLabels[j], met_hist_withTriggers)
+			drawCompGraph_MET(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
 
 	#drawCutFlow(inputFile)

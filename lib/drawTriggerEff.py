@@ -12,7 +12,7 @@ def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, traili
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
 
-	met_array = array('f', [200., 220., 240., 270., 300., 340., 380., 420., 500.]) 
+	met_array = array('f', [80., 90., 100., 110., 117., 124., 131., 138., 145., 152., 159., 166., 173., 180., 187., 194., 201., 210., 220.]) 
 
 	outputDir = 'output/' + trigger
 
@@ -21,20 +21,21 @@ def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, traili
 		os.mkdir(outputDir)
 
 	#Create the output ROOT file to save the histograms and efficiency graphs
-
+	
 	if args.test:
 
-		fileName = trigger + '_mjj' + str(mjjCut) + '_leadingJetPt' + str(leadingJetPtCut) + '_trailingJetPt' + str(trailingJetPtCut) + '_test.root'
+		fileName = trigger + '_test.root'
 		filePath = os.path.join(outputDir, fileName)
 
-		out = ROOT.TFile(filePath, 'RECREATE')
+		out = ROOT.TFile.Open(filePath, 'UPDATE')
 
 	else:
 
-		fileName = trigger + '_mjj' + str(mjjCut) + '_leadingJetPt' + str(leadingJetPtCut) + '_trailingJetPt' + str(trailingJetPtCut) + '.root'
+		fileName = trigger + '.root'
 		filePath = os.path.join(outputDir, fileName)
 
-		out = ROOT.TFile(filePath, 'RECREATE')
+		out = ROOT.TFile.Open(filePath, 'UPDATE')
+
 
 	#if count == 0: #First time calling the function
 
@@ -99,13 +100,17 @@ def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, traili
 		
 			eff_graph_MET.Write('eff_graph_' + trigger + '_MET')
 		
-		eff_graph_mjj.Draw('AP')
-
 		canv = ROOT.TCanvas('canv', 'canv')
+			
+		eff_graph_MET.Draw('AP')
 
-		pngDir = 'pngImages/triggerEffPlots'
+		pngDir = 'pngImages/triggerEffPlots/METPlots/mjjCut' + str(mjjCut) + '_leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
 		file_name = trigger + '_MET.png'
 		
+		if not os.path.isdir(pngDir):
+
+			os.makedirs(pngDir)
+
 		canv.Print(os.path.join(pngDir, file_name))
 
 		print('Efficiency graph for ' + trigger + ' with respect to MET is constructed!\n')
@@ -146,8 +151,30 @@ def drawTriggerEff_trailingJetPt(inputFile, trigger, args, mjjCut, leadingJetPtC
     '''
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
+	
+	outputDir = 'output/' + trigger
 
-	trailingJetPt_array = array('f', [20., 25., 30., 35., 45., 55., 70., 80.])
+	if not os.path.isdir(outputDir):
+	
+		os.makedirs(outputDir)
+
+	#Create the output ROOT file to save the histograms and efficiency graphs
+
+	if args.test:
+
+		fileName = trigger + '_test.root'
+		filePath = os.path.join(outputDir, fileName)
+
+		out = ROOT.TFile.Open(filePath, 'UPDATE')
+
+	else:
+
+		fileName = trigger + '.root'
+		filePath = os.path.join(outputDir, fileName)
+
+		out = ROOT.TFile.Open(filePath, 'UPDATE')
+
+	trailingJetPt_array = array('f', [20., 23., 26., 29., 32., 35., 39., 43., 47., 52., 56., 60., 65., 70., 75., 80.])
 
 	trailingJetPt_hist = ROOT.TH1F('trailingJetPt_hist', 'trailingJetPt_hist', len(trailingJetPt_array)-1, trailingJetPt_array)
 
@@ -163,9 +190,9 @@ def drawTriggerEff_trailingJetPt(inputFile, trigger, args, mjjCut, leadingJetPtC
 
 	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
 
-	f.eventTree.Draw('jet_pt[0]>>trailingJetPt_hist')
-	f.eventTree.Draw('jet_pt[0]>>trailingJetPt_hist_afterVBFCuts', vbfCuts, '')
-	f.eventTree.Draw('jet_pt[0]>>trailingJetPt_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
+	f.eventTree.Draw('jet_pt[1]>>trailingJetPt_hist')
+	f.eventTree.Draw('jet_pt[1]>>trailingJetPt_hist_afterVBFCuts', vbfCuts, '')
+	f.eventTree.Draw('jet_pt[1]>>trailingJetPt_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
 	
 	####
 	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
@@ -174,13 +201,13 @@ def drawTriggerEff_trailingJetPt(inputFile, trigger, args, mjjCut, leadingJetPtC
 	
 	#Go to the directory for trigger efficiencies 
 	
-	try: f.GetKey('triggerEff_trailingJetPt').IsFolder()
+	try: out.GetKey('triggerEff_trailingJetPt').IsFolder()
 
 	except ReferenceError: 
 
-		f.mkdir('triggerEff_trailingJetPt', 'triggerEff_trailingJetPt') 
+		out.mkdir('triggerEff_trailingJetPt', 'triggerEff_trailingJetPt') 
 
-	f.cd('triggerEff_trailingJetPt')
+	out.cd('triggerEff_trailingJetPt')
 	
 	if ROOT.TEfficiency.CheckConsistency(trailingJetPt_hist_afterVBFCutsAndTrigger, trailingJetPt_hist_afterVBFCuts):
 
@@ -194,24 +221,28 @@ def drawTriggerEff_trailingJetPt(inputFile, trigger, args, mjjCut, leadingJetPtC
 
 		canv = ROOT.TCanvas('canv', 'canv')
 	
-		eff_graph_mjj.Draw('AP')
+		eff_graph_trailingJetPt.Draw('AP')
 
-		pngDir = 'pngImages/triggerEffPlots'
+		pngDir = 'pngImages/triggerEffPlots/trailingJetPtPlots/mjjCut' + str(mjjCut) + '_leadingJetPtCut' + str(leadingJetPtCut)
 		fileName = trigger + '_trailingJetPt.png'
 		
+		if not os.path.isdir(pngDir):
+
+			os.makedirs(pngDir)
+
 		canv.Print(os.path.join(pngDir, fileName))
 	
 		print('Efficiency graph for ' + trigger + ' with respect to trailing jet pt is constructed!\n')
 	
-	f.cd()
+	out.cd()
 	
-	try: f.GetKey('trailingJetPtHistos').IsFolder()
+	try: out.GetKey('trailingJetPtHistos').IsFolder()
 
 	except ReferenceError: 
 
-		f.mkdir('trailingJetPtHistos', 'trailingJetPtHistos') 
+		out.mkdir('trailingJetPtHistos', 'trailingJetPtHistos') 
 	
-	f.cd('trailingJetPtHistos')
+	out.cd('trailingJetPtHistos')
 
 	if not args.noWrite:
 	
@@ -223,8 +254,9 @@ def drawTriggerEff_trailingJetPt(inputFile, trigger, args, mjjCut, leadingJetPtC
 	trailingJetPt_hist_afterVBFCuts.SetDirectory(0)
 	trailingJetPt_hist_afterVBFCutsAndTrigger.SetDirectory(0)
 
-	f.cd()
-		
+	out.cd()
+	
+	out.Close()	
 	f.Close()
 
 	return trailingJetPt_hist_afterVBFCutsAndTrigger, eff_graph_trailingJetPt
@@ -238,8 +270,30 @@ def drawTriggerEff_leadingJetPt(inputFile, trigger, args, mjjCut):
     '''
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
+	
+	outputDir = 'output/' + trigger
 
-	leadingJetPt_array = array('f', [80., 90., 100., 115., 130., 150., 180., 230.])
+	if not os.path.isdir(outputDir):
+	
+		os.makedirs(outputDir)
+
+	#Create the output ROOT file to save the histograms and efficiency graphs
+
+	if args.test:
+
+		fileName = trigger + '_test.root'
+		filePath = os.path.join(outputDir, fileName)
+
+		out = ROOT.TFile.Open(filePath, 'UPDATE')
+
+	else:
+
+		fileName = trigger + '.root'
+		filePath = os.path.join(outputDir, fileName)
+
+		out = ROOT.TFile.Open(filePath, 'UPDATE')
+
+	leadingJetPt_array = array('f', [80., 85., 90., 95.,  100., 105.,  110., 115., 120., 130., 140., 150., 160., 175., 190., 210., 230., 250.])
 
 	leadingJetPt_hist = ROOT.TH1F('leadingJetPt_hist', 'leadingJetPt_hist', len(leadingJetPt_array)-1, leadingJetPt_array)
 
@@ -266,13 +320,13 @@ def drawTriggerEff_leadingJetPt(inputFile, trigger, args, mjjCut):
 	
 	#Go to the directory for trigger efficiencies 
 	
-	try: f.GetKey('triggerEff_leadingJetPt').IsFolder()
+	try: out.GetKey('triggerEff_leadingJetPt').IsFolder()
 
 	except ReferenceError: 
 
-		f.mkdir('triggerEff_leadingJetPt', 'triggerEff_leadingJetPt') 
+		out.mkdir('triggerEff_leadingJetPt', 'triggerEff_leadingJetPt') 
 
-	f.cd('triggerEff_leadingJetPt')
+	out.cd('triggerEff_leadingJetPt')
 	
 	if ROOT.TEfficiency.CheckConsistency(leadingJetPt_hist_afterVBFCutsAndTrigger, leadingJetPt_hist_afterVBFCuts):
 
@@ -286,24 +340,28 @@ def drawTriggerEff_leadingJetPt(inputFile, trigger, args, mjjCut):
 
 		canv = ROOT.TCanvas('canv', 'canv')
 	
-		eff_graph_mjj.Draw('AP')
+		eff_graph_leadingJetPt.Draw('AP')
 		
-		pngDir = 'pngImages/triggerEffPlots'
+		pngDir = 'pngImages/triggerEffPlots/leadingJetPtPlots/mjjCut' + str(mjjCut)
 		fileName = trigger + '_leadingJetPt.png'
+
+		if not os.path.isdir(pngDir):
+
+			os.makedirs(pngDir)
 
 		canv.Print(os.path.join(pngDir, fileName))
 	
 		print('Efficiency graph for ' + trigger + ' with respect to leading jet pt is constructed!\n')
 	
-	f.cd()
+	out.cd()
 	
-	try: f.GetKey('leadingJetPtHistos').IsFolder()
+	try: out.GetKey('leadingJetPtHistos').IsFolder()
 
 	except ReferenceError: 
 
-		f.mkdir('leadingJetPtHistos', 'leadingJetPtHistos') 
+		out.mkdir('leadingJetPtHistos', 'leadingJetPtHistos') 
 	
-	f.cd('leadingJetPtHistos')
+	out.cd('leadingJetPtHistos')
 
 	if not args.noWrite:
 	
@@ -315,8 +373,9 @@ def drawTriggerEff_leadingJetPt(inputFile, trigger, args, mjjCut):
 	leadingJetPt_hist_afterVBFCuts.SetDirectory(0)
 	leadingJetPt_hist_afterVBFCutsAndTrigger.SetDirectory(0)
 
-	f.cd()
-		
+	out.cd()
+	
+	out.Close()	
 	f.Close()
 
 	return leadingJetPt_hist_afterVBFCutsAndTrigger, eff_graph_leadingJetPt
@@ -422,7 +481,12 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	
 		eff_graph_mjj.Draw('AP')
 
-		pngDir = 'pngImages/triggerEffPlots'
+		pngDir = 'pngImages/triggerEffPlots/mjjPlots'
+	
+		if not os.path.isdir(pngDir):
+
+			os.makedirs(pngDir)
+
 		fileName = trigger + '_mjj.png'
 
 		canv.Print(os.path.join(pngDir, fileName))

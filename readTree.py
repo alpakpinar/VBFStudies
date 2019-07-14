@@ -81,13 +81,13 @@ def drawCompGraph_MET(dataFile, trigger1, trigger2, label1, label2, cuts):
 
 	outputDir = 'output/triggerComparisons'
 
-	fileName = label1 + '_' + label2 + '.root' 
+	#fileName = label1 + '_' + label2 + '.root' 
 
-	outFile = os.path.join(outputDir, fileName) 
+	#outFile = os.path.join(outputDir, fileName) 
 
 	fin = ROOT.TFile(dataFile)
 
-	fout = ROOT.TFile(outFile, 'RECREATE')
+	#fout = ROOT.TFile(outFile, 'RECREATE')
 	
 	#Get the relevant cuts
 	mjjCut, leadingJetPtCut, trailingJetPtCut = cuts[0], cuts[1], cuts[2]
@@ -95,8 +95,8 @@ def drawCompGraph_MET(dataFile, trigger1, trigger2, label1, label2, cuts):
 	hist1 = ROOT.TH1F('hist1', trigger1, len(met_array) - 1, array('f', met_array))
 	hist2 = ROOT.TH1F('hist2', trigger2, len(met_array) - 1, array('f', met_array))
 
-	hist1.SetDirectory(0)
-	hist2.SetDirectory(0)
+	#hist1.SetDirectory(0)
+	#hist2.SetDirectory(0)
 
 	cuts1 = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && mjj > ' + str(mjjCut) + ' && jet_pt[0] > ' + str(leadingJetPtCut) + ' && jet_pt[1] > ' + str(trailingJetPtCut) + ' && ' + trigger1 + ' == 1' 
 
@@ -137,12 +137,12 @@ def drawCompGraph_MET(dataFile, trigger1, trigger2, label1, label2, cuts):
 	print('MET comparison plot saved')
 	print('Filename: {}\n'.format(filePath))
 
-	fout.cd()
+	#fout.cd()
 	
-	hist1.Write('hist1')
-	hist2.Write('hist2')
+	#hist1.Write('hist1')
+	#hist2.Write('hist2')
 
-	fout.Close()
+	#fout.Close()
 	fin.Close()
 
 ##########################

@@ -3,3 +3,7 @@
 /*.root
 tmp/
 *.png
+*.log
+/output
+inputs/backup_ROOTFiles
+VBF_HToInv_2017.root 

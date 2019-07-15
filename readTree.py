@@ -278,15 +278,15 @@ if __name__ == '__main__':
 	
 	cuts = [750, 160, 50] #Cuts that will be applied: mjj, leadingJetPt, trailingJetPt
 
-	#for count, trigger in enumerate(triggers):
+	for count, trigger in enumerate(triggers):
 
-	#	mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type)
+		mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type)
 
-	#	leadingJetPt_hist_withTriggers[trigger], eff_graphs_leadingJetPt[trigger] = drawTriggerEff_leadingJetPt(inputFile, trigger, file_type, cuts[0])
+		leadingJetPt_hist_withTriggers[trigger], eff_graphs_leadingJetPt[trigger] = drawTriggerEff_leadingJetPt(inputFile, trigger, file_type, cuts[0])
 
-	#	trailingJetPt_hist_withTriggers[trigger], eff_graphs_trailingJetPt[trigger] = drawTriggerEff_trailingJetPt(inputFile, trigger, file_type, cuts[0], cuts[1])
-	#	
-	#	met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type, cuts[0], cuts[1], cuts[2])
+		trailingJetPt_hist_withTriggers[trigger], eff_graphs_trailingJetPt[trigger] = drawTriggerEff_trailingJetPt(inputFile, trigger, file_type, cuts[0], cuts[1])
+		
+		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type, cuts[0], cuts[1], cuts[2])
 
 	#Draw all the comparison graphs 
 
@@ -294,7 +294,9 @@ if __name__ == '__main__':
 
 		for j in range(3, 7):
 
-			#drawCompGraph_MET(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
+			drawCompGraph_MET(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
 			drawCompGraph_leadingJetPt(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
+			drawCompGraph_trailingJetPt(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
+			drawCompGraph_mjj(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
 
 	#drawCutFlow(inputFile)

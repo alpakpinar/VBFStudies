@@ -300,5 +300,8 @@ if __name__ == '__main__':
 			#drawCompGraph_mjj(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
 
 	drawCompGraph_MET(inputFile, triggers[0], triggers[3], legendLabels[0], legendLabels[3], cuts)
+	drawCompGraph_leadingJetPt(inputFile, triggers[0], triggers[3], legendLabels[0], legendLabels[3], cuts)
+	drawCompGraph_trailingJetPt(inputFile, triggers[0], triggers[3], legendLabels[0], legendLabels[3], cuts)
+	drawCompGraph_mjj(inputFile, triggers[0], triggers[3], legendLabels[0], legendLabels[3], cuts)
 
 	#drawCutFlow(inputFile)

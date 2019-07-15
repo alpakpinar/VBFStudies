@@ -294,6 +294,7 @@ if __name__ == '__main__':
 
 		for j in range(3, 7):
 
-			drawCompGraph_MET(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
+			#drawCompGraph_MET(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
+			drawCompGraph_leadingJetPt(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
 
 	#drawCutFlow(inputFile)

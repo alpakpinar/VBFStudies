@@ -3,6 +3,102 @@ import numpy as np
 import os
 from array import array
 
+def drawCompGraph(histo1, histo2, label1, label2, variable, case, cuts):
+
+	'''
+	Draws and saves the comparison graph for two given histograms.
+	Labels (label1 and label2) are trigger labels to be shown in the legend. Also will appear in the png filename.
+	Variable that will be on the x-axis should be specified: MET, leadingJetPt, trailingJetPt or mjj.
+	There are three available case options: Two jets in barrel, endcap or one in each region.
+	This must be specified in the case option while calling the function.
+	Cuts applied must be given as a list for the cuts argument. 
+	'''
+
+	#Check the variable and case arguments
+
+	if variable not in ['MET', 'leadingJetPt', 'trailingJetPt', 'mjj']:
+
+		raise ValueError('Variable argument is not correctly given! This argument should be one of the following: MET, leadingJetPt, trailingJetPt, mjj')
+
+	if case not in ['twoJetsInEndcap', 'twoJetsInBarrel', 'oneJetInBarrel_oneJetInEndcap']:
+
+		raise ValueError('Case argument is not correctly given! This argument should be one of the following: twoJetsInEndcap, twoJetsInBarrel, oneJetInBarrel_oneJetInEndcap')
+
+	#Proceed if there is no problem 
+
+	mjjCut = cuts[0]
+	leadingJetPtCut = cuts[1]
+	trailingJetPtCut = cuts[2]
+
+	histo1.SetLineColor(ROOT.kBlack)
+	histo1.SetLineWidth(2)
+	
+	histo2.SetLineColor(ROOT.kRed)
+	histo2.SetLineWidth(2)
+
+	legend = ROOT.TLegend(0.6, 0.6, 0.85, 0.85)
+	legend.SetBorderSize(0)
+	
+	legend.AddEntry(histo1, label1, 'l')
+	legend.AddEntry(histo2, label2, 'l')
+
+	canv = ROOT.TCanvas('canv', 'canv')
+
+	x_label = variable + ' (GeV)' #x-axis label
+	
+	if histo2.GetMaximum() > histo1.GetMaximum():
+		
+		histo2.GetXaxis().SetTitle(x_label)
+		histo2.GetYaxis().SetTitle('Number of Events')
+
+		histo2.SetTitle('')
+
+		histo2.Draw()
+		histo1.Draw('same')
+	
+	else:
+	
+		histo1.GetXaxis().SetTitle(x_label)
+		histo1.GetYaxis().SetTitle('Number of Events')
+
+		histo1.SetTitle('')
+
+		histo1.Draw()
+		histo2.Draw('same')
+
+	legend.Draw('same')
+	
+	filename = label1 + '_' + label2 + '_' + variable + '_' + str(mjjCut) + '_' + str(leadingJetPtCut) + '_' + str(trailingJetPtCut) + '.png'
+	
+	#Take or create the relevant directory to save png files
+
+	if case == 'twoJetsInBarrel':
+		
+		dirName = 'pngImages/triggerCompPlots/MET_plots/twoJetsInBarrel'
+
+	elif case == 'twoJetsInEndcap':
+
+		dirName = 'pngImages/triggerCompPlots/MET_plots/twoJetsInEndcap'
+
+	elif case == 'oneJetInBarrel_oneJetInEndcap':
+
+		dirName = 'pngImages/triggerCompPlots/MET_plots/oneJetInBarrel_oneJetInEndcap'
+
+	if not os.path.isdir(dirName):
+
+		os.makedirs(dirName)
+
+	filePath = os.path.join(dirName, filename)
+
+	canv.Print(filePath)
+
+	print('MET comparison plot for the case ' + case + ' saved')
+	print('Filename: {}\n'.format(filePath))
+
+
+############################################
+
+
 def drawCompGraph_mjj(dataFile, trigger1, trigger2, label1, label2, cuts):
 
 	'''
@@ -310,167 +406,13 @@ def drawCompGraph_MET(dataFile, trigger1, trigger2, label1, label2, cuts):
 	fin.eventTree.Draw('met>>hist1_oneJetInBarrel_oneJetInEndcap', cuts1 + ' && (abs(jet_eta[0]) > 1.479 && abs(jet_eta[1]) < 1.479) || (abs(jet_eta[0]) < 1.479 && abs(jet_eta[1]) > 1.479)', '')
 	fin.eventTree.Draw('met>>hist2_oneJetInBarrel_oneJetInEndcap', cuts2 + ' && (abs(jet_eta[0]) > 1.479 && abs(jet_eta[1]) < 1.479) || (abs(jet_eta[0]) < 1.479 && abs(jet_eta[1]) > 1.479)', '')
 
-	#####################
-	#Construct histograms for the case where two jets are in barrel
-	#####################
-
-	hist1_twoJetsInBarrel.SetLineColor(ROOT.kBlack)
-	hist1_twoJetsInBarrel.SetLineWidth(2)
+	#Construct histograms for all cases 
 	
-	hist2_twoJetsInBarrel.SetLineColor(ROOT.kRed)
-	hist2_twoJetsInBarrel.SetLineWidth(2)
+	drawCompGraph(hist1_twoJetsInBarrel, hist2_twoJetsInBarrel, label1, label2, 'MET', 'twoJetsInBarrel', cuts)
 
-	legend1 = ROOT.TLegend(0.6, 0.6, 0.85, 0.85)
-	legend1.SetBorderSize(0)
-	
-	legend1.AddEntry(hist1_twoJetsInBarrel, label1, 'l')
-	legend1.AddEntry(hist2_twoJetsInBarrel, label2, 'l')
+	drawCompGraph(hist1_twoJetsInEndcap, hist2_twoJetsInEndcap, label1, label2, 'MET', 'twoJetsInEndcap', cuts)
 
-	canv1 = ROOT.TCanvas('canv1', 'canv1')
-
-	if hist2_twoJetsInBarrel.GetMaximum() > hist1_twoJetsInBarrel.GetMaximum():
-		
-		hist2_twoJetsInBarrel.GetXaxis().SetTitle('MET (GeV)')
-		hist2_twoJetsInBarrel.GetYaxis().SetTitle('Number of Events')
-
-		hist2_twoJetsInBarrel.SetTitle('')
-
-		hist2_twoJetsInBarrel.Draw()
-		hist1_twoJetsInBarrel.Draw('same')
-	
-	else:
-	
-		hist1_twoJetsInBarrel.GetXaxis().SetTitle('MET (GeV)')
-		hist1_twoJetsInBarrel.GetYaxis().SetTitle('Number of Events')
-
-		hist1_twoJetsInBarrel.SetTitle('')
-
-		hist1_twoJetsInBarrel.Draw()
-		hist2_twoJetsInBarrel.Draw('same')
-
-	legend1.Draw('same')
-	
-	filename = label1 + '_' + label2 + '_MET_' + str(mjjCut) + '_' + str(leadingJetPtCut) + '_' + str(trailingJetPtCut) + '.png'
-	dirName = 'pngImages/triggerCompPlots/MET_plots/twoJetsInBarrel'
-
-	if not os.path.isdir(dirName):
-
-		os.makedirs(dirName)
-
-	filePath = os.path.join(dirName, filename)
-
-	canv1.Print(filePath)
-
-	print('MET comparison plot saved')
-	print('Filename: {}\n'.format(filePath))
-
-	#####################
-	#Construct histograms for the case where two jets are in endcap
-	#####################
-
-	hist1_twoJetsInEndcap.SetLineColor(ROOT.kBlack)
-	hist1_twoJetsInEndcap.SetLineWidth(2)
-
-	hist2_twoJetsInEndcap.SetLineColor(ROOT.kRed)
-	hist2_twoJetsInEndcap.SetLineWidth(2)
-
-	legend2 = ROOT.TLegend(0.6, 0.6, 0.85, 0.85)
-	legend2.SetBorderSize(0)
-	
-	legend2.AddEntry(hist1_twoJetsInEndcap, label1, 'l')
-	legend2.AddEntry(hist2_twoJetsInEndcap, label2, 'l')
-
-	canv2 = ROOT.TCanvas('canv2', 'canv2')
-	
-	if hist2_twoJetsInEndcap.GetMaximum() > hist1_twoJetsInEndcap.GetMaximum():
-		
-		hist2_twoJetsInEndcap.GetXaxis().SetTitle('MET (GeV)')
-		hist2_twoJetsInEndcap.GetYaxis().SetTitle('Number of Events')
-
-		hist2_twoJetsInEndcap.SetTitle('')
-
-		hist2_twoJetsInEndcap.Draw()
-		hist1_twoJetsInEndcap.Draw('same')
-	
-	else:
-	
-		hist1_twoJetsInEndcap.GetXaxis().SetTitle('MET (GeV)')
-		hist1_twoJetsInEndcap.GetYaxis().SetTitle('Number of Events')
-
-		hist1_twoJetsInEndcap.SetTitle('')
-
-		hist1_twoJetsInEndcap.Draw()
-		hist2_twoJetsInEndcap.Draw('same')
-
-	legend2.Draw('same')
-
-	filename = label1 + '_' + label2 + '_MET_' + str(mjjCut) + '_' + str(leadingJetPtCut) + '_' + str(trailingJetPtCut) + '.png'
-	dirName = 'pngImages/triggerCompPlots/MET_plots/twoJetsInEndcap'
-
-	if not os.path.isdir(dirName):
-
-		os.makedirs(dirName)
-
-	filePath = os.path.join(dirName, filename)
-
-	canv2.Print(filePath)
-
-	print('MET comparison plot saved')
-	print('Filename: {}\n'.format(filePath))
-
-	#####################
-	#Construct histograms for the case where one jet is in endcap and the other in barrel
-	#####################
-
-	hist1_oneJetInBarrel_oneJetInEndcap.SetLineColor(ROOT.kBlack)
-	hist1_oneJetInBarrel_oneJetInEndcap.SetLineWidth(2)
-
-	hist2_oneJetInBarrel_oneJetInEndcap.SetLineColor(ROOT.kRed)
-	hist2_oneJetInBarrel_oneJetInEndcap.SetLineWidth(2)
-
-	legend3 = ROOT.TLegend(0.6, 0.6, 0.85, 0.85)
-	legend3.SetBorderSize(0)
-	
-	legend3.AddEntry(hist1_oneJetInBarrel_oneJetInEndcap, label1, 'l')
-	legend3.AddEntry(hist2_oneJetInBarrel_oneJetInEndcap, label2, 'l')
-
-	canv3 = ROOT.TCanvas('canv3', 'canv3')
-	
-	if hist2_oneJetInBarrel_oneJetInEndcap.GetMaximum() > hist1_oneJetInBarrel_oneJetInEndcap.GetMaximum():
-		
-		hist2_oneJetInBarrel_oneJetInEndcap.GetXaxis().SetTitle('MET (GeV)')
-		hist2_oneJetInBarrel_oneJetInEndcap.GetYaxis().SetTitle('Number of Events')
-
-		hist2_oneJetInBarrel_oneJetInEndcap.SetTitle('')
-
-		hist2_oneJetInBarrel_oneJetInEndcap.Draw()
-		hist1_oneJetInBarrel_oneJetInEndcap.Draw('same')
-	
-	else:
-	
-		hist1_oneJetInBarrel_oneJetInEndcap.GetXaxis().SetTitle('MET (GeV)')
-		hist1_oneJetInBarrel_oneJetInEndcap.GetYaxis().SetTitle('Number of Events')
-
-		hist1_oneJetInBarrel_oneJetInEndcap.SetTitle('')
-
-		hist1_oneJetInBarrel_oneJetInEndcap.Draw()
-		hist2_oneJetInBarrel_oneJetInEndcap.Draw('same')
-
-	legend3.Draw('same')
-
-	filename = label1 + '_' + label2 + '_MET_' + str(mjjCut) + '_' + str(leadingJetPtCut) + '_' + str(trailingJetPtCut) + '.png'
-	dirName = 'pngImages/triggerCompPlots/MET_plots/oneJetInBarrel_oneJetInEndcap'
-
-	if not os.path.isdir(dirName):
-
-		os.makedirs(dirName)
-
-	filePath = os.path.join(dirName, filename)
-
-	canv3.Print(filePath)
-
-	print('MET comparison plot saved')
-	print('Filename: {}\n'.format(filePath))
+	drawCompGraph(hist1_oneJetInBarrel_oneJetInEndcap, hist2_oneJetInBarrel_oneJetInEndcap, label1, label2, 'MET', 'oneJetInBarrel_oneJetInEndcap', cuts)
 
 	fin.Close()
 

@@ -1,15 +1,41 @@
 import ROOT
 from math import sqrt
 
-def applyVBFSelections(tree):
+def applyVBFSelections(tree, cuts, drawHisto=False):
 
 	'''
 	Applies VBF selections and tracks the number of events throughout each cut.
+	Also draws histograms for variables of interest at each cut level, if drawHisto option is True.
 	Returns the list of labels and event counts at different stages in the cut flow.
 	'''
 	labels = ['total', 'METCut', 'numJet', 'LeadJetPt', 'TrailJetPt', 'MinPhiJetMET', 'NegEtaProd', 'EtaDiff', 'bJetCut', 'LeptonVeto', 'PhotonVeto', 'mjjCut']
 
  	eventCounter = [0 for label in labels] 
+
+	mjj_cut = cuts[0]
+	leadingJetPt_cut = cuts[1]
+	tralingJetPt_cut = cuts[2]
+	met_cut = cuts[3]
+
+	eventCounter[0] = tree.GetEntries() #Total number of entries
+
+	cut = 'met > ' + str(met_cut)
+
+	eventCounter[1] = tree.GetEntries(cut)
+	tree.Draw('met>>met_hist1', cut, '')
+	tree.Draw('mjj>>mjj_hist1', cut, '')
+	tree.Draw('leadingJetPt>>leadingJetPt_hist1', cut, '')
+	tree.Draw('trailingJetPt>>trailingJetPt_hist1', cut, '')
+	
+	cut += ' && nJets > 2'	
+
+	eventCounter[2] = tree.GetEntries(cut)
+	tree.Draw('met>>met_hist2', cut, '')
+	tree.Draw('mjj>>mjj_hist2', cut, '')
+	tree.Draw('leadingJetPt>>leadingJetPt_hist2', cut, '')
+	tree.Draw('trailingJetPt>>trailingJetPt_hist2', cut, '')
+
+	#Rest to be implemented and tested
 
 	for event in tree:
 
@@ -18,7 +44,7 @@ def applyVBFSelections(tree):
 		if event.met < 200: continue
 
 		eventCounter[1] += 1
-
+		
 		if event.nJets < 2: continue
 
 		eventCounter[2] += 1

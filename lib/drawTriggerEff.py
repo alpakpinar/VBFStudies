@@ -1,5 +1,6 @@
 import ROOT
-import os 
+import os
+import numpy as np 
 from array import array
 
 def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, trailingJetPtCut):
@@ -105,7 +106,7 @@ def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, traili
 		eff_graph_MET.Draw('AP')
 
 		pngDir = 'pngImages/triggerEffPlots/METPlots/mjjCut' + str(mjjCut) + '_leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
-		file_name = trigger + '_MET.png'
+		file_name = trigger + '_MET_mjjCut' + str(mjjCut) + '_leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut) + '.png'
 		
 		if not os.path.isdir(pngDir):
 
@@ -224,7 +225,7 @@ def drawTriggerEff_trailingJetPt(inputFile, trigger, args, mjjCut, leadingJetPtC
 		eff_graph_trailingJetPt.Draw('AP')
 
 		pngDir = 'pngImages/triggerEffPlots/trailingJetPtPlots/mjjCut' + str(mjjCut) + '_leadingJetPtCut' + str(leadingJetPtCut)
-		fileName = trigger + '_trailingJetPt.png'
+		fileName = trigger + '_trailingJetPt_mjjCut' + str(mjjCut) + '_leadingJetPtCut' + str(leadingJetPtCut) + '.png'
 		
 		if not os.path.isdir(pngDir):
 
@@ -261,13 +262,14 @@ def drawTriggerEff_trailingJetPt(inputFile, trigger, args, mjjCut, leadingJetPtC
 
 	return trailingJetPt_hist_afterVBFCutsAndTrigger, eff_graph_trailingJetPt
 
+
 def drawTriggerEff_leadingJetPt(inputFile, trigger, args, mjjCut):
 
 	'''
     Constructs the trigger efficiency graph for a given trigger, as a function of leading jet pt. 
     Returns the leading jet pt histogram wih VBF cuts + trigger and efficiency plot.
-	On top of default VBF cuts, applies the given mjj cut.
-    '''
+    Applies given mjjCut on top of default VBF selections.
+	'''
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
 	
@@ -293,7 +295,7 @@ def drawTriggerEff_leadingJetPt(inputFile, trigger, args, mjjCut):
 
 		out = ROOT.TFile.Open(filePath, 'UPDATE')
 
-	leadingJetPt_array = array('f', [80., 85., 90., 95.,  100., 105.,  110., 115., 120., 130., 140., 150., 160., 175., 190., 210., 230., 250.])
+	leadingJetPt_array = array('f', [80., 85., 90., 95.,  100., 105.,  110., 115., 120., 130., 140., 150., 160., 175., 190., 210., 230., 250., 280., 310., 350.]) 
 
 	leadingJetPt_hist = ROOT.TH1F('leadingJetPt_hist', 'leadingJetPt_hist', len(leadingJetPt_array)-1, leadingJetPt_array)
 
@@ -305,19 +307,25 @@ def drawTriggerEff_leadingJetPt(inputFile, trigger, args, mjjCut):
 
 	#Cuts are default VBF cuts and mjj cut provided
 
-	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && mjj > ' + str(mjjCut)
+	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && mjj > ' + str(mjjCut) 
 
 	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
 
 	f.eventTree.Draw('jet_pt[0]>>leadingJetPt_hist')
 	f.eventTree.Draw('jet_pt[0]>>leadingJetPt_hist_afterVBFCuts', vbfCuts, '')
 	f.eventTree.Draw('jet_pt[0]>>leadingJetPt_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
+
+	#Including overflow bin for each histogram
+
+	#leadingJetPt_hist.GetXaxis().SetRange(1, leadingJetPt_hist.GetNbinsX()+1)
+	#leadingJetPt_hist_afterVBFCuts.GetXaxis().SetRange(1, leadingJetPt_hist.GetNbinsX()+1)
+	#leadingJetPt_hist_afterVBFCutsAndTrigger.GetXaxis().SetRange(1, leadingJetPt_hist.GetNbinsX()+1)
 	
 	####
 	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
 	print('Events passing VBF cuts + {}: {}\n'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
 	####	
-	
+
 	#Go to the directory for trigger efficiencies 
 	
 	try: out.GetKey('triggerEff_leadingJetPt').IsFolder()
@@ -343,7 +351,7 @@ def drawTriggerEff_leadingJetPt(inputFile, trigger, args, mjjCut):
 		eff_graph_leadingJetPt.Draw('AP')
 		
 		pngDir = 'pngImages/triggerEffPlots/leadingJetPtPlots/mjjCut' + str(mjjCut)
-		fileName = trigger + '_leadingJetPt.png'
+		fileName = trigger + '_leadingJetPt_mjjCut' + str(mjjCut)  + '.png'
 
 		if not os.path.isdir(pngDir):
 
@@ -379,8 +387,6 @@ def drawTriggerEff_leadingJetPt(inputFile, trigger, args, mjjCut):
 	f.Close()
 
 	return leadingJetPt_hist_afterVBFCutsAndTrigger, eff_graph_leadingJetPt
-	
-
 
 def drawTriggerEff_mjj(inputFile, trigger, args):
 
@@ -413,7 +419,8 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 
 		out = ROOT.TFile(filePath, 'RECREATE')
 
-	mjj_array = array('f', [500., 520., 540., 570., 600., 640., 680., 730., 790., 880., 1000.]) 
+	mjj_array = np.arange(0., 3000., 100.)
+	#mjj_array = array('f', [500., 520., 540., 570., 600., 640., 680., 730., 790., 880., 1000.]) 
 
 	mjj_hist = ROOT.TH1F('mjj_hist', 'mjj_hist', len(mjj_array)-1, mjj_array)
 
@@ -455,6 +462,14 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	print('Events passing VBF cuts + {}: {}\n'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
 	####	
 	
+	#Rebin the histograms
+
+	#mjj_hist.Rebin(10)
+	#mjj_hist_afterVBFCuts.Rebin(10)
+	#mjj_hist_afterVBFCutsAndTrigger.Rebin(10)
+
+	#########################################
+
 	#Go to the directory for trigger efficiencies 
 	
 	try: out.GetKey('triggerEff_mjj').IsFolder()
@@ -519,4 +534,6 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	f.Close()
 
 	return mjj_hist_afterVBFCutsAndTrigger, eff_graph_mjj
+
+
 

@@ -74,25 +74,25 @@ def drawCutFlow(inputFile):
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
 	tree = f.eventTree
 
-	labels, eventCounts = applyVBFSelections(tree)	
+	labels, eventCounts = applyVBFSelections(tree, cuts, drawHisto=True)	
 
 	canv = ROOT.TCanvas('canv', 'canv', 800, 600)
 	canv.SetGrid()
 
-	cutFlowGraph = ROOT.TGraph(len(eventCounts))
+	cutFlowGraph = ROOT.TGraph(len(eventCounts)-1)
 
 	cutFlowGraph.SetNameTitle('evtCounts', 'Event Counts After Each VBF Cut')
 
 	x_ax = cutFlowGraph.GetXaxis()
 
-	x_ax.Set(len(eventCounts), 0, len(eventCounts))
+	x_ax.Set(len(eventCounts)-1, 0, len(eventCounts)-1)
 
-	for i in range(len(eventCounts)):
+	for i in range(1, len(eventCounts)):
 		
 		x_ax.SetBinLabel(i+1, labels[i]) #Labeling the x-axis
 
 		cutFlowGraph.SetPoint(i, i, eventCounts[i]*100/eventCounts[0]) #Filling the graph with percentage of events passing through each cut
-		print(x_ax.GetBinLabel(i+1))
+		print(x_ax.GetBinLabel(i))
 
 	print(x_ax.GetXmax())
 
@@ -276,9 +276,9 @@ if __name__ == '__main__':
 	eff_graphs_trailingJetPt = {}
 	trailingJetPt_hist_withTriggers = {}
 	
-	cuts = [750, 160, 50] #Cuts that will be applied: mjj, leadingJetPt, trailingJetPt
+	cuts = [750, 160, 50, 150] #Cuts that will be applied: mjj, leadingJetPt, trailingJetPt, MET
 
-	for count, trigger in enumerate(triggers):
+	#for count, trigger in enumerate(triggers):
 
 		#mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type)
 		#
@@ -286,7 +286,7 @@ if __name__ == '__main__':
 
 		#trailingJetPt_hist_withTriggers[trigger], eff_graphs_trailingJetPt[trigger] = drawTriggerEff_trailingJetPt(inputFile, trigger, file_type, cuts[0], cuts[1])
 		
-		met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type, cuts[0], cuts[1], cuts[2])
+		#met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type, cuts[0], cuts[1], cuts[2])
 
 	#Draw all the comparison graphs 
 
@@ -304,4 +304,4 @@ if __name__ == '__main__':
 	#drawCompGraph_trailingJetPt(inputFile, triggers[0], triggers[3], legendLabels[0], legendLabels[3], cuts)
 	#drawCompGraph_mjj(inputFile, triggers[0], triggers[3], legendLabels[0], legendLabels[3], cuts)
 
-	#drawCutFlow(inputFile)
+	drawCutFlow(inputFile)

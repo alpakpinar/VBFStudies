@@ -5,7 +5,8 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 
 	'''
 	Applies VBF selections and tracks the number of events throughout each cut.
-	Also draws histograms for variables of interest at each cut level, if drawHisto option is True.
+	Cuts to be applied must be given in the cuts list.
+	Also draws histograms for variables of interest at each cut level and saves them in a ROOT file, if drawHisto option is True.
 	Returns the list of labels and event counts at different stages in the cut flow.
 	'''
 	labels = ['total', 'METCut', 'numJet', 'LeadJetPt', 'TrailJetPt', 'MinPhiJetMET', 'NegEtaProd', 'EtaDiff', 'bJetCut', 'LeptonVeto', 'PhotonVeto', 'mjjCut']
@@ -14,8 +15,10 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 
 	mjj_cut = cuts[0]
 	leadingJetPt_cut = cuts[1]
-	tralingJetPt_cut = cuts[2]
+	trailingJetPt_cut = cuts[2]
 	met_cut = cuts[3]
+
+	out = ROOT.TFile('output/distributions.root', 'RECREATE')
 
 	eventCounter[0] = tree.GetEntries() #Total number of entries
 
@@ -24,66 +27,94 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	eventCounter[1] = tree.GetEntries(cut)
 	tree.Draw('met>>met_hist1', cut, '')
 	tree.Draw('mjj>>mjj_hist1', cut, '')
-	tree.Draw('leadingJetPt>>leadingJetPt_hist1', cut, '')
-	tree.Draw('trailingJetPt>>trailingJetPt_hist1', cut, '')
+	tree.Draw('jet_pt[0]>>leadingJetPt_hist1', cut, '')
+	tree.Draw('jet_pt[1]>>trailingJetPt_hist1', cut, '')
 	
-	cut += ' && nJets > 2'	
+	cut += ' && nJet > 2'	
 
 	eventCounter[2] = tree.GetEntries(cut)
 	tree.Draw('met>>met_hist2', cut, '')
 	tree.Draw('mjj>>mjj_hist2', cut, '')
-	tree.Draw('leadingJetPt>>leadingJetPt_hist2', cut, '')
-	tree.Draw('trailingJetPt>>trailingJetPt_hist2', cut, '')
+	tree.Draw('jet_pt[0]>>leadingJetPt_hist2', cut, '')
+	tree.Draw('jet_pt[1]>>trailingJetPt_hist2', cut, '')
 
-	#Rest to be implemented and tested
+	cut += ' && jet_pt[0] > ' + str(leadingJetPt_cut)
 
-	for event in tree:
+	eventCounter[3] = tree.GetEntries(cut)
+	tree.Draw('met>>met_hist3', cut, '')
+	tree.Draw('mjj>>mjj_hist3', cut, '')
+	tree.Draw('jet_pt[0]>>leadingJetPt_hist3', cut, '')
+	tree.Draw('jet_pt[1]>>trailingJetPt_hist3', cut, '')
 
-		eventCounter[0] += 1
+	cut += ' && jet_pt[1] > ' + str(trailingJetPt_cut)
+
+	eventCounter[4] = tree.GetEntries(cut)
+	tree.Draw('met>>met_hist4', cut, '')
+	tree.Draw('mjj>>mjj_hist4', cut, '')
+	tree.Draw('jet_pt[0]>>leadingJetPt_hist4', cut, '')
+	tree.Draw('jet_pt[1]>>trailingJetPt_hist4', cut, '')
+
+	cut += ' && mjj > ' + str(mjj_cut)
+
+	eventCounter[5] = tree.GetEntries(cut)
+	tree.Draw('met>>met_hist5', cut, '')
+	tree.Draw('mjj>>mjj_hist5', cut, '')
+	tree.Draw('jet_pt[0]>>leadingJetPt_hist5', cut, '')
+	tree.Draw('jet_pt[1]>>trailingJetPt_hist5', cut, '')
+
+	cut += ' && minPhi_jetMET > 0.5'
+
+	eventCounter[6] = tree.GetEntries(cut)
+	tree.Draw('met>>met_hist6', cut, '')
+	tree.Draw('mjj>>mjj_hist6', cut, '')
+	tree.Draw('jet_pt[0]>>leadingJetPt_hist6', cut, '')
+	tree.Draw('jet_pt[1]>>trailingJetPt_hist6', cut, '')
+
+	cut += ' && jet_eta[0]*jet_eta[1] < 0'
+
+	eventCounter[7] = tree.GetEntries(cut)
+	tree.Draw('met>>met_hist7', cut, '')
+	tree.Draw('mjj>>mjj_hist7', cut, '')
+	tree.Draw('jet_pt[0]>>leadingJetPt_hist7', cut, '')
+	tree.Draw('jet_pt[1]>>trailingJetPt_hist7', cut, '')
+
+	cut += ' && abs(jet_eta[0] - jet_eta[1]) > 2.5'
+
+	eventCounter[8] = tree.GetEntries(cut)
+	tree.Draw('met>>met_hist8', cut, '')
+	tree.Draw('mjj>>mjj_hist8', cut, '')
+	tree.Draw('jet_pt[0]>>leadingJetPt_hist8', cut, '')
+	tree.Draw('jet_pt[1]>>trailingJetPt_hist8', cut, '')
+
+	cut += ' && contains_bJet == 0'
 	
-		if event.met < 200: continue
+	eventCounter[9] = tree.GetEntries(cut)
+	tree.Draw('met>>met_hist9', cut, '')
+	tree.Draw('mjj>>mjj_hist9', cut, '')
+	tree.Draw('jet_pt[0]>>leadingJetPt_hist9', cut, '')
+	tree.Draw('jet_pt[1]>>trailingJetPt_hist9', cut, '')
 
-		eventCounter[1] += 1
-		
-		if event.nJets < 2: continue
+	cut += ' && containsLepton == 0'
+	
+	eventCounter[10] = tree.GetEntries(cut)
+	tree.Draw('met>>met_hist10', cut, '')
+	tree.Draw('mjj>>mjj_hist10', cut, '')
+	tree.Draw('jet_pt[0]>>leadingJetPt_hist10', cut, '')
+	tree.Draw('jet_pt[1]>>trailingJetPt_hist10', cut, '')
 
-		eventCounter[2] += 1
+	cut += ' && containsPhoton == 0'
+	
+	eventCounter[11] = tree.GetEntries(cut)
+	tree.Draw('met>>met_hist11', cut, '')
+	tree.Draw('mjj>>mjj_hist11', cut, '')
+	tree.Draw('jet_pt[0]>>leadingJetPt_hist11', cut, '')
+	tree.Draw('jet_pt[1]>>trailingJetPt_hist11', cut, '')
 
-		if event.jet_pt[0] < 80: continue
+	out.Write()
+	out.Close()
 
-		eventCounter[3] += 1
-
-		if event.jet_pt[1] < 40: continue
-		
-		eventCounter[4] += 1
-
-		if event.minPhi_jetMET < 0.5: continue
-
-		eventCounter[5] += 1
-
-		if event.jet_eta[0] * event.jet_eta[1] > 0: continue
-
-		eventCounter[6] += 1
-
-		if abs(event.jet_eta[0] - event.jet_eta[1]) < 2.5: continue
-
-		eventCounter[7] += 1
-
-		if event.contains_bJet != 0: continue
-
-		eventCounter[8] += 1
-
-		if event.containsLepton != 0: continue
-
-		eventCounter[9] += 1
-
-		if event.containsPhoton != 0: continue
-
-		eventCounter[10] += 1
-		
-		if event.mjj < 500: continue
-
-		eventCounter[11] += 1
+	print(eventCounter)
+	print(labels)
 
 	return labels, eventCounter
 

@@ -29,13 +29,6 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	tree.Draw('jet_pt[1]>>trailingJetPt_hist0')
 	tree.Draw('nJet>>numJets_hist0')
 
-	#Retrieve the histograms so that Python knows about them
-	#met_hist0 = ROOT.gDirectory.Get('met_hist0')
-	#mjj_hist0 = ROOT.gDirectory.Get('mjj_hist0')
-	#leadingJetPt_hist0 = ROOT.gDirectory.Get('leadingJetPt_hist0')
-	#trailingJetPt_hist0 = ROOT.gDirectory.Get('trailingJetPt_hist0')
-	#numJets_hist0 = ROOT.gDirectory.Get('numJets_hist0')
-
 	cut = 'minPhi_jetMET > 0.5'
 	
 	eventCounter[1] = tree.GetEntries(cut)
@@ -44,12 +37,6 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	tree.Draw('jet_pt[0]>>leadingJetPt_hist1', cut, '')
 	tree.Draw('jet_pt[1]>>trailingJetPt_hist1', cut, '')
 	tree.Draw('nJet>>numJets_hist1', cut, '')	
-
-	#met_hist1 = ROOT.gDirectory.Get('met_hist1')
-	#mjj_hist1 = ROOT.gDirectory.Get('mjj_hist1')
-	#leadingJetPt_hist1 = ROOT.gDirectory.Get('leadingJetPt_hist1')
-	#trailingJetPt_hist1 = ROOT.gDirectory.Get('trailingJetPt_hist1')
-	#numJets_hist1 = ROOT.gDirectory.Get('numJets_hist1')
 	
 	cut += ' && jet_eta[0]*jet_eta[1] < 0'
 
@@ -60,12 +47,6 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	tree.Draw('jet_pt[1]>>trailingJetPt_hist2', cut, '')
 	tree.Draw('nJet>>numJets_hist2', cut, '')	
 	
-	#met_hist2 = ROOT.gDirectory.Get('met_hist2')
-	#mjj_hist2 = ROOT.gDirectory.Get('mjj_hist2')
-	#leadingJetPt_hist2 = ROOT.gDirectory.Get('leadingJetPt_hist2')
-	#trailingJetPt_hist2 = ROOT.gDirectory.Get('trailingJetPt_hist2')
-	#numJets_hist2 = ROOT.gDirectory.Get('numJets_hist2')
-	
 	cut += ' && abs(jet_eta[0] - jet_eta[1]) > 2.5'
 
 	eventCounter[3] = tree.GetEntries(cut)
@@ -75,12 +56,6 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	tree.Draw('jet_pt[1]>>trailingJetPt_hist3', cut, '')
 	tree.Draw('nJet>>numJets_hist3', cut, '')	
 	
-	#met_hist3 = ROOT.gDirectory.Get('met_hist3')
-	#mjj_hist3 = ROOT.gDirectory.Get('mjj_hist3')
-	#leadingJetPt_hist3 = ROOT.gDirectory.Get('leadingJetPt_hist3')
-	#trailingJetPt_hist3 = ROOT.gDirectory.Get('trailingJetPt_hist3')
-	#numJets_hist3 = ROOT.gDirectory.Get('numJets_hist3')
-	
 	cut += ' && contains_bJet == 0'
 
 	eventCounter[4] = tree.GetEntries(cut)
@@ -89,12 +64,6 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	tree.Draw('jet_pt[0]>>leadingJetPt_hist4', cut, '')
 	tree.Draw('jet_pt[1]>>trailingJetPt_hist4', cut, '')
 	tree.Draw('nJet>>numJets_hist4', cut, '')	
-
-	#met_hist4 = ROOT.gDirectory.Get('met_hist4')
-	#mjj_hist4 = ROOT.gDirectory.Get('mjj_hist4')
-	#leadingJetPt_hist4 = ROOT.gDirectory.Get('leadingJetPt_hist4')
-	#trailingJetPt_hist4 = ROOT.gDirectory.Get('trailingJetPt_hist4')
-	#numJets_hist4 = ROOT.gDirectory.Get('numJets_hist4')
 	
 	cut += ' && containsLepton == 0'
 	
@@ -105,12 +74,6 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	tree.Draw('jet_pt[1]>>trailingJetPt_hist5', cut, '')
 	tree.Draw('nJet>>numJets_hist5', cut, '')	
 	
-	#met_hist5 = ROOT.gDirectory.Get('met_hist5')
-	#mjj_hist5 = ROOT.gDirectory.Get('mjj_hist5')
-	#leadingJetPt_hist5 = ROOT.gDirectory.Get('leadingJetPt_hist5')
-	#trailingJetPt_hist5 = ROOT.gDirectory.Get('trailingJetPt_hist5')
-	#numJets_hist5 = ROOT.gDirectory.Get('numJets_hist5')
-	
 	cut += ' && containsPhoton == 0'
 
 	eventCounter[6] = tree.GetEntries(cut)
@@ -119,12 +82,6 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	tree.Draw('jet_pt[0]>>leadingJetPt_hist6', cut, '')
 	tree.Draw('jet_pt[1]>>trailingJetPt_hist6', cut, '')
 	tree.Draw('nJet>>numJets_hist6', cut, '')	
-	
-	#met_hist6 = ROOT.gDirectory.Get('met_hist6')
-	#mjj_hist6 = ROOT.gDirectory.Get('mjj_hist6')
-	#leadingJetPt_hist6 = ROOT.gDirectory.Get('leadingJetPt_hist6')
-	#trailingJetPt_hist6 = ROOT.gDirectory.Get('trailingJetPt_hist6')
-	#numJets_hist6 = ROOT.gDirectory.Get('numJets_hist6')
 	
 	cut += ' && mjj > ' + str(mjj_cut)
 	
@@ -135,12 +92,6 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	tree.Draw('jet_pt[1]>>trailingJetPt_hist7', cut, '')
 	tree.Draw('nJet>>numJets_hist7', cut, '')	
 	
-	#met_hist7 = ROOT.gDirectory.Get('met_hist7')
-	#mjj_hist7 = ROOT.gDirectory.Get('mjj_hist7')
-	#leadingJetPt_hist7 = ROOT.gDirectory.Get('leadingJetPt_hist7')
-	#trailingJetPt_hist7 = ROOT.gDirectory.Get('trailingJetPt_hist7')
-	#numJets_hist7 = ROOT.gDirectory.Get('numJets_hist7')
-	
 	cut += ' && jet_pt[0] > ' + str(leadingJetPt_cut)
 	
 	eventCounter[8] = tree.GetEntries(cut)
@@ -149,12 +100,6 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	tree.Draw('jet_pt[0]>>leadingJetPt_hist8', cut, '')
 	tree.Draw('jet_pt[1]>>trailingJetPt_hist8', cut, '')
 	tree.Draw('nJet>>numJets_hist8', cut, '')	
-	
-	#met_hist8 = ROOT.gDirectory.Get('met_hist8')
-	#mjj_hist8 = ROOT.gDirectory.Get('mjj_hist8')
-	#leadingJetPt_hist8 = ROOT.gDirectory.Get('leadingJetPt_hist8')
-	#trailingJetPt_hist8 = ROOT.gDirectory.Get('trailingJetPt_hist8')
-	#numJets_hist8 = ROOT.gDirectory.Get('numJets_hist8')
 	
 	cut += ' && jet_pt[1] > ' + str(trailingJetPt_cut)
 	
@@ -165,12 +110,6 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	tree.Draw('jet_pt[1]>>trailingJetPt_hist9', cut, '')
 	tree.Draw('nJet>>numJets_hist9', cut, '')	
 	
-	#met_hist9 = ROOT.gDirectory.Get('met_hist9')
-	#mjj_hist9 = ROOT.gDirectory.Get('mjj_hist9')
-	#leadingJetPt_hist9 = ROOT.gDirectory.Get('leadingJetPt_hist9')
-	#trailingJetPt_hist9 = ROOT.gDirectory.Get('trailingJetPt_hist9')
-	#numJets_hist9 = ROOT.gDirectory.Get('numJets_hist9')
-	
 	cut += ' && met > ' + str(met_cut)
 
 	eventCounter[10] = tree.GetEntries(cut)
@@ -179,12 +118,6 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	tree.Draw('jet_pt[0]>>leadingJetPt_hist10', cut, '')
 	tree.Draw('jet_pt[1]>>trailingJetPt_hist10', cut, '')
 	tree.Draw('nJet>>numJets_hist10', cut, '')	
-	
-	#met_hist10 = ROOT.gDirectory.Get('met_hist10')
-	#mjj_hist10 = ROOT.gDirectory.Get('mjj_hist10')
-	#leadingJetPt_hist10 = ROOT.gDirectory.Get('leadingJetPt_hist10')
-	#trailingJetPt_hist10 = ROOT.gDirectory.Get('trailingJetPt_hist10')
-	#numJets_hist10 = ROOT.gDirectory.Get('numJets_hist10')
 	
 	#Create the output directory for png files if not created before
 

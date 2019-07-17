@@ -171,11 +171,9 @@ def applyVBFSelections(tree, cuts, drawHisto=False):
 	#trailingJetPt_hist9 = ROOT.gDirectory.Get('trailingJetPt_hist9')
 	#numJets_hist9 = ROOT.gDirectory.Get('numJets_hist9')
 	
-	cut += 'met > ' + str(met_cut)
+	cut += ' && met > ' + str(met_cut)
 
 	eventCounter[10] = tree.GetEntries(cut)
-	print(eventCounter[10])
-
 	tree.Draw('met>>met_hist10', cut, '')
 	tree.Draw('mjj>>mjj_hist10', cut, '')
 	tree.Draw('jet_pt[0]>>leadingJetPt_hist10', cut, '')

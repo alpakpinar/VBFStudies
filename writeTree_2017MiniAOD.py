@@ -127,12 +127,61 @@ def writeTree(inputFile, tree, args):
 
 		if met[0] < 50: continue
 
+		######################
+		#Implementing tight jet ID, 2017 recommendations
+		######################
+
 		jets_ = jets.product()
 
-		nJet[0] = len(jets_)
-		mjj[0] = invMassTwoJets(jets_)
+		nJet[0] = 0
 
+		AK4_tightJets = []
+		
 		for i, jet in enumerate(jets_):
+
+			if abs(jet.eta()) <= 2.7:
+
+				if jet.nConstituents() <= 1: continue
+
+				if jet.neutralHadronEnergyFraction() >= 0.9: continue
+
+				if jet.neutralEmEnergyFraction() >= 0.9: continue
+				
+				if abs(jet.eta()) <= 2.4:
+
+					if jet.chargedHadronEnergyFraction() <= 0: continue
+
+					if jet.chargedMultiplicity() <= 0: continue
+
+					AK4_tightJets.append(jet)			
+
+				else: AK4_tightJets.append(jet)
+				
+			
+			if 2.7 < abs(jet.eta()) <= 3.0:
+
+				if not 0.02 < jet.neutralEmEnergyFraction() < 0.99: continue
+
+				if jet.neutralMultiplicity() <= 2: continue
+
+				AK4_tightJets.append(jet)
+
+			if abs(jet.eta()) > 3.0:
+
+				if jet.neutralEmEnergyFraction() > 0.9: continue
+
+				if jet.neutralHadronEnergyFraction() <= 0.02: continue
+		
+				if jet.neutralMultiplicity() <= 10: continue
+
+				AK4_tightJets.append(jet) 
+
+		###########################
+
+		nJet[0] = len(AK4_tightJets)
+		mjj[0] = invMassTwoJets(AK4_tightJets)
+
+		for i, jet in enumerate(AK4_tightJets):
 
 			jet_pt[i] = jet.pt()
 			jet_energy[i] = jet.energy()

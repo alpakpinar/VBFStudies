@@ -388,11 +388,12 @@ def drawTriggerEff_leadingJetPt(inputFile, trigger, args, mjjCut):
 
 	return leadingJetPt_hist_afterVBFCutsAndTrigger, eff_graph_leadingJetPt
 
-def drawTriggerEff_mjj(inputFile, trigger, args):
+def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtCut):
 
 	'''
 	Constructs the trigger efficiency graph for a given trigger, as a function of invariant mass of two leading jets, mjj.
 	Returns the mjj histogram wih VBF cuts + trigger and efficiency plot.
+	Applies the default VBF cuts and given leadingJetPt and trailingJetPt cuts.
 	'''
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
@@ -430,7 +431,7 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	mjj_hist_afterVBFCutsAndTrigger = ROOT.TH1F('mjj_hist_afterVBFCutsAndTrigger', 'mjj_hist_afterVBFCutsAndTrigger', len(mjj_array)-1, mjj_array)
 	mjj_hist_afterVBFCutsAndTrigger.SetLineColor(ROOT.kBlack)
 
-	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5'
+	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && jet_pt[0] > ' + str(leadingJetPtCut) + ' && jet_pt[1] > ' + str(trailingJetPtCut)
 
 	#vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5 && Flag_BadPFMuonFilter == 1 && Flag_goodVertices == 1 && Flag_globalSuperTightHalo2016Filter == 1 && Flag_HBHENoiseFilter == 1 && Flag_HBHENoiseIsoFilter == 1 && Flag_EcalDeadCellTriggerPrimitiveFilter == 1'
 
@@ -496,13 +497,13 @@ def drawTriggerEff_mjj(inputFile, trigger, args):
 	
 		eff_graph_mjj.Draw('AP')
 
-		pngDir = 'pngImages/triggerEffPlots/mjjPlots'
+		pngDir = 'pngImages/triggerEffPlots/mjjPlots/leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
 	
 		if not os.path.isdir(pngDir):
 
 			os.makedirs(pngDir)
 
-		fileName = trigger + '_mjj.png'
+		fileName = trigger + '_mjj_leadingJetPt' + str(leadingJetPtCut) + '_trailingJetPt' + str(trailingJetPtCut) + '.png'
 
 		canv.Print(os.path.join(pngDir, fileName))
 	

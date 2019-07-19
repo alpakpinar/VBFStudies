@@ -82,7 +82,7 @@ def writeTree(inputFile, tree, args):
 	genParticles, genParticlesLabel = Handle('std::vector<reco::GenParticle>'), 'prunedGenParticles'
 
 	triggerBits, triggerBitLabel = Handle('edm::TriggerResults'), ('TriggerResults','','HLT')
-	filterLabel = 'TriggerResults'
+	filterBits, filterLabel = Handle('edm::TriggerResults'), ('TriggerResults', '', 'PAT')
 
 	l1Jets, l1JetLabel  = Handle("BXVector<l1t::Jet>"), "caloStage2Digis:Jet"
 	l1EtSums, l1EtSumLabel  = Handle("BXVector<l1t::EtSum>"), "caloStage2Digis:EtSum"
@@ -108,7 +108,7 @@ def writeTree(inputFile, tree, args):
 		event.getByLabel(genParticlesLabel, genParticles)
 
 		event.getByLabel(triggerBitLabel, triggerBits)
-		#event.getByLabel(filterLabel, filters)
+		event.getByLabel(filterLabel, filterBits)
 		event.getByLabel(l1JetLabel, l1Jets)
 		event.getByLabel(l1EtSumLabel, l1EtSums)
 
@@ -156,8 +156,7 @@ def writeTree(inputFile, tree, args):
 					AK4_tightJets.append(jet)			
 
 				else: AK4_tightJets.append(jet)
-				
-			
+					
 			if 2.7 < abs(jet.eta()) <= 3.0:
 
 				if not 0.02 < jet.neutralEmEnergyFraction() < 0.99: continue
@@ -176,8 +175,6 @@ def writeTree(inputFile, tree, args):
 
 				AK4_tightJets.append(jet) 
 
-		###########################
-
 		nJet[0] = len(AK4_tightJets)
 		mjj[0] = invMassTwoJets(AK4_tightJets)
 
@@ -187,9 +184,6 @@ def writeTree(inputFile, tree, args):
 			jet_energy[i] = jet.energy()
 			jet_eta[i] = jet.eta()
 			jet_phi[i] = jet.phi()
-			jet_px[i] = jet.px()
-			jet_py[i] = jet.py()
-			jet_pz[i] = jet.pz()	
 			
 			#Getting b-tag information for each jet
 			tags = jet.getPairDiscri()
@@ -302,29 +296,24 @@ def writeTree(inputFile, tree, args):
 		for j, prt in enumerate(genParticles_):
 
 			pdgId[j] = prt.pdgId()
-			#mothers[i] = prt.mother()
+		
+		##########################
 		
 		triggerBits_ = triggerBits.product()
 
 		names = event.object().triggerNames(triggerBits_)
-		
-		##########################
 
 		for k in range(triggerBits_.size()):
 
 			#VBF DiJet triggers
 
 			if names.triggerName(k) == 'HLT_DiJet110_35_Mjj650_PFMET110_v5':
-				#print('Inside the first if')		
 	
 				if triggerBits_.accept(k):
 					HLT_DiJet110_35_Mjj650_PFMET110_v5[0] = 1
-					#print('In the second if statement!')
-					#print(HLT_DiJet110_35_Mjj650_PFMET110_v5[0])
+
 				else:
 					HLT_DiJet110_35_Mjj650_PFMET110_v5[0] = 0 
-					#print('In the second if statement!')
-					#print(HLT_DiJet110_35_Mjj650_PFMET110_v5[0])
  
 
 			elif names.triggerNames()[k] == 'HLT_DiJet110_35_Mjj650_PFMET120_v5':
@@ -391,56 +380,53 @@ def writeTree(inputFile, tree, args):
 			L1_jet_eta[i] = jet.eta()			
 			L1_jet_phi[i] = jet.phi()			
 			L1_jet_energy[i] = jet.energy()			
-			L1_jet_px[i] = jet.px()			
-			L1_jet_py[i] = jet.py()			
-			L1_jet_pz[i] = jet.pz()			
 
 		########################
 
 		#Cleaning filters		
 
-#		filters_ = filters.product()
-#	
-#		filterNames = event.object().triggerNames(filters_)
-#	
-#		for numFilter in range(filters_.size()):
-#
-#			if filterNames.triggerNames()[numFilter] == 'Flag_BadPFMuonFilter':
-#
-#				if filters_.accept(numFilter): Flag_BadPFMuonFilter[0] = 1
-#
-#				else: Flag_BadPFMuonFilter[0] = 0
-#			
-#			elif filterNames.triggerNames()[numFilter] == 'Flag_goodVertices':
-#
-#				if filters_.accept(numFilter): Flag_goodVertices[0] = 1
-#
-#				else: Flag_goodVertices[0] = 0
-#
-#			elif filterNames.triggerNames()[numFilter] == 'Flag_globalSuperTightHalo2016Filter':
-#
-#				if filters_.accept(numFilter): Flag_globalSuperTightHalo2016Filter[0] = 1
-#
-#				else: Flag_globalSuperTightHalo2016Filter[0] = 0
-#
-#			elif filterNames.triggerNames()[numFilter] == 'Flag_HBHENoiseFilter':
-#
-#				if filters_.accept(numFilter): Flag_HBHENoiseFilter[0] = 1
-#
-#				else: Flag_HBHENoiseFilter[0] = 0
-#
-#			elif filterNames.triggerNames()[numFilter] == 'Flag_HBHENoiseIsoFilter':
-#
-#				if filters_.accept(numFilter): Flag_HBHENoiseIsoFilter[0] = 1
-#
-#				else: Flag_HBHENoiseIsoFilter[0] = 0
-#
-#			elif filterNames.triggerNames()[numFilter] == 'Flag_EcalDeadCellTriggerPrimitiveFilter':
-#
-#				if filters_.accept(numFilter): Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 1
-#
-#				else: Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 0
-#
+		filters_ = filterBits.product()
+
+		filterNames = event.object().triggerNames(filters_)
+	
+		for numFilter in range(filters_.size()):
+
+			if filterNames.triggerNames()[numFilter] == 'Flag_BadPFMuonFilter':
+
+				if filters_.accept(numFilter): Flag_BadPFMuonFilter[0] = 1
+
+				else: Flag_BadPFMuonFilter[0] = 0
+			
+			elif filterNames.triggerNames()[numFilter] == 'Flag_goodVertices':
+
+				if filters_.accept(numFilter): Flag_goodVertices[0] = 1
+
+				else: Flag_goodVertices[0] = 0
+
+			elif filterNames.triggerNames()[numFilter] == 'Flag_globalSuperTightHalo2016Filter':
+
+				if filters_.accept(numFilter): Flag_globalSuperTightHalo2016Filter[0] = 1
+
+				else: Flag_globalSuperTightHalo2016Filter[0] = 0
+
+			elif filterNames.triggerNames()[numFilter] == 'Flag_HBHENoiseFilter':
+
+				if filters_.accept(numFilter): Flag_HBHENoiseFilter[0] = 1
+
+				else: Flag_HBHENoiseFilter[0] = 0
+
+			elif filterNames.triggerNames()[numFilter] == 'Flag_HBHENoiseIsoFilter':
+
+				if filters_.accept(numFilter): Flag_HBHENoiseIsoFilter[0] = 1
+
+				else: Flag_HBHENoiseIsoFilter[0] = 0
+
+			elif filterNames.triggerNames()[numFilter] == 'Flag_EcalDeadCellTriggerPrimitiveFilter':
+
+				if filters_.accept(numFilter): Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 1
+
+				else: Flag_EcalDeadCellTriggerPrimitiveFilter[0] = 0
+
 		tree.Fill()
 
 def main():

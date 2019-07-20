@@ -470,14 +470,16 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 	#########################################
 
 	#Go to the directory for trigger efficiencies 
+
+	folderName = 'triggerEff_mjj_leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
 	
-	try: out.GetKey('triggerEff_mjj').IsFolder()
+	try: out.GetKey(folderName).IsFolder()
 
 	except ReferenceError: 
 
-		out.mkdir('triggerEff_mjj', 'triggerEff_mjj') 
+		out.mkdir(folderName, folderName) 
 
-	out.cd('triggerEff_mjj')
+	out.cd(folderName)
 
 	#Check if the two histograms are consistent
 
@@ -509,13 +511,17 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 	
 	out.cd()
 	
-	try: out.GetKey('mjjHistos').IsFolder()
+	#Browse (create if necessary) the folder for individual histograms
+
+	histoDirName = 'mjjHistos_leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
+
+	try: out.GetKey(histoDirName).IsFolder()
 
 	except ReferenceError: 
 
-		out.mkdir('mjjHistos', 'mjjHistos') 
+		out.mkdir(histoDirName, histoDirName) 
 	
-	out.cd('mjjHistos')
+	out.cd(histoDirName)
 
 	if not args.noWrite:
 	
@@ -531,8 +537,6 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 	
 	out.Close()	
 	f.Close()
-
-	return mjj_hist_afterVBFCutsAndTrigger, eff_graph_mjj
 
 
 

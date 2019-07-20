@@ -11,7 +11,7 @@ from lib.selections import *
 from lib.drawTriggerEff import *
 from lib.drawCompGraph import *
 
-def getFileType():
+def getArgs():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-y', '--year', help = 'The production year for MiniAOD file (2017 or 2018)', type = int)
@@ -212,26 +212,41 @@ def readTree(inputFile):
     print('Total number of events passed L1 + HLT + VBF selections  : {0:6d}        Passing Ratio: {1:6.2f}%\n'.format(event_count_afterALL, event_count_afterALL*100/event_count_before)) 
     print('Job finished')
 
+def drawTriggerEff_mjjRange(inputFile, args, leadingJetPtCuts, trailingJetPtCuts, triggers):
+
+	'''
+	Given the leadingJetPtCuts, trailingJetPtCuts and triggers lists, draws and saves trigger efficiency plots for each of the given cuts for the given triggers.
+	'''
+	
+	for leadingJetPtCut in leadingJetPtCuts:
+
+		for trailingJetPtCut in trailingJetPtCuts:
+
+			for trigger in triggers;
+
+				drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtCut)	
+	
+
 
 if __name__ == '__main__':
 
-    file_type = getFileType()
+    args = getArgs()
     
-    if file_type.test:
+    if args.test:
 
-        inputFile = 'inputs/VBF_HToInv_' + str(file_type.year) + '_test.root'
+        inputFile = 'inputs/VBF_HToInv_' + str(args.year) + '_test.root'
         print('Starting job')
         print('File: {}'.format(inputFile))
 
-    elif file_type.shortTest:
+    elif args.shortTest:
         
-        inputFile = 'inputs/VBF_HToInv_' + str(file_type.year) + '_shortTest.root'
+        inputFile = 'inputs/VBF_HToInv_' + str(args.year) + '_shortTest.root'
         print('Starting job')
         print('File: {}'.format(inputFile))
     
     else:
  
-        inputFile = 'inputs/VBF_HToInv_' + str(file_type.year) + '.root'
+        inputFile = 'inputs/VBF_HToInv_' + str(args.year) + '.root'
         print('Starting job')
         print('File: {}'.format(inputFile))
     
@@ -251,7 +266,7 @@ if __name__ == '__main__':
     #Clean the ROOT file if needed
     ##############################
 
-    if file_type.clean:
+    if args.clean:
         
         for trigger in triggers:
 
@@ -286,13 +301,13 @@ if __name__ == '__main__':
 
     for count, trigger in enumerate(triggers):
 
-        #mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, file_type, cuts[1], cuts[2])
+        #mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, args, cuts[1], cuts[2])
         
-        #leadingJetPt_hist_withTriggers[trigger], eff_graphs_leadingJetPt[trigger] = drawTriggerEff_leadingJetPt(inputFile, trigger, file_type, cuts[0])
+        #leadingJetPt_hist_withTriggers[trigger], eff_graphs_leadingJetPt[trigger] = drawTriggerEff_leadingJetPt(inputFile, trigger, args, cuts[0])
 
-        #trailingJetPt_hist_withTriggers[trigger], eff_graphs_trailingJetPt[trigger] = drawTriggerEff_trailingJetPt(inputFile, trigger, file_type, cuts[0], cuts[1])
+        #trailingJetPt_hist_withTriggers[trigger], eff_graphs_trailingJetPt[trigger] = drawTriggerEff_trailingJetPt(inputFile, trigger, args, cuts[0], cuts[1])
         
-        met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, file_type, cuts[0], cuts[1], cuts[2])
+        met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, args, cuts[0], cuts[1], cuts[2])
 
     #Draw all the comparison graphs 
 

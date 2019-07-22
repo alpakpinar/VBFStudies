@@ -9,6 +9,7 @@ def constructTriggerEff(histo_cut, histo_all, trigger, args, pngDir, fileName):
 	Draws the efficiency graph for a given trigger, given two historgrams.
 	Saves the graph both as a graph in the relevant ROOT file and a png file in the relevant directory (if noWrite option is NOT specified while running the main script).
 	Saves the png file in the given directory pngDir, and filename will be fileName. Creates the pngDir if not already created.
+	Called in other drawTriggerEff functions.
 	'''
 
 	#Obtain the variable to be plotted and the case (two jets forward, central etc...)
@@ -109,90 +110,137 @@ def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, traili
 
 		#			deleteHistos(histo)
 
-	met_hist = ROOT.TH1F('met_hist', 'met_hist', len(met_array)-1, met_array)
+	met_hist_twoCentralJets = ROOT.TH1F('met_hist_twoCentralJets', 'met_hist_twoCentralJets', len(met_array)-1, met_array)
+	met_hist_twoForwardJets = ROOT.TH1F('met_hist_twoForwardJets', 'met_hist_twoForwardJets', len(met_array)-1, met_array)
+	met_hist_oneCentralJetOneForwardJet = ROOT.TH1F('met_hist_oneCentralJetOneForwardJet', 'met_hist_oneCentralJetOneForwardJet', len(met_array)-1, met_array)
 	
-	met_hist_afterVBFCuts = ROOT.TH1F('met_hist_afterVBFCuts', 'met_hist_afterVBFCuts', len(met_array)-1, met_array)	
-	met_hist_afterVBFCuts.SetLineColor(ROOT.kRed)
+	met_hist_afterVBFCuts_twoCentralJets = ROOT.TH1F('met_hist_afterVBFCuts_twoCentralJets', 'met_hist_afterVBFCuts_twoCentralJets', len(met_array)-1, met_array)	
+	met_hist_afterVBFCuts_twoCentralJets.SetLineColor(ROOT.kRed)
+	met_hist_afterVBFCuts_twoForwardJets = ROOT.TH1F('met_hist_afterVBFCuts_twoForwardJets', 'met_hist_afterVBFCuts_twoForwardJets', len(met_array)-1, met_array)	
+	met_hist_afterVBFCuts_twoForwardJets.SetLineColor(ROOT.kRed)
+	met_hist_afterVBFCuts_oneCentralJetOneForwardJet = ROOT.TH1F('met_hist_afterVBFCuts_oneCentralJetOneForwardJet', 'met_hist_afterVBFCuts_oneCentralJetOneForwardJet', len(met_array)-1, met_array)	
+	met_hist_afterVBFCuts_oneCentralJetOneForwardJet.SetLineColor(ROOT.kRed)
 	
-	met_hist_afterVBFCutsAndTrigger = ROOT.TH1F('met_hist_afterVBFCutsAndTrigger', 'met_hist_afterVBFCutsAndTrigger', len(met_array)-1, met_array)	
-	met_hist_afterVBFCutsAndTrigger.SetLineColor(ROOT.kBlack)
+	met_hist_afterVBFCutsAndTrigger_twoCentralJets = ROOT.TH1F('met_hist_afterVBFCutsAndTrigger_twoCentralJets', 'met_hist_afterVBFCutsAndTrigger_twoCentralJets', len(met_array)-1, met_array)	
+	met_hist_afterVBFCutsAndTrigger_twoCentralJets.SetLineColor(ROOT.kBlack)
+	met_hist_afterVBFCutsAndTrigger_twoForwardJets = ROOT.TH1F('met_hist_afterVBFCutsAndTrigger_twoForwardJets', 'met_hist_afterVBFCutsAndTrigger_twoForwardJets', len(met_array)-1, met_array)	
+	met_hist_afterVBFCutsAndTrigger_twoForwardJets.SetLineColor(ROOT.kBlack)
+	met_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet = ROOT.TH1F('met_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet', 'met_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet', len(met_array)-1, met_array)	
+	met_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet.SetLineColor(ROOT.kBlack)
 
 	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && Flag_BadPFMuonFilter == 1 && Flag_goodVertices == 1 && Flag_globalSuperTightHalo2016Filter == 1 && Flag_HBHENoiseFilter == 1 && Flag_HBHENoiseIsoFilter == 1 && Flag_EcalDeadCellTriggerPrimitiveFilter == 1 && mjj > ' + str(mjjCut) + ' && jet_pt[0] > ' + str(leadingJetPtCut) + ' && jet_pt[1] > ' + str(trailingJetPtCut) 
 
-	#vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && met > 200 && jet_pt[0] > 80 && jet_pt[1] > 40 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && mjj > 500 && absEtaDiff_leadingTwoJets > 2.5 && Flag_BadPFMuonFilter == 1 && Flag_goodVertices == 1 && Flag_globalSuperTightHalo2016Filter == 1 && Flag_HBHENoiseFilter == 1 && Flag_HBHENoiseIsoFilter == 1 && Flag_EcalDeadCellTriggerPrimitiveFilter == 1'
-
 	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
+	
+	twoCentralJets_cut = 'abs(jet_eta[0]) <= 2.5 && abs(jet_eta[1]) <= 2.5'
+	twoForwardJets_cut = 'abs(jet_eta[0]) > 2.5 && abs(jet_eta[1]) > 2.5'
+	oneCentralJetOneForwardJet_cut = '(abs(jet_eta[0]) <= 2.5 && abs(jet_eta[1]) > 2.5) || (abs(jet_eta[0]) > 2.5 && abs(jet_eta[1]) <= 2.5)'
 
-	f.eventTree.Draw('met>>met_hist')
-	f.eventTree.Draw('met>>met_hist_afterVBFCuts', vbfCuts, '')
-	f.eventTree.Draw('met>>met_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
+	f.eventTree.Draw('met>>met_hist_twoCentralJets' twoCentralJets_cut, '')
+	f.eventTree.Draw('met>>met_hist_twoForwardJets' twoForwardJets_cut, '')
+	f.eventTree.Draw('met>>met_hist_oneCentralJetOneForwardJet' oneCentralJetOneForwardJet_cut, '')
+
+	f.eventTree.Draw('met>>met_hist_afterVBFCuts_twoCentralJets', vbfCuts + ' && ' + twoCentralJets_cut, '')
+	f.eventTree.Draw('met>>met_hist_afterVBFCuts_twoForwardJets', vbfCuts + ' && ' + twoForwardJets_cut, '')
+	f.eventTree.Draw('met>>met_hist_afterVBFCuts_oneCentralJetOneForwardJet', vbfCuts + ' && ' + oneCentralJetOneForwardJet_cut, '')
+
+	f.eventTree.Draw('met>>met_hist_afterVBFCutsAndTrigger_twoCentralJets', vbfAndTriggerCuts + ' && ' + twoCentralJets_cut, '')
+	f.eventTree.Draw('met>>met_hist_afterVBFCutsAndTrigger_twoForwardJets', vbfAndTriggerCuts + ' && ' + twoForwardJets_cut, '')
+	f.eventTree.Draw('met>>met_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet', vbfAndTriggerCuts + ' && ' + oneCentralJetOneForwardJet_cut, '')
 	
 	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
 	print('Events passing VBF cuts + {}: {}\n'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
 	
-	#Go to the directory for trigger efficiencies 
+	#Go to the directory (in the ROOT file) for trigger efficiencies 
 	
-	try: out.GetKey('triggerEff_MET').IsFolder()
+	folderName = 'triggerEff_MET_mjjCut' + str(mjjCut) + 'leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
+	
+	try: out.GetKey(folderName).IsFolder()
 
 	except ReferenceError:
 
-		out.mkdir('triggerEff_MET', 'triggerEff_MET') 
+		out.mkdir(folderName, folderName) 
 
-	out.cd('triggerEff_MET')
+	out.cd(folderName)
+	
+	#Name of the directory to save the png files, and the name of the png file
+
+	pngDir = 'pngImages/triggerEffPlots/METPlots/mjjCut' + str(mjjCut) + '_leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
+	file_name = trigger + '_MET_mjjCut' + str(mjjCut) + '_leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut) + '.png'
 	
 	#Check if the two histograms are consistent
 
-	if ROOT.TEfficiency.CheckConsistency(met_hist_afterVBFCutsAndTrigger, met_hist_afterVBFCuts):
+	#if ROOT.TEfficiency.CheckConsistency(met_hist_afterVBFCutsAndTrigger, met_hist_afterVBFCuts):
 
-		eff_graph_MET = ROOT.TEfficiency(met_hist_afterVBFCutsAndTrigger, met_hist_afterVBFCuts)
-		
-		eff_graph_MET.SetTitle(trigger + ';MET (GeV);eff')
+	#	eff_graph_MET = ROOT.TEfficiency(met_hist_afterVBFCutsAndTrigger, met_hist_afterVBFCuts)
+	#	
+	#	eff_graph_MET.SetTitle(trigger + ';MET (GeV);eff')
 
-		if not args.noWrite:
-		
-			eff_graph_MET.Write('eff_graph_' + trigger + '_MET')
-		
-		canv = ROOT.TCanvas('canv', 'canv')
-			
-		eff_graph_MET.Draw('AP')
+	#	if not args.noWrite:
+	#	
+	#		eff_graph_MET.Write('eff_graph_' + trigger + '_MET')
+	#	
+	#	canv = ROOT.TCanvas('canv', 'canv')
+	#		
+	#	eff_graph_MET.Draw('AP')
 
-		pngDir = 'pngImages/triggerEffPlots/METPlots/mjjCut' + str(mjjCut) + '_leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
-		file_name = trigger + '_MET_mjjCut' + str(mjjCut) + '_leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut) + '.png'
-		
-		if not os.path.isdir(pngDir):
+	#	
+	#	if not os.path.isdir(pngDir):
 
-			os.makedirs(pngDir)
+	#		os.makedirs(pngDir)
 
-		canv.Print(os.path.join(pngDir, file_name))
+	#	canv.Print(os.path.join(pngDir, file_name))
 
-		print('Efficiency graph for ' + trigger + ' with respect to MET is constructed!\n')
+	#	print('Efficiency graph for ' + trigger + ' with respect to MET is constructed!\n')
+	
+	constructTriggerEff(met_hist_afterVBFCutsAndTrigger_twoCentralJets, met_hist_afterVBFCuts_twoCentralJets, trigger, args, pngDir, fileName)
+	constructTriggerEff(met_hist_afterVBFCutsAndTrigger_twoForwardJets, met_hist_afterVBFCuts_twoForwardJets, trigger, args, pngDir, fileName)
+	constructTriggerEff(met_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet, met_hist_afterVBFCuts_oneCentralJetOneForwardJet, trigger, args, pngDir, fileName)
 
 	out.cd()
 	
-	try: out.GetKey('metHistos').IsFolder()
+	#Browse (create if necessary) the folder for individual histograms
+
+	histoDirName = 'METHistos_mjjCut' + str(mjjCut) + '_leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
+	
+	try: out.GetKey(histoDirName).IsFolder()
 
 	except ReferenceError: 
 
-		out.mkdir('metHistos', 'metHistos') 
+		out.mkdir(histoDirName, histoDirName) 
 	
-	out.cd('metHistos')
+	out.cd(histoDirName)
 
 	if not args.noWrite:
 
-		met_hist.Write('met_hist')
-		met_hist_afterVBFCuts.Write('met_hist_afterVBFCuts')
-		met_hist_afterVBFCutsAndTrigger.Write('met_hist_afterVBFCutsAndTrigger_' + trigger)
+		met_hist_twoCentralJets.Write('met_hist_twoCentralJets')
+		met_hist_twoForwardJets.Write('met_hist_twoForwardJets')
+		met_hist_oneCentralJetOneForwardJet.Write('met_hist_oneCentralJetOneForwardJet')
+		
+		met_hist_afterVBFCuts_twoCentralJets.Write('met_hist_afterVBFCuts_twoCentralJets')
+		met_hist_afterVBFCuts_twoForwardJets.Write('met_hist_afterVBFCuts_twoForwardJets')
+		met_hist_afterVBFCuts_oneCentralJetOneForwardJet.Write('met_hist_afterVBFCuts_oneCentralJetOneForwardJet')
+		
+		met_hist_afterVBFCutsAndTrigger_twoCentralJets.Write('met_hist_afterVBFCutsAndTrigger_twoCentralJets')
+		met_hist_afterVBFCutsAndTrigger_twoForwardJets.Write('met_hist_afterVBFCutsAndTrigger_twoForwardJets')
+		met_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet.Write('met_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet')
 	
-	met_hist.SetDirectory(0)
-	met_hist_afterVBFCuts.SetDirectory(0)
-	met_hist_afterVBFCutsAndTrigger.SetDirectory(0)
+	met_hist_twoCentralJets.SetDirectory(0)
+	met_hist_twoForwardJets.SetDirectory(0)
+	met_hist_oneCentralJetOneForwardJet.SetDirectory(0)
+
+	met_hist_afterVBFCuts_twoCentralJets.SetDirectory(0)
+	met_hist_afterVBFCuts_twoForwardJets.SetDirectory(0)
+	met_hist_afterVBFCuts_oneCentralJetOneForwardJet.SetDirectory(0)
+
+	met_hist_afterVBFCutsAndTrigger_twoCentralJets.SetDirectory(0)
+	met_hist_afterVBFCutsAndTrigger_twoForwardJets.SetDirectory(0)
+	met_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet.SetDirectory(0)
 	
 	out.cd()
 
 	out.Close()
 	f.Close()
-
-	return met_hist_afterVBFCutsAndTrigger, eff_graph_MET
 
 def drawTriggerEff_trailingJetPt(inputFile, trigger, args, mjjCut, leadingJetPtCut):
 

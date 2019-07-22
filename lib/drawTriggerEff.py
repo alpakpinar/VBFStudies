@@ -3,6 +3,30 @@ import os
 import numpy as np 
 from array import array
 
+def constructTriggerEff(histo_cut, histo_all, trigger):
+
+	'''
+	Draws the efficiency graph for a given trigger, given two historgrams.
+	Returns the filled canvas.
+	'''
+
+	if ROOT.TEfficiency.CheckConsistency(histo_cut, histo_all):
+
+		eff_graph_mjj = ROOT.TEfficiency(histo_cut, histo_all)
+
+		eff_graph_mjj.SetTitle(trigger + ';mjj (GeV);eff')
+
+		if not args.noWrite:
+
+			eff_graph_mjj.Write('eff_graph_' + trigger + '_mjj')
+
+		canv = ROOT.TCanvas('canv', 'canv')
+	
+		eff_graph_mjj.Draw('AP')
+
+		return canv
+
+
 def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, trailingJetPtCut):
 
 	'''
@@ -461,35 +485,10 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCutsAndTrigger_twoForwardJets', vbfAndTriggerCuts + ' && ' + twoForwardJets_cut, '')
 	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet', vbfAndTriggerCuts + ' && ' + oneCentralJetOneForwardJet_cut, '')
 
-	#Make the histograms bin-width divided
-
-	#for nBin in range(1, mjj_hist.GetNbinsX()+1):
-
-	#	mjj_orig = mjj_hist.GetBinContent(nBin)
-	#	mjj_binWidth = mjj_hist.GetBinWidth(nBin)
-	#	mjj_hist.SetBinContent(nBin, mjj_orig/mjj_binWidth)
-
-	#	mjj_afterVBF_orig = mjj_hist_afterVBFCuts.GetBinContent(nBin)
-	#	mjj_afterVBF_binWidth = mjj_hist_afterVBFCuts.GetBinWidth(nBin)
-	#	mjj_hist_afterVBFCuts.SetBinContent(nBin, mjj_afterVBF_orig/mjj_afterVBF_binWidth) 
-	#
-	#	mjj_afterVBFTrig_orig = mjj_hist_afterVBFCutsAndTrigger.GetBinContent(nBin)
-	#	mjj_afterVBFTrig_binWidth = mjj_hist_afterVBFCutsAndTrigger.GetBinWidth(nBin)
-	#	mjj_hist_afterVBFCutsAndTrigger.SetBinContent(nBin, mjj_afterVBFTrig_orig/mjj_afterVBFTrig_binWidth)
-		
-
 	####
 	print('Events passing VBF cuts: {}'.format(f.eventTree.GetEntries(vbfCuts)))
 	print('Events passing VBF cuts + {}: {}\n'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
 	####	
-	
-	#Rebin the histograms
-
-	#mjj_hist.Rebin(10)
-	#mjj_hist_afterVBFCuts.Rebin(10)
-	#mjj_hist_afterVBFCutsAndTrigger.Rebin(10)
-
-	#########################################
 
 	#Go to the directory for trigger efficiencies 
 
@@ -503,21 +502,29 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 
 	out.cd(folderName)
 
+	########################
+	#CONTENT MOVED TO FUNC, UNDER TESTING
+	########################
+
 	#Check if the two histograms are consistent
 
-	if ROOT.TEfficiency.CheckConsistency(mjj_hist_afterVBFCutsAndTrigger, mjj_hist_afterVBFCuts):
+	#if ROOT.TEfficiency.CheckConsistency(mjj_hist_afterVBFCutsAndTrigger, mjj_hist_afterVBFCuts):
 
-		eff_graph_mjj = ROOT.TEfficiency(mjj_hist_afterVBFCutsAndTrigger, mjj_hist_afterVBFCuts)
+	#	eff_graph_mjj = ROOT.TEfficiency(mjj_hist_afterVBFCutsAndTrigger, mjj_hist_afterVBFCuts)
 
-		eff_graph_mjj.SetTitle(trigger + ';mjj (GeV);eff')
+	#	eff_graph_mjj.SetTitle(trigger + ';mjj (GeV);eff')
 
-		if not args.noWrite:
+	#	if not args.noWrite:
 
-			eff_graph_mjj.Write('eff_graph_' + trigger + '_mjj')
+	#		eff_graph_mjj.Write('eff_graph_' + trigger + '_mjj')
 
-		canv = ROOT.TCanvas('canv', 'canv')
-	
-		eff_graph_mjj.Draw('AP')
+	#	canv = ROOT.TCanvas('canv', 'canv')
+	#
+	#	eff_graph_mjj.Draw('AP')
+
+	#########################
+
+		canv = constructTriggerEff(mjj_hist_afterVBFCuts_twoCentralJets, mjj_hist_afterVBFCutsAndTrigger_twoCentralJets)
 
 		pngDir = 'pngImages/triggerEffPlots/mjjPlots/leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
 	

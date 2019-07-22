@@ -299,9 +299,9 @@ if __name__ == '__main__':
     
     cuts = [1000, 160, 50, 150] #Cuts that will be applied: mjj, leadingJetPt, trailingJetPt, MET
 
-    #for count, trigger in enumerate(triggers):
+    for count, trigger in enumerate(triggers):
 
-        #mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, args, cuts[1], cuts[2])
+        drawTriggerEff_mjj(inputFile, trigger, args, cuts[1], cuts[2])
         
         #leadingJetPt_hist_withTriggers[trigger], eff_graphs_leadingJetPt[trigger] = drawTriggerEff_leadingJetPt(inputFile, trigger, args, cuts[0])
 

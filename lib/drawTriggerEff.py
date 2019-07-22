@@ -18,6 +18,8 @@ def constructTriggerEff(histo_cut, histo_all, trigger, args, pngDir, fileName):
 	variable = histoName_splitted[0]
 	case = histoName_splitted[-1]
 
+	pngDir += '_' + case #Add the case information in the dir name
+
 	#Text box containing the case for jet eta
 
 	#text = ROOT.TPaveText(0.6, 0.6, 0.8, 0.8)
@@ -38,7 +40,7 @@ def constructTriggerEff(histo_cut, histo_all, trigger, args, pngDir, fileName):
 		canv = ROOT.TCanvas('canv', 'canv')
 	
 		eff_graph.Draw('AP')
-		text.Draw('same')
+		#text.Draw('same')
 
 		#Create the relevant dir if not already present
 
@@ -48,8 +50,8 @@ def constructTriggerEff(histo_cut, histo_all, trigger, args, pngDir, fileName):
 
 		canv.Print(os.path.join(pngDir, fileName))
 	
-		print('Efficiency graph for ' + trigger + ' with respect to mjj is constructed!\n')
-		print('CASE: {}'.format(case))
+		print('Efficiency graph for ' + trigger + ' with respect to mjj is constructed!')
+		print('CASE: {}\n'.format(case))
 
 
 def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, trailingJetPtCut):
@@ -515,7 +517,7 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 	print('Events passing VBF cuts + {}: {}\n'.format(trigger, f.eventTree.GetEntries(vbfAndTriggerCuts)))
 	####	
 
-	#Go to the directory for trigger efficiencies 
+	#Go to the directory (in the ROOT file) for trigger efficiencies 
 
 	folderName = 'triggerEff_mjj_leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
 	
@@ -526,36 +528,6 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 		out.mkdir(folderName, folderName) 
 
 	out.cd(folderName)
-
-	########################
-	#CONTENT MOVED TO FUNC, UNDER TESTING
-	########################
-
-	#Check if the two histograms are consistent
-
-	#if ROOT.TEfficiency.CheckConsistency(mjj_hist_afterVBFCutsAndTrigger, mjj_hist_afterVBFCuts):
-
-	#	eff_graph_mjj = ROOT.TEfficiency(mjj_hist_afterVBFCutsAndTrigger, mjj_hist_afterVBFCuts)
-
-	#	eff_graph_mjj.SetTitle(trigger + ';mjj (GeV);eff')
-
-	#	if not args.noWrite:
-
-	#		eff_graph_mjj.Write('eff_graph_' + trigger + '_mjj')
-
-	#	canv = ROOT.TCanvas('canv', 'canv')
-	#
-	#	eff_graph_mjj.Draw('AP')
-	#
-	#	if not os.path.isdir(pngDir):
-
-	#		os.makedirs(pngDir)
-
-	#	canv.Print(os.path.join(pngDir, fileName))
-	#
-	#	print('Efficiency graph for ' + trigger + ' with respect to mjj is constructed!\n')
-
-	###########################
 
 	#Name of the directory to save the png files, and the name of the png file
 	

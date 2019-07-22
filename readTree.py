@@ -301,13 +301,13 @@ if __name__ == '__main__':
 
     for count, trigger in enumerate(triggers):
 
-        drawTriggerEff_mjj(inputFile, trigger, args, cuts[1], cuts[2])
+        #drawTriggerEff_mjj(inputFile, trigger, args, cuts[1], cuts[2])
         
         #leadingJetPt_hist_withTriggers[trigger], eff_graphs_leadingJetPt[trigger] = drawTriggerEff_leadingJetPt(inputFile, trigger, args, cuts[0])
 
         #trailingJetPt_hist_withTriggers[trigger], eff_graphs_trailingJetPt[trigger] = drawTriggerEff_trailingJetPt(inputFile, trigger, args, cuts[0], cuts[1])
         
-        #met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, args, cuts[0], cuts[1], cuts[2])
+        drawTriggerEff_MET(inputFile, trigger, args, cuts[0], cuts[1], cuts[2])
 
 	#For testing
     #drawTriggerEff_mjj(inputFile, 'HLT_DiJet110_35_Mjj650_PFMET110_v5', args, cuts[1], cuts[2])

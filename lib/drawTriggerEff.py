@@ -423,21 +423,43 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 	mjj_array = np.arange(0., 3000., 100.)
 	#mjj_array = array('f', [500., 520., 540., 570., 600., 640., 680., 730., 790., 880., 1000.]) 
 
-	mjj_hist = ROOT.TH1F('mjj_hist', 'mjj_hist', len(mjj_array)-1, mjj_array)
+	mjj_hist_twoCentralJets = ROOT.TH1F('mjj_hist', 'mjj_hist', len(mjj_array)-1, mjj_array)
+	mjj_hist_twoForwardJets = ROOT.TH1F('mjj_hist', 'mjj_hist', len(mjj_array)-1, mjj_array)
+	mjj_hist_oneCentralJetOneForwardJet = ROOT.TH1F('mjj_hist', 'mjj_hist', len(mjj_array)-1, mjj_array)
 
-	mjj_hist_afterVBFCuts = ROOT.TH1F('mjj_hist_afterVBFCuts', 'mjj_hist_afterVBFCuts', len(mjj_array)-1, mjj_array)	
-	mjj_hist_afterVBFCuts.SetLineColor(ROOT.kRed)
+	mjj_hist_afterVBFCuts_twoCentralJets = ROOT.TH1F('mjj_hist_afterVBFCuts_twoCentralJets', 'mjj_hist_afterVBFCuts_twoCentralJets', len(mjj_array)-1, mjj_array)	
+	mjj_hist_afterVBFCuts_twoCentralJets.SetLineColor(ROOT.kRed)
+	mjj_hist_afterVBFCuts_twoForwardJets = ROOT.TH1F('mjj_hist_afterVBFCuts_twoForwardJets', 'mjj_hist_afterVBFCuts_twoForwardJets', len(mjj_array)-1, mjj_array)	
+	mjj_hist_afterVBFCuts_twoForwardJets.SetLineColor(ROOT.kRed)
+	mjj_hist_afterVBFCuts_oneCentralJetOneForwardJet = ROOT.TH1F('mjj_hist_afterVBFCuts_oneCentralJetOneForwardJet', 'mjj_hist_afterVBFCuts_oneCentralJetOneForwardJet', len(mjj_array)-1, mjj_array)	
+	mjj_hist_afterVBFCuts_oneCentralJetOneForwardJet.SetLineColor(ROOT.kRed)
 	
-	mjj_hist_afterVBFCutsAndTrigger = ROOT.TH1F('mjj_hist_afterVBFCutsAndTrigger', 'mjj_hist_afterVBFCutsAndTrigger', len(mjj_array)-1, mjj_array)
-	mjj_hist_afterVBFCutsAndTrigger.SetLineColor(ROOT.kBlack)
+	mjj_hist_afterVBFCutsAndTrigger_twoCentralJets = ROOT.TH1F('mjj_hist_afterVBFCutsAndTrigger_twoCentralJets', 'mjj_hist_afterVBFCutsAndTrigger_twoCentralJets', len(mjj_array)-1, mjj_array)
+	mjj_hist_afterVBFCutsAndTrigger_twoCentralJets.SetLineColor(ROOT.kBlack)
+	mjj_hist_afterVBFCutsAndTrigger_twoForwardJets = ROOT.TH1F('mjj_hist_afterVBFCutsAndTrigger_twoForwardJets', 'mjj_hist_afterVBFCutsAndTrigger_twoForwardJets', len(mjj_array)-1, mjj_array)
+	mjj_hist_afterVBFCutsAndTrigger_twoForwardJets.SetLineColor(ROOT.kBlack)
+	mjj_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet = ROOT.TH1F('mjj_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet', 'mjj_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet', len(mjj_array)-1, mjj_array)
+	mjj_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet.SetLineColor(ROOT.kBlack)
 
 	vbfCuts = 'containsPhoton == 0 && containsLepton == 0 && contains_bJet == 0 && minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && Flag_BadPFMuonFilter == 1 && Flag_goodVertices == 1 && Flag_globalSuperTightHalo2016Filter == 1 && Flag_HBHENoiseFilter == 1 && Flag_HBHENoiseIsoFilter == 1 && Flag_EcalDeadCellTriggerPrimitiveFilter == 1 && jet_pt[0] > ' + str(leadingJetPtCut) + ' && jet_pt[1] > ' + str(trailingJetPtCut)
 
 	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
 
-	f.eventTree.Draw('mjj>>mjj_hist')
-	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCuts', vbfCuts, '')
-	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCutsAndTrigger', vbfAndTriggerCuts, '')
+	twoCentralJets_cut = 'abs(jet_eta[0]) <= 2.5 && abs(jet_eta[1]) <= 2.5'
+	twoForwardJets_cut = 'abs(jet_eta[0]) > 2.5 && abs(jet_eta[1]) > 2.5'
+	oneCentralJetOneForwardJet_cut = '(abs(jet_eta[0]) <= 2.5 && abs(jet_eta[1]) > 2.5) || (abs(jet_eta[0]) > 2.5 && abs(jet_eta[1]) <= 2.5)'
+
+	f.eventTree.Draw('mjj>>mjj_hist_twoCentralJets', twoCentralJets_cut, '')
+	f.eventTree.Draw('mjj>>mjj_hist_twoForwardJets', twoForwardJets_cut, '')
+	f.eventTree.Draw('mjj>>mjj_hist_oneCentralJetOneForwardJet', oneCentralJetOneForwardJet_cut, '')
+	
+	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCuts_twoCentralJets', vbfCuts + ' && ' + twoCentralJets_cut, '')
+	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCuts_twoForwardJets', vbfCuts + ' && ' + twoForwardJets_cut, '')
+	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCuts_oneCentralJetOneForwardJet', vbfCuts + ' && ' + oneCentralJetOneForwardJet_cut, '')
+	
+	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCutsAndTrigger_twoCentralJets', vbfAndTriggerCuts + ' && ' + twoCentralJets_cut, '')
+	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCutsAndTrigger_twoForwardJets', vbfAndTriggerCuts + ' && ' + twoForwardJets_cut, '')
+	f.eventTree.Draw('mjj>>mjj_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet', vbfAndTriggerCuts + ' && ' + oneCentralJetOneForwardJet_cut, '')
 
 	#Make the histograms bin-width divided
 

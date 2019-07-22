@@ -547,9 +547,17 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 
 	if not args.noWrite:
 	
-		mjj_hist.Write('mjj_hist')
-		mjj_hist_afterVBFCuts.Write('mjj_hist_afterVBFCuts')
-		mjj_hist_afterVBFCutsAndTrigger.Write('mjj_hist_afterVBFCutsAndTrigger_' + trigger)
+		mjj_hist_twoCentralJets.Write('mjj_hist_twoCentralJets')
+		mjj_hist_twoForwardJets.Write('mjj_hist_twoForwardJets')
+		mjj_hist_oneCentralJetOneForwardJet.Write('mjj_hist_oneCentralJetOneForwardJet')
+		
+		mjj_hist_afterVBFCuts_twoCentralJets.Write('mjj_hist_afterVBFCuts_twoCentralJets')
+		mjj_hist_afterVBFCuts_twoForwardJets.Write('mjj_hist_afterVBFCuts_twoForwardJets')
+		mjj_hist_afterVBFCuts_oneCentralJetOneForwardJet.Write('mjj_hist_afterVBFCuts_oneCentralJetOneForwardJet')
+		
+		mjj_hist_afterVBFCutsAndTrigger_twoCentralJets.Write('mjj_hist_afterVBFCutsAndTrigger_twoCentralJets_' + trigger)
+		mjj_hist_afterVBFCutsAndTrigger_twoForwardJets.Write('mjj_hist_afterVBFCutsAndTrigger_twoForwardJets_' + trigger)
+		mjj_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet.Write('mjj_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet_' + trigger)
 	
 	mjj_hist.SetDirectory(0)
 	mjj_hist_afterVBFCuts.SetDirectory(0)

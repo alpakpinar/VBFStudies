@@ -214,18 +214,18 @@ def readTree(inputFile):
 
 def drawTriggerEff_mjjRange(inputFile, args, leadingJetPtCuts, trailingJetPtCuts, triggers):
 
-	'''
-	Given the leadingJetPtCuts, trailingJetPtCuts and triggers lists, draws and saves trigger efficiency plots for each of the given cuts for the given triggers.
-	'''
-	
-	for leadingJetPtCut in leadingJetPtCuts:
+    '''
+    Given the leadingJetPtCuts, trailingJetPtCuts and triggers lists, draws and saves trigger efficiency plots for each of the given cuts for the given triggers.
+    '''
+    
+    for leadingJetPtCut in leadingJetPtCuts:
 
-		for trailingJetPtCut in trailingJetPtCuts:
+        for trailingJetPtCut in trailingJetPtCuts:
 
-			for trigger in triggers;
+            for trigger in triggers:
 
-				drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtCut)	
-	
+                drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtCut)    
+    
 
 
 if __name__ == '__main__':
@@ -299,7 +299,7 @@ if __name__ == '__main__':
     
     cuts = [1000, 160, 50, 150] #Cuts that will be applied: mjj, leadingJetPt, trailingJetPt, MET
 
-    for count, trigger in enumerate(triggers):
+    #for count, trigger in enumerate(triggers):
 
         #mjj_hist_withTriggers[trigger], eff_graphs_mjj[trigger] = drawTriggerEff_mjj(inputFile, trigger, args, cuts[1], cuts[2])
         
@@ -307,7 +307,10 @@ if __name__ == '__main__':
 
         #trailingJetPt_hist_withTriggers[trigger], eff_graphs_trailingJetPt[trigger] = drawTriggerEff_trailingJetPt(inputFile, trigger, args, cuts[0], cuts[1])
         
-        met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, args, cuts[0], cuts[1], cuts[2])
+        #met_hist_withTriggers[trigger], eff_graphs_MET[trigger] = drawTriggerEff_MET(inputFile, trigger, args, cuts[0], cuts[1], cuts[2])
+
+	#For testing
+    #drawTriggerEff_mjj(inputFile, 'HLT_DiJet110_35_Mjj650_PFMET110_v5', args, cuts[1], cuts[2])
 
     #Draw all the comparison graphs 
 

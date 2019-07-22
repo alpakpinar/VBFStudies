@@ -3,28 +3,53 @@ import os
 import numpy as np 
 from array import array
 
-def constructTriggerEff(histo_cut, histo_all, trigger):
+def constructTriggerEff(histo_cut, histo_all, trigger, args, pngDir, fileName):
 
 	'''
 	Draws the efficiency graph for a given trigger, given two historgrams.
-	Returns the filled canvas.
+	Saves the graph both as a graph in the relevant ROOT file and a png file in the relevant directory (if noWrite option is NOT specified while running the main script).
+	Saves the png file in the given directory pngDir, and filename will be fileName. Creates the pngDir if not already created.
 	'''
+
+	#Obtain the variable to be plotted and the case (two jets forward, central etc...)
+
+	histoName_splitted = histo_cut.GetName().split('_')
+
+	variable = histoName_splitted[0]
+	case = histoName_splitted[-1]
+
+	#Text box containing the case for jet eta
+
+	#text = ROOT.TPaveText(0.6, 0.6, 0.8, 0.8)
+	#text.AddText(case)
+	
+	#Construct the efficiency graph and save it
 
 	if ROOT.TEfficiency.CheckConsistency(histo_cut, histo_all):
 
-		eff_graph_mjj = ROOT.TEfficiency(histo_cut, histo_all)
+		eff_graph = ROOT.TEfficiency(histo_cut, histo_all)
 
-		eff_graph_mjj.SetTitle(trigger + ';mjj (GeV);eff')
+		eff_graph.SetTitle(trigger + ';' + variable + ' (GeV);eff')
 
 		if not args.noWrite:
 
-			eff_graph_mjj.Write('eff_graph_' + trigger + '_mjj')
+			eff_graph.Write('eff_graph_' + trigger + '_' + variable + '_' + case)
 
 		canv = ROOT.TCanvas('canv', 'canv')
 	
-		eff_graph_mjj.Draw('AP')
+		eff_graph.Draw('AP')
+		text.Draw('same')
 
-		return canv
+		#Create the relevant dir if not already present
+
+		if not os.path.isdir(pngDir):
+
+			os.makedirs(pngDir)
+
+		canv.Print(os.path.join(pngDir, fileName))
+	
+		print('Efficiency graph for ' + trigger + ' with respect to mjj is constructed!\n')
+		print('CASE: {}'.format(case))
 
 
 def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, trailingJetPtCut):
@@ -521,22 +546,25 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 	#	canv = ROOT.TCanvas('canv', 'canv')
 	#
 	#	eff_graph_mjj.Draw('AP')
+	#
+	#	if not os.path.isdir(pngDir):
 
-	#########################
+	#		os.makedirs(pngDir)
 
-		canv = constructTriggerEff(mjj_hist_afterVBFCuts_twoCentralJets, mjj_hist_afterVBFCutsAndTrigger_twoCentralJets)
+	#	canv.Print(os.path.join(pngDir, fileName))
+	#
+	#	print('Efficiency graph for ' + trigger + ' with respect to mjj is constructed!\n')
 
-		pngDir = 'pngImages/triggerEffPlots/mjjPlots/leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
+	###########################
+
+	#Name of the directory to save the png files, and the name of the png file
 	
-		if not os.path.isdir(pngDir):
-
-			os.makedirs(pngDir)
-
-		fileName = trigger + '_mjj_leadingJetPt' + str(leadingJetPtCut) + '_trailingJetPt' + str(trailingJetPtCut) + '.png'
-
-		canv.Print(os.path.join(pngDir, fileName))
+	pngDir = 'pngImages/triggerEffPlots/mjjPlots/leadingJetPtCut' + str(leadingJetPtCut) + '_trailingJetPtCut' + str(trailingJetPtCut)
+	fileName = trigger + '_mjj_leadingJetPt' + str(leadingJetPtCut) + '_trailingJetPt' + str(trailingJetPtCut) + '.png'
 	
-		print('Efficiency graph for ' + trigger + ' with respect to mjj is constructed!\n')
+	constructTriggerEff(mjj_hist_afterVBFCutsAndTrigger_twoCentralJets, mjj_hist_afterVBFCuts_twoCentralJets, trigger, args, pngDir, fileName)
+	constructTriggerEff(mjj_hist_afterVBFCutsAndTrigger_twoForwardJets, mjj_hist_afterVBFCuts_twoForwardJets, trigger, args, pngDir, fileName)
+	constructTriggerEff(mjj_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet, mjj_hist_afterVBFCuts_oneCentralJetOneForwardJet, trigger, args, pngDir, fileName)
 	
 	out.cd()
 	
@@ -566,9 +594,17 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 		mjj_hist_afterVBFCutsAndTrigger_twoForwardJets.Write('mjj_hist_afterVBFCutsAndTrigger_twoForwardJets_' + trigger)
 		mjj_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet.Write('mjj_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet_' + trigger)
 	
-	mjj_hist.SetDirectory(0)
-	mjj_hist_afterVBFCuts.SetDirectory(0)
-	mjj_hist_afterVBFCutsAndTrigger.SetDirectory(0)
+	mjj_hist_twoCentralJets.SetDirectory(0)
+	mjj_hist_twoForwardJets.SetDirectory(0)
+	mjj_hist_oneCentralJetOneForwardJet.SetDirectory(0)
+	
+	mjj_hist_afterVBFCuts_twoCentralJets.SetDirectory(0)
+	mjj_hist_afterVBFCuts_twoForwardJets.SetDirectory(0)
+	mjj_hist_afterVBFCuts_oneCentralJetOneForwardJet.SetDirectory(0)
+	
+	mjj_hist_afterVBFCutsAndTrigger_twoCentralJets.SetDirectory(0)
+	mjj_hist_afterVBFCutsAndTrigger_twoForwardJets.SetDirectory(0)
+	mjj_hist_afterVBFCutsAndTrigger_oneCentralJetOneForwardJet.SetDirectory(0)
 
 	out.cd()
 	

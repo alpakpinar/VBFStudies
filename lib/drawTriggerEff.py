@@ -473,12 +473,12 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 
 		out = ROOT.TFile(filePath, 'RECREATE')
 
-	mjj_array = np.arange(0., 3000., 100.)
+	mjj_array = np.arange(0., 3000., 300.)
 	#mjj_array = array('f', [500., 520., 540., 570., 600., 640., 680., 730., 790., 880., 1000.]) 
 
-	mjj_hist_twoCentralJets = ROOT.TH1F('mjj_hist', 'mjj_hist', len(mjj_array)-1, mjj_array)
-	mjj_hist_twoForwardJets = ROOT.TH1F('mjj_hist', 'mjj_hist', len(mjj_array)-1, mjj_array)
-	mjj_hist_oneCentralJetOneForwardJet = ROOT.TH1F('mjj_hist', 'mjj_hist', len(mjj_array)-1, mjj_array)
+	mjj_hist_twoCentralJets = ROOT.TH1F('mjj_hist_twoCentralJets', 'mjj_hist_twoCentralJets', len(mjj_array)-1, mjj_array)
+	mjj_hist_twoForwardJets = ROOT.TH1F('mjj_hist_twoForwardJets', 'mjj_hist_twoForwardJets', len(mjj_array)-1, mjj_array)
+	mjj_hist_oneCentralJetOneForwardJet = ROOT.TH1F('mjj_hist_oneCentralJetOneForwardJet', 'mjj_hist_oneCentralJetOneForwardJet', len(mjj_array)-1, mjj_array)
 
 	mjj_hist_afterVBFCuts_twoCentralJets = ROOT.TH1F('mjj_hist_afterVBFCuts_twoCentralJets', 'mjj_hist_afterVBFCuts_twoCentralJets', len(mjj_array)-1, mjj_array)	
 	mjj_hist_afterVBFCuts_twoCentralJets.SetLineColor(ROOT.kRed)

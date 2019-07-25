@@ -18,25 +18,17 @@ def invMassTwoJets(jets_):
 	
 	'''
 	Calculates the invariant mass of two leading jets in the event.
-	If there are less than two jets in the event, returns 0. 
 	'''
-
-	try:
 	
-		leadingJet = jets_[0]
-		trailingJet = jets_[1]
-		
-		total_p4 = leadingJet.p4() + trailingJet.p4()
+	leadingJet = jets_[0]
+	trailingJet = jets_[1]
+	
+	total_p4 = leadingJet.p4() + trailingJet.p4()
 
-		mjj = total_p4.M()
+	mjj = total_p4.M()
 
-		return mjj
+	return mjj
 
-	except IndexError:
-		
-		print('Event has less than 2 jets!')
-		
-		return 0
 
 def minJetMETPhi(jets_, mets_):
 
@@ -176,6 +168,9 @@ def writeTree(inputFile, tree, args):
 				AK4_tightJets.append(jet) 
 
 		nJet[0] = len(AK4_tightJets)
+		
+		if nJet[0] < 2: continue #Discard the events with number of jets smaller than 2
+
 		mjj[0] = invMassTwoJets(AK4_tightJets)
 
 		for i, jet in enumerate(AK4_tightJets):

@@ -44,18 +44,20 @@ def invMassJetCombos(jets_):
 
 				invMass = invMassTwoJets(jets_[i], jets_[j])
 
-				mjj_values['otherCombos'].append(invMass)
+				mjj_values['otherCombos'].append([i, j, invMass])
 
 	print('leadingJet_trailingJet_mjj: {}'.format(mjj_values['leadingJet_trailingJet']))
 
 	if len(mjj_values['otherCombos']) != 0:
-		print('max mjj from other combos: {}'.format(max(mjj_values['otherCombos'])))
+		mjj_vals = [mjj_entry[-1] for mjj_entry in mjj_values['otherCombos']]
+		print('max mjj from other combos: {}'.format(max(mjj_vals)))
 	else:
 		print('max mjj from other combos: None') 
 
-
 	print('Jet_eta[0]: {}'.format(jets_[0].eta()))
 	print('Jet_eta[1]: {}'.format(jets_[1].eta()))
+
+	print(mjj_values)
 	
 	return mjj_values
 
@@ -64,16 +66,25 @@ def getMaxCombo(mjj_values):
 	'''
 	Given mjj_values dict, containing all possible mjj combos, determines the max mjj and which combo it belongs to.
 	'''
+	mjjMax_jetCombo = [0, 1] #By default, the two leading jets
+	max_mjj = mjj_values['leadingJet_trailingJet']
 
-	mjjMax_leadingCase = True
+	try:
+		
+		for entry in mjj_values['otherCombos']:
+
+			if entry[-1] > max_mjj: 
+
+				mjjMax_jetCombo = entry[:2] 
+				max_mjj = entry[-1]
+
+		print(mjjMax_jetCombo)
+
+		return mjjMax_jetCombo
 	
-	for mjj_val in mjj_values['otherCombos']:
+	except IndexError:
 
-		if mjj_val > mjj_values['leadingJet_trailingJet']: mjjMax_leadingCase = False
-
-	if mjjMax_leadingCase: return 'Leading+Trailing'
-
-	else: return 'Other Combo'
+		return mjjMax_jetCombo
 
 def count():
 
@@ -168,9 +179,9 @@ def count():
 
 		mjj_values = invMassJetCombos(AK4_tightJets) #Get all the mjj values for all possible combos
 
-		maxCase = getMaxCombo(mjj_values) #Get the case where maximum mjj happens to be
+		maxCase = getMaxCombo(mjj_values) #Get the jet pair for which the maximum mjj happens to be
 
-		print('Event: {0}, maxCase: {1}'.format(iev, maxCase))
+		#print('Event: {0}, maxCase: {1}'.format(iev, maxCase))
 	
 		####################
 		#Counting the number of cases
@@ -186,15 +197,15 @@ def count():
 		else: 
 			case = 'mixed'
 	
-		if maxCase == 'Leading+Trailing':
+		if maxCase == [0, 1]: 
 			
 			counter_twoLeadingJets[case] += 1	 
 			mjjValues_leadingPair.append(mjj_values['leadingJet_trailingJet'])			
 
-		elif maxCase == 'Other Combo': 
+		else:
 
 			counter_otherCombos[case] += 1
-			mjjValues_otherMaxPair.append(mjj_values['otherCombos'])
+			mjjValues_otherMaxPair.append(mjj_values['otherCombos'][-1])
 
 	return counter_twoLeadingJets, counter_otherCombos
 		

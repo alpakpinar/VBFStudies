@@ -28,11 +28,10 @@ def invMassJetCombos(jets_):
 	'''
 
 	numJets = len(jets_)
-	print('Number of jets: {}'.format(numJets))
 	mjj_values = {}
 
 	mjj_values['leadingJet_trailingJet'] = invMassTwoJets(jets_[0], jets_[1])
-	mjj_values['otherCombos'] = []
+	mjj_values['otherCombos'] = {}
 
 	for i in range(numJets):
 
@@ -42,23 +41,12 @@ def invMassJetCombos(jets_):
 
 				if i == j: continue
 
+				if ((i,j) in mjj_values['otherCombos'].keys() or (j, i) in mjj_values['otherCombos'].keys()): continue 
+
 				invMass = invMassTwoJets(jets_[i], jets_[j])
 
-				mjj_values['otherCombos'].append([i, j, invMass])
+				mjj_values['otherCombos'][(i, j)] = invMass
 
-	print('leadingJet_trailingJet_mjj: {}'.format(mjj_values['leadingJet_trailingJet']))
-
-	if len(mjj_values['otherCombos']) != 0:
-		mjj_vals = [mjj_entry[-1] for mjj_entry in mjj_values['otherCombos']]
-		print('max mjj from other combos: {}'.format(max(mjj_vals)))
-	else:
-		print('max mjj from other combos: None') 
-
-	print('Jet_eta[0]: {}'.format(jets_[0].eta()))
-	print('Jet_eta[1]: {}'.format(jets_[1].eta()))
-
-	print(mjj_values)
-	
 	return mjj_values
 
 def getMaxCombo(mjj_values):
@@ -71,14 +59,14 @@ def getMaxCombo(mjj_values):
 
 	try:
 		
-		for entry in mjj_values['otherCombos']:
+		for key, mjj_value in mjj_values['otherCombos'].items():
 
-			if entry[-1] > max_mjj: 
+			if mjj_value > max_mjj: 
 
-				mjjMax_jetCombo = entry[:2] 
-				max_mjj = entry[-1]
+				mjjMax_jetCombo = key 
+				max_mjj = mjj_value
 
-		print(mjjMax_jetCombo)
+		#print(mjjMax_jetCombo)
 
 		return mjjMax_jetCombo
 	
@@ -123,7 +111,8 @@ def count():
 
 	for iev, event in enumerate(events):
 
-		if iev == 3: break
+		if iev % 1000 == 0:
+			print('Working on event {}'.format(iev))
 
 		event.getByLabel(jetLabel, jets)
 
@@ -200,12 +189,12 @@ def count():
 		if maxCase == [0, 1]: 
 			
 			counter_twoLeadingJets[case] += 1	 
-			mjjValues_leadingPair.append(mjj_values['leadingJet_trailingJet'])			
+			#mjjValues_leadingPair.append(mjj_values['leadingJet_trailingJet'])			
 
 		else:
 
 			counter_otherCombos[case] += 1
-			mjjValues_otherMaxPair.append(mjj_values['otherCombos'][-1])
+			#mjjValues_otherMaxPair.append(mjj_values['otherCombos'][-1])
 
 	return counter_twoLeadingJets, counter_otherCombos
 		

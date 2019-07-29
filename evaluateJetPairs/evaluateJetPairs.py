@@ -54,7 +54,7 @@ def getMaxCombo(mjj_values):
 	'''
 	Given mjj_values dict, containing all possible mjj combos, determines the max mjj and which combo it belongs to.
 	'''
-	mjjMax_jetCombo = [0, 1] #By default, the two leading jets
+	mjjMax_jetCombo = (0, 1) #By default, the two leading jets
 	max_mjj = mjj_values['leadingJet_trailingJet']
 
 	try:
@@ -89,6 +89,8 @@ def count():
 	jets, jetLabel = Handle('std::vector<pat::Jet>'), 'slimmedJets'
 
 	events = Events('root://cmsxrootd.fnal.gov///store/mc/RunIIFall17MiniAODv2/VBF_HToInvisible_M125_13TeV_TuneCP5_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/00000/14347E60-56F2-E811-81F4-24BE05C6C7E1.root')
+
+	mother_dict = {}
 	
 	counter_twoLeadingJets = {} #Counts the number of events where mjj is max for the two leading jets
 	counter_otherCombos = {} #Counts the number of events where mjj is max for other combinations
@@ -96,14 +98,26 @@ def count():
 	mjjValues_leadingPair = [] #Stores max mjj for the case where max mjj comes from leading two pairs
 	mjjValues_otherMaxPair = [] #Stores max mjj for the case where max mjj comes from other combos
 
-	ptValues_leadingPair = [] #Stores jet_pt[0] and jet_pt[1] for the case where max mjj comes from leading two pairs
-	ptValues_otherMaxPair = [] #Stores jet_pt of two jets that have the max mjj 
+	ptValues1_leadingPair = [] #Stores jet_pt[0] for the case where max mjj comes from leading two pairs
+	ptValues2_leadingPair = [] #Stores jet_pt[1] for the case where max mjj comes from leading two pairs
+
+	ptValues1_otherMaxPair = [] #Stores jet_pt of jet with larger pt in the case where this pair have the max mjj 
+	ptValues2_otherMaxPair = [] #Stores jet_pt of jet with smaller pt in the case where this pair have the max mjj 
 
 	cases = ['twoCentralJets', 'twoForwardJets', 'mixed']		
 
 	for case in cases:
 		counter_twoLeadingJets[case] = 0
 		counter_otherCombos[case] = 0
+
+	mother_dict['counter_twoLeadingJets'] = counter_twoLeadingJets
+	mother_dict['counter_otherCombos'] = counter_otherCombos
+	mother_dict['mjjValues_leadingPair'] = mjjValues_leadingPair
+	mother_dict['mjjValues_otherMaxPair'] = mjjValues_otherMaxPair
+	mother_dict['ptValues1_leadingPair'] = ptValues1_leadingPair
+	mother_dict['ptValues2_leadingPair'] = ptValues2_leadingPair
+	mother_dict['ptValues1_otherMaxPair'] = ptValues1_otherMaxPair	
+	mother_dict['ptValues2_otherMaxPair'] = ptValues2_otherMaxPair	
 
 	#####################
 	#Event loop starts here
@@ -168,9 +182,9 @@ def count():
 
 		mjj_values = invMassJetCombos(AK4_tightJets) #Get all the mjj values for all possible combos
 
-		maxCase = getMaxCombo(mjj_values) #Get the jet pair for which the maximum mjj happens to be
+		maxCombo = getMaxCombo(mjj_values) #Get the jet pair for which the maximum mjj happens to be
 
-		#print('Event: {0}, maxCase: {1}'.format(iev, maxCase))
+		#print('Event: {0}, maxCombo: {1}'.format(iev, maxCombo))
 	
 		####################
 		#Counting the number of cases
@@ -186,21 +200,45 @@ def count():
 		else: 
 			case = 'mixed'
 	
-		if maxCase == [0, 1]: 
+		if maxCombo == (0, 1): 
 			
 			counter_twoLeadingJets[case] += 1	 
-			#mjjValues_leadingPair.append(mjj_values['leadingJet_trailingJet'])			
+			mjjValues_leadingPair.append(mjj_values['leadingJet_trailingJet'])			
+			ptValues1_leadingPair.append(AK4_tightJets[0].pt()) 			
+			ptValues2_leadingPair.append(AK4_tightJets[1].pt()) 			
 
 		else:
 
 			counter_otherCombos[case] += 1
-			#mjjValues_otherMaxPair.append(mjj_values['otherCombos'][-1])
+			mjjValues_otherMaxPair.append(mjj_values['otherCombos'][maxCombo])
 
-	return counter_twoLeadingJets, counter_otherCombos
+			jet_idx1, jet_idx2 = maxCombo[0], maxCombo[1]
+			
+			if AK4_tightJets[jet_idx1].pt() > AK4_tightJets[jet_idx2].pt():
+				
+				ptValues1_otherMaxPair.append(AK4_tightJets[jet_idx1].pt())
+				ptValues2_otherMaxPair.append(AK4_tightJets[jet_idx2].pt())
+		
+			else:
+
+				ptValues2_otherMaxPair.append(AK4_tightJets[jet_idx1].pt())
+				ptValues1_otherMaxPair.append(AK4_tightJets[jet_idx2].pt())
+	
+
+	return mother_dict 
 		
 def main():
 
-	counter_twoLeadingJets, counter_otherCombos = count()
+	mother_dict = count()
+
+	counter_twoLeadingJets = mother_dict['counter_twoLeadingJets']
+	counter_otherCombos = mother_dict['counter_otherCombos']
+	mjjValues_leadingPair = mother_dict['mjjValues_leadingPair']
+	mjjValues_otherMaxPair = mother_dict['mjjValues_otherMaxPair']
+	ptValues1_leadingPair = mother_dict['ptValues1_leadingPair']
+	ptValues2_leadingPair = mother_dict['ptValues2_leadingPair']
+	ptValues1_otherMaxPair = mother_dict['ptValues1_otherMaxPair']
+	ptValues2_otherMaxPair = mother_dict['ptValues2_otherMaxPair']
 
 	print('*'*10)
 	print('RESULTS')
@@ -217,6 +255,13 @@ def main():
 
 	print('*'*10)
 
+	print(mjjValues_leadingPair)
+	print(mjjValues_otherMaxPair)
+	print(ptValues1_leadingPair)
+	print(ptValues2_leadingPair)
+	print(ptValues1_otherMaxPair)
+	print(ptValues2_otherMaxPair)
+	
 if __name__ == '__main__':
 
 	main()

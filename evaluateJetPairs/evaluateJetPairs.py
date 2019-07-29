@@ -65,9 +65,6 @@ def getMaxCombo(mjj_values):
 	Given mjj_values dict, containing all possible mjj combos, determines the max mjj and which combo it belongs to.
 	'''
 
-	max_mjj = None
-	max_mjj_case = None
-
 	mjjMax_leadingCase = True
 	
 	for mjj_val in mjj_values['otherCombos']:
@@ -96,6 +93,12 @@ def count():
 	
 	counter_twoLeadingJets = {} #Counts the number of events where mjj is max for the two leading jets
 	counter_otherCombos = {} #Counts the number of events where mjj is max for other combinations
+
+	mjjValues_leadingPair = [] #Stores max mjj for the case where max mjj comes from leading two pairs
+	mjjValues_otherMaxPair = [] #Stores max mjj for the case where max mjj comes from other combos
+
+	ptValues_leadingPair = [] #Stores jet_pt[0] and jet_pt[1] for the case where max mjj comes from leading two pairs
+	ptValues_otherMaxPair = [] #Stores jet_pt of two jets that have the max mjj 
 
 	cases = ['twoCentralJets', 'twoForwardJets', 'mixed']		
 
@@ -186,10 +189,12 @@ def count():
 		if maxCase == 'Leading+Trailing':
 			
 			counter_twoLeadingJets[case] += 1	 
-		
+			mjjValues_leadingPair.append(mjj_values['leadingJet_trailingJet'])			
+
 		elif maxCase == 'Other Combo': 
 
 			counter_otherCombos[case] += 1
+			mjjValues_otherMaxPair.append(mjj_values['otherCombos'])
 
 	return counter_twoLeadingJets, counter_otherCombos
 		

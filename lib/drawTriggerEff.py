@@ -65,7 +65,8 @@ def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, traili
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
 
-	met_array = array('f', [80., 90., 100., 110., 117., 124., 131., 138., 145., 152., 159., 166., 173., 180., 187., 194., 201., 210., 220.]) 
+	#met_array = array('f', [80., 90., 100., 110., 117., 124., 131., 138., 145., 152., 159., 166., 173., 180., 187., 194., 201., 210., 220.]) 
+	met_array = np.arange(80., 230., 15.) 
 
 	outputDir = 'output/' + trigger
 

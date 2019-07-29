@@ -260,6 +260,8 @@ if __name__ == '__main__':
 
     triggers = ['HLT_DiJet110_35_Mjj650_PFMET110_v5', 'HLT_DiJet110_35_Mjj650_PFMET120_v5', 'HLT_DiJet110_35_Mjj650_PFMET130_v5', 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v16', 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v16', 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v15', 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v15']
 
+    VBF_triggers = triggers[:3]
+
     histos = []
     
     ##############################
@@ -299,18 +301,19 @@ if __name__ == '__main__':
     
     cuts = [1000, 160, 50, 150] #Cuts that will be applied: mjj, leadingJetPt, trailingJetPt, MET
 
-    for count, trigger in enumerate(triggers):
+    #for count, trigger in enumerate(VBF_triggers):
 
-        #drawTriggerEff_mjj(inputFile, trigger, args, cuts[1], cuts[2])
+    #    drawTriggerEff_mjj(inputFile, trigger, args, cuts[1], cuts[2])
         
         #leadingJetPt_hist_withTriggers[trigger], eff_graphs_leadingJetPt[trigger] = drawTriggerEff_leadingJetPt(inputFile, trigger, args, cuts[0])
 
         #trailingJetPt_hist_withTriggers[trigger], eff_graphs_trailingJetPt[trigger] = drawTriggerEff_trailingJetPt(inputFile, trigger, args, cuts[0], cuts[1])
         
-        drawTriggerEff_MET(inputFile, trigger, args, cuts[0], cuts[1], cuts[2])
+        #drawTriggerEff_MET(inputFile, trigger, args, cuts[0], cuts[1], cuts[2])
 
-	#For testing
-    #drawTriggerEff_mjj(inputFile, 'HLT_DiJet110_35_Mjj650_PFMET110_v5', args, cuts[1], cuts[2])
+    #For testing
+    drawTriggerEff_mjj(inputFile, 'HLT_DiJet110_35_Mjj650_PFMET110_v5', args, cuts[1], cuts[2])
+    #drawTriggerEff_MET(inputFile, 'HLT_DiJet110_35_Mjj650_PFMET110_v5', args, cuts[0], cuts[1], cuts[2])
 
     #Draw all the comparison graphs 
 

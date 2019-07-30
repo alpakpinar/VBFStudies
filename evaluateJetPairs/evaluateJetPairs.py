@@ -1,6 +1,5 @@
 import ROOT
-from numpy import arange
-from matplotlib import pyplot as plt
+from defineHistos import define2DHistos
 
 # load FWLite C++ libraries
 ROOT.gSystem.Load("libFWCoreFWLite.so");
@@ -125,13 +124,16 @@ def count():
 	mother_dict['ptValues1_otherMaxPair'] = ptValues1_otherMaxPair	
 	mother_dict['ptValues2_otherMaxPair'] = ptValues2_otherMaxPair	
 
+	#Get the dictionary containing the definitions of 2D histograms
+	histo_dict = define2DHistos()
+
 	#####################
 	#Event loop starts here
 	#####################
 
 	for iev, event in enumerate(events):
 
-		if iev == 10: break
+		#if iev == 10: break #For testing
 
 		if iev % 1000 == 0:
 			print('Working on event {}'.format(iev))
@@ -238,28 +240,6 @@ def count():
 
 	return mother_dict 
 		
-def createHisto(data):
-
-	'''
-	Creates a histogram out of the given data.
-	Uses matplotlib to construct the histogram.
-	'''
-	#####################
-	#ONLY WORKS FOR MJJ NOW
-	#####################
-
-	bin_width = (max(data)-min(data))/100
-	bins = arange(min(data)-5, max(data)+5, bin_width)
-		
-	plt.xlim([min(data)-5, max(data)+5])
-
-	plt.hist(data, bins=bins)
-	plt.title('Mjj distribution')
-	plt.xlabel('mjj (GeV)')
-	plt.ylabel('Number of Events')
-
-	plt.show()
-
 def main():
 
 	mother_dict = count()
@@ -278,12 +258,12 @@ def main():
 	print('*'*10)
 	print('RESULTS')
 	print('*'*10)
-	print('\nTotal number of events with max mjj belonging to two leading jets: {}'.format(counter_twoLeadingJets['mixed'] + counter_twoLeadingJets['twoForwardJets'] + counter_twoLeadingJets['twoCentralJets']))
+	print('\nTotal number of events with max mjj belonging to two leading jets  : {}'.format(counter_twoLeadingJets['mixed'] + counter_twoLeadingJets['twoForwardJets'] + counter_twoLeadingJets['twoCentralJets']))
 	print('--- Number of events in two forward jets category                  : {}'.format(counter_twoLeadingJets['twoForwardJets']))
 	print('--- Number of events in two central jets category                  : {}'.format(counter_twoLeadingJets['twoCentralJets']))
 	print('--- Number of events in mixed category                             : {}'.format(counter_twoLeadingJets['mixed']))
 
-	print('\nTotal number of events with max mjj belonging to other jet combos: {}'.format(counter_otherCombos['mixed'] + counter_otherCombos['twoForwardJets'] + counter_otherCombos['twoCentralJets']))
+	print('\nTotal number of events with max mjj belonging to other jet combos  : {}'.format(counter_otherCombos['mixed'] + counter_otherCombos['twoForwardJets'] + counter_otherCombos['twoCentralJets']))
 	print('--- Number of events in two forward jets category                  : {}'.format(counter_otherCombos['twoForwardJets']))
 	print('--- Number of events in two central jets category                  : {}'.format(counter_otherCombos['twoCentralJets']))
 	print('--- Number of events in mixed category                             : {}'.format(counter_otherCombos['mixed']))

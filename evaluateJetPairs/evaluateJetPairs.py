@@ -75,6 +75,18 @@ def getMaxCombo(mjj_values):
 
 		return mjjMax_jetCombo
 
+def jetWithLargerPt(jet1, jet2):
+
+	'''
+	Given two jets, returns the jet with the larger pt value.
+	'''
+
+	if jet1.pt() > jet2.pt():
+
+		return jet1
+
+	return jet2
+
 def isTightJet(jet):
 
 	'''
@@ -110,6 +122,90 @@ def isTightJet(jet):
 		if jet.neutralMultiplicity() <= 10: return False
 
 	return True
+
+def fill2DHistos(histo_dict):
+
+	'''
+	Given the dict containing all histograms, fills the histograms by doing an event loop.
+	'''
+	#No stat box in the histograms
+	
+	ROOT.gStyle.SetOptStat(0)
+
+	mjj_histo = histo_dict['mjj_histo']
+	leadJetPt_histo = histo_dict['leadJetPt_histo']
+	trailJetPt_histo = histo_dict['trailJetPt_histo']
+	leadJetEta_histo = histo_dict['leadJetEta_histo']
+	trailJetEta_histo = histo_dict['trailJetEta_histo']
+
+	jets, jetLabel = Handle('std::vector<pat::Jet>'), 'slimmedJets'
+
+	events = Events('root://cmsxrootd.fnal.gov///store/mc/RunIIFall17MiniAODv2/VBF_HToInvisible_M125_13TeV_TuneCP5_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/00000/14347E60-56F2-E811-81F4-24BE05C6C7E1.root')
+
+	#######################
+	#Event loop starts here
+	#######################
+
+	for iev, event in enumerate(events):
+
+		#if iev == 1000: break #For testing
+
+		if iev % 1000 == 0:
+			print('Working on event {}'.format(iev))
+
+		event.getByLabel(jetLabel, jets)
+
+		######################
+		#Implementing tight jet ID, 2017 recommendations
+		######################
+	
+		jets_ = jets.product()
+
+		AK4_tightJets = []
+		
+		for jet in jets_:
+
+			if isTightJet(jet):			
+	
+				AK4_tightJets.append(jet) 
+
+		nJet = len(AK4_tightJets)
+
+		if nJet < 2: continue #Discard the events with number of jets smaller than 2
+		
+		mjj_values = invMassJetCombos(AK4_tightJets) #Get all the mjj values for all possible combos
+
+		maxCombo = getMaxCombo(mjj_values) #Get the jet pair for which the maximum mjj happens to be
+
+		#################################
+		#In the following, max_ variables stand for "the pair with highest mjj"
+		#In contrast, leadingPair_ stands for "the highest pt jet pair"
+		#################################
+
+		if maxCombo == (0, 1):
+		
+			max_mjj = leadingPair_mjj = mjj_values['leadingJet_trailingJet']
+			max_leadJetPt = leadingPair_leadJetPt = AK4_tightJets[0].pt()
+			max_trailJetPt = leadingPair_trailJetPt = AK4_tightJets[1].pt()
+			max_leadJetEta = leadingPair_leadJetEta = AK4_tightJets[0].eta()
+			max_trailJetEta = leadingPair_trailJetEta = AK4_tightJets[1].eta()
+
+		else:
+			
+			leadingPair_mjj = mjj_values['leadingJet_trailingJet']
+			max_mjj = mjj_values['otherCombos'][maxCombo]
+			
+			#jetWithLarger_pt = jetWithLargerPt(AK4_tightJets[maxCombo[0]], AK4_tightJets[maxCombo[1]])
+
+		mjj_histo.Fill(max_mjj, leadingPair_mjj)
+
+	#Create a canvas and save the 2D histogram here
+
+	canv = ROOT.TCanvas('canv', 'canv')
+	
+	mjj_histo.Draw('COLZ') #Draw colormap with color palette
+
+	canv.Print('trial2dHisto.png')
 
 def count():
 
@@ -243,39 +339,39 @@ def count():
 		
 def main():
 
-	mother_dict = count()
+	#mother_dict = count()
 	
 	#Get the dictionary containing the definitions of 2D histograms
-	#histo_dict = define2DHistos()
+	histo_dict = define2DHistos()
 
-	counter_twoLeadingJets = mother_dict['counter_twoLeadingJets']
-	counter_otherCombos = mother_dict['counter_otherCombos']
-	mjjValues_leadingPair = mother_dict['mjjValues_leadingPair']
-	mjjValues_otherMaxPair = mother_dict['mjjValues_otherMaxPair']
-	ptValues1_leadingPair = mother_dict['ptValues1_leadingPair']
-	ptValues2_leadingPair = mother_dict['ptValues2_leadingPair']
-	leadingJetPtValues_otherMaxPair = mother_dict['leadingJetPtValues_otherMaxPair']
-	trailingJetPtValues_otherMaxPair = mother_dict['trailingJetPtValues_otherMaxPair']
-	ptValues1_otherMaxPair = mother_dict['ptValues1_otherMaxPair']
-	ptValues2_otherMaxPair = mother_dict['ptValues2_otherMaxPair']
+	fill2DHistos(histo_dict)
 
-	print('*'*10)
-	print('RESULTS')
-	print('*'*10)
-	print('\nTotal number of events with max mjj belonging to two leading jets  : {}'.format(counter_twoLeadingJets['mixed'] + counter_twoLeadingJets['twoForwardJets'] + counter_twoLeadingJets['twoCentralJets']))
-	print('--- Number of events in two forward jets category                  : {}'.format(counter_twoLeadingJets['twoForwardJets']))
-	print('--- Number of events in two central jets category                  : {}'.format(counter_twoLeadingJets['twoCentralJets']))
-	print('--- Number of events in mixed category                             : {}'.format(counter_twoLeadingJets['mixed']))
+#	counter_twoLeadingJets = mother_dict['counter_twoLeadingJets']
+#	counter_otherCombos = mother_dict['counter_otherCombos']
+#	mjjValues_leadingPair = mother_dict['mjjValues_leadingPair']
+#	mjjValues_otherMaxPair = mother_dict['mjjValues_otherMaxPair']
+#	ptValues1_leadingPair = mother_dict['ptValues1_leadingPair']
+#	ptValues2_leadingPair = mother_dict['ptValues2_leadingPair']
+#	leadingJetPtValues_otherMaxPair = mother_dict['leadingJetPtValues_otherMaxPair']
+#	trailingJetPtValues_otherMaxPair = mother_dict['trailingJetPtValues_otherMaxPair']
+#	ptValues1_otherMaxPair = mother_dict['ptValues1_otherMaxPair']
+#	ptValues2_otherMaxPair = mother_dict['ptValues2_otherMaxPair']
+#
+#	print('*'*10)
+#	print('RESULTS')
+#	print('*'*10)
+#	print('\nTotal number of events with max mjj belonging to two leading jets  : {}'.format(counter_twoLeadingJets['mixed'] + counter_twoLeadingJets['twoForwardJets'] + counter_twoLeadingJets['twoCentralJets']))
+#	print('--- Number of events in two forward jets category                  : {}'.format(counter_twoLeadingJets['twoForwardJets']))
+#	print('--- Number of events in two central jets category                  : {}'.format(counter_twoLeadingJets['twoCentralJets']))
+#	print('--- Number of events in mixed category                             : {}'.format(counter_twoLeadingJets['mixed']))
+#
+#	print('\nTotal number of events with max mjj belonging to other jet combos  : {}'.format(counter_otherCombos['mixed'] + counter_otherCombos['twoForwardJets'] + counter_otherCombos['twoCentralJets']))
+#	print('--- Number of events in two forward jets category                  : {}'.format(counter_otherCombos['twoForwardJets']))
+#	print('--- Number of events in two central jets category                  : {}'.format(counter_otherCombos['twoCentralJets']))
+#	print('--- Number of events in mixed category                             : {}'.format(counter_otherCombos['mixed']))
+#
+#	print('*'*10)
 
-	print('\nTotal number of events with max mjj belonging to other jet combos  : {}'.format(counter_otherCombos['mixed'] + counter_otherCombos['twoForwardJets'] + counter_otherCombos['twoCentralJets']))
-	print('--- Number of events in two forward jets category                  : {}'.format(counter_otherCombos['twoForwardJets']))
-	print('--- Number of events in two central jets category                  : {}'.format(counter_otherCombos['twoCentralJets']))
-	print('--- Number of events in mixed category                             : {}'.format(counter_otherCombos['mixed']))
-
-	print('*'*10)
-
-	#createHisto(mjjValues_leadingPair)
-	
 if __name__ == '__main__':
 
 	main()

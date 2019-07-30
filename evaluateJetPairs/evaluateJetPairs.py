@@ -75,6 +75,42 @@ def getMaxCombo(mjj_values):
 
 		return mjjMax_jetCombo
 
+def isTightJet(jet):
+
+	'''
+	Returns True if the given jet passes the tight ID requirements (2017).
+	Otherwise, returns False.
+	'''
+	if abs(jet.eta()) <= 2.7:
+
+		if jet.nConstituents() <= 1: return False
+
+		if jet.neutralHadronEnergyFraction() >= 0.9: return False
+
+		if jet.neutralEmEnergyFraction() >= 0.9: return False
+		
+		if abs(jet.eta()) <= 2.4:
+
+			if jet.chargedHadronEnergyFraction() <= 0: return False
+
+			if jet.chargedMultiplicity() <= 0: return False
+
+	if 2.7 < abs(jet.eta()) <= 3.0:
+
+		if not 0.02 < jet.neutralEmEnergyFraction() < 0.99: return False
+
+		if jet.neutralMultiplicity() <= 2: return False
+
+	if abs(jet.eta()) > 3.0:
+
+		if jet.neutralEmEnergyFraction() > 0.9: return False
+
+		if jet.neutralHadronEnergyFraction() <= 0.02: return False
+
+		if jet.neutralMultiplicity() <= 10: return False
+
+	return True
+
 def count():
 
 	'''
@@ -124,9 +160,6 @@ def count():
 	mother_dict['ptValues1_otherMaxPair'] = ptValues1_otherMaxPair	
 	mother_dict['ptValues2_otherMaxPair'] = ptValues2_otherMaxPair	
 
-	#Get the dictionary containing the definitions of 2D histograms
-	histo_dict = define2DHistos()
-
 	#####################
 	#Event loop starts here
 	#####################
@@ -150,40 +183,42 @@ def count():
 		
 		for i, jet in enumerate(jets_):
 
-			if abs(jet.eta()) <= 2.7:
+	#		if abs(jet.eta()) <= 2.7:
 
-				if jet.nConstituents() <= 1: continue
+	#			if jet.nConstituents() <= 1: continue
 
-				if jet.neutralHadronEnergyFraction() >= 0.9: continue
+	#			if jet.neutralHadronEnergyFraction() >= 0.9: continue
 
-				if jet.neutralEmEnergyFraction() >= 0.9: continue
-				
-				if abs(jet.eta()) <= 2.4:
+	#			if jet.neutralEmEnergyFraction() >= 0.9: continue
+	#			
+	#			if abs(jet.eta()) <= 2.4:
 
-					if jet.chargedHadronEnergyFraction() <= 0: continue
+	#				if jet.chargedHadronEnergyFraction() <= 0: continue
 
-					if jet.chargedMultiplicity() <= 0: continue
+	#				if jet.chargedMultiplicity() <= 0: continue
 
-					AK4_tightJets.append(jet)			
+	#				AK4_tightJets.append(jet)			
 
-				else: AK4_tightJets.append(jet)
-					
-			if 2.7 < abs(jet.eta()) <= 3.0:
+	#			else: AK4_tightJets.append(jet)
+	#				
+	#		if 2.7 < abs(jet.eta()) <= 3.0:
 
-				if not 0.02 < jet.neutralEmEnergyFraction() < 0.99: continue
+	#			if not 0.02 < jet.neutralEmEnergyFraction() < 0.99: continue
 
-				if jet.neutralMultiplicity() <= 2: continue
+	#			if jet.neutralMultiplicity() <= 2: continue
 
-				AK4_tightJets.append(jet)
+	#			AK4_tightJets.append(jet)
 
-			if abs(jet.eta()) > 3.0:
+	#		if abs(jet.eta()) > 3.0:
 
-				if jet.neutralEmEnergyFraction() > 0.9: continue
+	#			if jet.neutralEmEnergyFraction() > 0.9: continue
 
-				if jet.neutralHadronEnergyFraction() <= 0.02: continue
-		
-				if jet.neutralMultiplicity() <= 10: continue
+	#			if jet.neutralHadronEnergyFraction() <= 0.02: continue
+	#	
+	#			if jet.neutralMultiplicity() <= 10: continue
 
+			if isTightJet(jet):			
+	
 				AK4_tightJets.append(jet) 
 
 		nJet = len(AK4_tightJets)
@@ -243,6 +278,9 @@ def count():
 def main():
 
 	mother_dict = count()
+	
+	#Get the dictionary containing the definitions of 2D histograms
+	histo_dict = define2DHistos()
 
 	counter_twoLeadingJets = mother_dict['counter_twoLeadingJets']
 	counter_otherCombos = mother_dict['counter_otherCombos']

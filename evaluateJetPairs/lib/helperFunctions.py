@@ -93,12 +93,29 @@ def printHisto(hist):
 	canv = ROOT.TCanvas('canv')
 	
 	hist.Draw('COLZ')
-
+	canv.SetLogz(1)
 	histo_variable = hist.GetName().split('_')[0]
 
 	fileName = histo_variable + '.png'	
 
 	canv.Print(fileName)
+
+def getJetGeometry(jet1, jet2):
+
+	'''
+	Given the leading two jets, determines whether:
+	--Both of them are central
+	--One is central and one is forward
+	--Both of them are forward
+	Returns a string that contains information about the jet geometry.
+	'''
+
+	if abs(jet1.eta()) <= 2.5 and abs(jet2.eta()) <= 2.5: return 'Two Central Jets'
+
+	elif abs(jet1.eta()) > 2.5 and abs(jet2.eta()) > 2.5: return 'Two Forward Jets'
+
+	else: return 'Mixed'
+
 
 def isTightJet(jet):
 

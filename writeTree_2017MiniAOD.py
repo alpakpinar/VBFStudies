@@ -42,6 +42,8 @@ def minJetMETPhi(jets_, mets_):
 
 	if len(jets_) <= 4:
 		for j in jets_:
+
+			if j.pt() < 30: continue
 			phi_diff = abs(j.phi() - met.phi())
 			
 			if phi_diff <= pi:
@@ -52,6 +54,8 @@ def minJetMETPhi(jets_, mets_):
 
 	else:
 		for i in range(4): #Take only the first four leading jets
+
+			if jets_[i].pt() < 30: continue
 			phi_diff = abs(jets_[i].phi() - met.phi())
 			
 			if phi_diff <= pi:

@@ -68,7 +68,7 @@ def minJetMETPhi(jets_, mets_):
 
 		return min(phiDiffList)
 
-	return 0.0	
+	return -1.0 #These events will not pass 	
 
 def writeTree(inputFile, tree, args):
 	

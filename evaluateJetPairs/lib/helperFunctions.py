@@ -1,5 +1,45 @@
 import ROOT
 
+def minJetMETPhi(jets_, mets_):
+
+	'''
+	Calculates the minimum phi difference between four leading jets and MET.
+	If there are less than four jets in the event, it calculates the minimum phi difference by looking at all the jets.
+	'''
+
+	phiDiffList = []	
+	met = mets_[0]
+
+	if len(jets_) <= 4:
+		for j in jets_:
+
+			if j.pt() < 30: continue
+			phi_diff = abs(j.phi() - met.phi())
+			
+			if phi_diff <= pi:
+				phiDiffList.append(phi_diff)
+
+			else:
+				phiDiffList.append(2*pi - phi_diff)
+
+	else:
+		for i in range(4): #Take only the first four leading jets
+
+			if jets_[i].pt() < 30: continue
+			phi_diff = abs(jets_[i].phi() - met.phi())
+			
+			if phi_diff <= pi:
+				phiDiffList.append(phi_diff)
+
+			else:
+				phiDiffList.append(2*pi - phi_diff)
+
+	if phiDiffList:
+
+		return min(phiDiffList)
+
+	return -1.0 #These events will not pass 	
+
 def invMassTwoJets(jet1, jet2):
 	
 	'''

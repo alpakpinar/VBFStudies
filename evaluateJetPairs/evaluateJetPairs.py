@@ -94,7 +94,11 @@ def getFracOfEvents_mjj():
 		if containsLeptonOrPhoton(electrons, muons, taus, photons): continue #Lepton-photon veto
 
 		if contains_bJet(AK4_tightJets): continue #b-jet veto
-		
+	
+		minPhi_jetMET = minJetMETPhi(AK4_tightJets, mets_)
+
+		if minPhi_jetMET <= 0.5: continue
+	
 		mjj_values = invMassJetCombos(AK4_tightJets) #Get all the mjj values for all possible combos
 
 		maxCombo = getMaxCombo(mjj_values) #Get the jet pair for which the maximum mjj happens to be

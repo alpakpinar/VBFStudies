@@ -80,7 +80,7 @@ def containsLeptonOrPhoton(electrons, muons, taus, photons):
 	taus_ = taus.product()
 	photons_ = photons.product()
  
-	contains_lepton_photon = containsLooseElectron(electrons_) and containsLooseMuon(muons_) and containsLooseTau(taus_) and containsLoosePhoton(photons_)
+	contains_lepton_photon = containsLooseElectron(electrons_) or containsLooseMuon(muons_) or containsLooseTau(taus_) or containsLoosePhoton(photons_)
 
 	return contains_lepton_photon
 

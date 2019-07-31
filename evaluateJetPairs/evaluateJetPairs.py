@@ -116,7 +116,7 @@ def getFracOfEvents_mjj():
 		if AK4_tightJets[0].eta() * AK4_tightJets[1].eta() > 0: continue
 
 		#Leading jet pt cuts
-		if not (AK4_tightJets[0].pt() > 160 and AK4_tightJets[1].pt() > 50): continue
+		if not (AK4_tightJets[0].pt() > 100 and AK4_tightJets[1].pt() > 30): continue
 
 		#########################
 		#VBF cuts end here
@@ -148,20 +148,21 @@ def getFracOfEvents_mjj():
 	#Construct the histograms containing ratios of the events
 	########################
 	
-	ratioHist_twoCentralJets = mjjHistWithSelectedEvents_twoCentralJets.Clone()
+	printHisto(mjjHistWithSelectedEvents_twoCentralJets)
+	printHisto(mjjHistWithSelectedEvents_mixed)
+	
+	ratioHist_twoCentralJets = mjjHistWithSelectedEvents_twoCentralJets.Clone('ratioHist_twoCentralJets')
 	ratioHist_twoCentralJets.Divide(mjjHistWithAllEvents_twoCentralJets) #Divide the two histograms
 	ratioHist_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
 	ratioHist_twoCentralJets.GetYaxis().SetTitle('Ratio of Events')
 
-	ratioHist_mixed = mjjHistWithSelectedEvents_mixed.Clone()
+	ratioHist_mixed = mjjHistWithSelectedEvents_mixed.Clone('ratioHist_mixed')
 	ratioHist_mixed.Divide(mjjHistWithAllEvents_mixed) #Divide the two histograms
 	ratioHist_mixed.GetXaxis().SetTitle('mjj (GeV)')
 	ratioHist_mixed.GetYaxis().SetTitle('Ratio of Events')
 
 	printHisto(mjjHistWithAllEvents_twoCentralJets)
 	printHisto(mjjHistWithAllEvents_mixed)
-	printHisto(mjjHistWithSelectedEvents_twoCentralJets)
-	printHisto(mjjHistWithSelectedEvents_mixed)
 	printHisto(ratioHist_twoCentralJets)
 	printHisto(ratioHist_mixed) 	
 

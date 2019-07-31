@@ -176,6 +176,21 @@ def getJetGeometry(jet1, jet2):
 
 	else: return 'Mixed'
 
+def constructRatioPlot(histWithSelectedEvents, histWithAllEvents):
+	
+	'''
+	Constructs the ratio plot for the given histWithSelectedEvents and histWithAllEvents.
+	Saves the histograms as png files.
+	'''
+
+	histType = histWithSelectedEvents.GetName().split('_')[-1] #twoCentralJets or mixed
+
+	ratioHist = histWithSelectedEvents.Clone('ratioHist_' + histType)
+	ratioHist.Divide(histWithAllEvents) #Divide the two histograms
+	ratioHist.GetXaxis().SetTitle('mjj (GeV)')
+	ratioHist.GetYaxis().SetTitle('Ratio of Events')
+	
+	printHisto(ratioHist)
 
 def isTightJet(jet):
 

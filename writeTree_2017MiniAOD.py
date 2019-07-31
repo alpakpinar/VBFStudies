@@ -64,8 +64,11 @@ def minJetMETPhi(jets_, mets_):
 			else:
 				phiDiffList.append(2*pi - phi_diff)
 
-	return min(phiDiffList)
+	if phiDiffList:
 
+		return min(phiDiffList)
+
+	return 0.0	
 
 def writeTree(inputFile, tree, args):
 	

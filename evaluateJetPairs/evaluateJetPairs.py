@@ -19,6 +19,10 @@ def getFracOfEvents_mjj():
 	--Two central jets
 	--Mixed (one central, one forward jet)
 	'''
+	#No stat box in the histograms
+	
+	ROOT.gStyle.SetOptStat(0)
+	
 	jets, jetLabel = Handle('std::vector<pat::Jet>'), 'slimmedJets'
 
 	events = Events('root://cmsxrootd.fnal.gov///store/mc/RunIIFall17MiniAODv2/VBF_HToInvisible_M125_13TeV_TuneCP5_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/00000/14347E60-56F2-E811-81F4-24BE05C6C7E1.root')
@@ -30,11 +34,11 @@ def getFracOfEvents_mjj():
 	mjj_array = np.arange(500., 2500., 50.)
 
 	mjj_histWithAllEvents_twoCentralJets = ROOT.TH1F('mjj_histWithAllEvents_twoCentralJets', 'mjj_histWithAllEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
-	mjj_histWithAllEvents_Mixed = ROOT.TH1F('mjj_histWithAllEvents_Mixed', 'mjj_histWithAllEvents_Mixed', len(mjj_array)-1, mjj_array)
+	mjj_histWithAllEvents_mixed = ROOT.TH1F('mjj_histWithAllEvents_mixed', 'mjj_histWithAllEvents_mixed', len(mjj_array)-1, mjj_array)
 
 	#These histograms only contain the events with highest mjj pair coinciding with the leading jet pair
 	mjj_histWithSelectedEvents_twoCentralJets = ROOT.TH1F('mjj_histWithSelectedEvents_twoCentralJets', 'mjj_histWithSelectedEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
-	mjj_histWithSelectedEvents_Mixed = ROOT.TH1F('mjj_histWithSelectedEvents_Mixed', 'mjj_histWithSelectedEvents_Mixed', len(mjj_array)-1, mjj_array)
+	mjj_histWithSelectedEvents_mixed = ROOT.TH1F('mjj_histWithSelectedEvents_mixed', 'mjj_histWithSelectedEvents_mixed', len(mjj_array)-1, mjj_array)
 
 	#######################
 	#Event loop starts here
@@ -83,11 +87,11 @@ def getFracOfEvents_mjj():
 
 		elif jet_geometry == 'Mixed':
 			
-			mjj_histWithAllEvents_Mixed.Fill(mjj_values['leadingJet_trailingJet'])
+			mjj_histWithAllEvents_mixed.Fill(mjj_values['leadingJet_trailingJet'])
 			
 			if maxCombo == (0,1) or maxCombo == (1,0):
 
-				mjj_histWithSelectedEvents_Mixed.Fill(mjj_values['leadingJet_trailingJet'])
+				mjj_histWithSelectedEvents_mixed.Fill(mjj_values['leadingJet_trailingJet'])
 
 	########################
 	#Construct the histograms containing ratios of the events
@@ -98,12 +102,13 @@ def getFracOfEvents_mjj():
 	ratioHist_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
 	ratioHist_twoCentralJets.GetYaxis().SetTitle('Ratio of Events')
 
-	ratioHist_Mixed = mjj_histWithSelectedEvents_Mixed.Clone()
-	ratioHist_Mixed.Divide(mjj_histWithAllEvents_Mixed) #Divide the two histograms
-	ratioHist_Mixed.GetXaxis().SetTitle('mjj (GeV)')
-	ratioHist_Mixed.GetYaxis().SetTitle('Ratio of Events')
- 	
+	ratioHist_mixed = mjj_histWithSelectedEvents_mixed.Clone()
+	ratioHist_mixed.Divide(mjj_histWithAllEvents_mixed) #Divide the two histograms
+	ratioHist_mixed.GetXaxis().SetTitle('mjj (GeV)')
+	ratioHist_mixed.GetYaxis().SetTitle('Ratio of Events')
 
+	printHisto(ratioHist_twoCentralJets)
+	printHisto(ratioHist_mixed) 	
 
 def fill2DHistos(histo_dict):
 
@@ -339,9 +344,11 @@ def main():
 	#mother_dict = count()
 	
 	#Get the dictionary containing the definitions of 2D histograms
-	histo_dict = define2DHistos()
+	#histo_dict = define2DHistos()
 
-	fill2DHistos(histo_dict)
+	#fill2DHistos(histo_dict)
+
+	getFracOfEvents_mjj()
 
 #	counter_twoLeadingJets = mother_dict['counter_twoLeadingJets']
 #	counter_otherCombos = mother_dict['counter_otherCombos']

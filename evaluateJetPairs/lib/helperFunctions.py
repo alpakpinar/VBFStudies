@@ -83,6 +83,22 @@ def sortJets(jets_list, combo):
 
 	return idx_jetWithLargerPt, idx_jetWithSmallerPt
 
+def printHisto(hist):
+
+	'''
+	Given 1D histogram, crates a canvas and plots the histogram.
+	It then saves the file as a png.
+	'''
+
+	canv = ROOT.TCanvas('canv')
+
+	hist.Draw()
+	
+	geometry = hist.GetName().split('_')[-1]
+	fileName = 'ratioPlot_' + geometry + '.png'
+
+	canv.Print(fileName)
+
 def print2DHisto(hist):
 
 	'''

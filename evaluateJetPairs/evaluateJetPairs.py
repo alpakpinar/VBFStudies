@@ -98,7 +98,20 @@ def getFracOfEvents_mjj():
 		minPhi_jetMET = minJetMETPhi(AK4_tightJets, mets_)
 
 		if minPhi_jetMET <= 0.5: continue
+
+		absEtaDiff_twoLeadingJets = abs(AK4_tightJets[0].eta() - AK4_tightJets[1].eta())
 	
+		if absEtaDiff_twoLeadingJets <= 2.5: continue
+
+		if AK4_tightJets[0].eta() * AK4_tightJets[1].eta() > 0: continue
+
+		#Leading jet pt cuts
+		if not (AK4_tightJets[0].pt() > 160 and AK4_tightJets[1].pt() > 50): continue
+
+		#########################
+		#VBF cuts end here
+		#########################
+
 		mjj_values = invMassJetCombos(AK4_tightJets) #Get all the mjj values for all possible combos
 
 		maxCombo = getMaxCombo(mjj_values) #Get the jet pair for which the maximum mjj happens to be

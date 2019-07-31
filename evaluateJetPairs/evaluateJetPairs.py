@@ -75,17 +75,22 @@ def getMaxCombo(mjj_values):
 
 		return mjjMax_jetCombo
 
-def jetWithLargerPt(jet1, jet2):
-
+def sortJets(jets_list, combo):
+	
 	'''
-	Given two jets, returns the jet with the larger pt value.
+	Given the list of jets and indices of two jets in combo, sorts the jets with respect to pt and returns the indices.
+	Larger index is returned first.
 	'''
+	
+	if jets_list[combo[0]].pt() > jets_list[combo[1]].pt():
 
-	if jet1.pt() > jet2.pt():
+		idx_jetWithLargerPt, idx_jetWithSmallerPt = combo[0], combo[1]
+	
+	else:
+		
+		idx_jetWithLargerPt, idx_jetWithSmallerPt = combo[1], combo[0]
 
-		return jet1
-
-	return jet2
+	return idx_jetWithLargerPt, idx_jetWithSmallerPt
 
 def isTightJet(jet):
 
@@ -181,23 +186,40 @@ def fill2DHistos(histo_dict):
 		#In the following, max_ variables stand for "the pair with highest mjj"
 		#In contrast, leadingPair_ stands for "the highest pt jet pair"
 		#################################
+		
+		leadingPair_mjj = mjj_values['leadingJet_trailingJet']
+		leadingPair_leadJetPt = AK4_tightJets[0].pt()
+		leadingPair_trailJetPt = AK4_tightJets[1].pt()
+		leadingPair_leadJetEta = AK4_tightJets[0].eta()
+		leadingPair_trailJetEta = AK4_tightJets[1].eta()
 
 		if maxCombo == (0, 1):
 		
-			max_mjj = leadingPair_mjj = mjj_values['leadingJet_trailingJet']
-			max_leadJetPt = leadingPair_leadJetPt = AK4_tightJets[0].pt()
-			max_trailJetPt = leadingPair_trailJetPt = AK4_tightJets[1].pt()
-			max_leadJetEta = leadingPair_leadJetEta = AK4_tightJets[0].eta()
-			max_trailJetEta = leadingPair_trailJetEta = AK4_tightJets[1].eta()
+			max_mjj = leadingPair_mjj 
+			max_leadJetPt = leadingPair_leadJetPt 
+			max_trailJetPt = leadingPair_trailJetPt 
+			max_leadJetEta = leadingPair_leadJetEta 
+			max_trailJetEta = leadingPair_trailJetEta 
 
 		else:
 			
-			leadingPair_mjj = mjj_values['leadingJet_trailingJet']
 			max_mjj = mjj_values['otherCombos'][maxCombo]
 			
-			#jetWithLarger_pt = jetWithLargerPt(AK4_tightJets[maxCombo[0]], AK4_tightJets[maxCombo[1]])
+			#Identify the jet with larger pt in the max mjj combo
+
+			idx_jetWithLargerPt, idx_jetWithSmallerPt = sortJets(AK4_tightJets, maxCombo)
+
+			max_leadJetPt = AK4_tightJets[idx_jetWithLargerPt].pt()
+			max_trailJetPt = AK4_tightJets[idx_jetWithSmallerPt].pt()
+			max_leadJetEta = AK4_tightJets[idx_jetWithLargerPt].eta()
+			max_trailJetEta = AK4_tightJets[idx_jetWithSmallerPt].eta()
 
 		mjj_histo.Fill(max_mjj, leadingPair_mjj)
+		leadJetPt_histo.Fill(max_leadJetPt, leadingPair_leadJetPt)
+		trailJetPt_histo.Fill(max_trailJetPt, leadingPair_trailJetPt)
+		leadJetEta_histo.Fill(max_leadJetEta, leadingPair_leadJetEta)
+		trailJetEta_histo.Fill(max_trailJetEta, leadingPair_trailJetEta)
+
 
 	#Create a canvas and save the 2D histogram here
 

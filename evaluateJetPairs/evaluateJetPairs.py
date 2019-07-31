@@ -39,12 +39,22 @@ def getFracOfEvents_mjj():
 
 	mjj_array = np.arange(500., 2500., 100.)
 
-	mjj_histWithAllEvents_twoCentralJets = ROOT.TH1F('mjj_histWithAllEvents_twoCentralJets', 'mjj_histWithAllEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
-	mjj_histWithAllEvents_mixed = ROOT.TH1F('mjj_histWithAllEvents_mixed', 'mjj_histWithAllEvents_mixed', len(mjj_array)-1, mjj_array)
+	mjjHistWithAllEvents_twoCentralJets = ROOT.TH1F('mjjHistWithAllEvents_twoCentralJets', 'mjjHistWithAllEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
+	mjjHistWithAllEvents_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
+	mjjHistWithAllEvents_twoCentralJets.GetYaxis().SetTitle('Number of Events')
+
+	mjjHistWithAllEvents_mixed = ROOT.TH1F('mjjHistWithAllEvents_mixed', 'mjjHistWithAllEvents_mixed', len(mjj_array)-1, mjj_array)
+	mjjHistWithAllEvents_mixed.GetXaxis().SetTitle('mjj (GeV)')
+	mjjHistWithAllEvents_mixed.GetYaxis().SetTitle('Number of Events')
 
 	#These histograms only contain the events with highest mjj pair coinciding with the leading jet pair
-	mjj_histWithSelectedEvents_twoCentralJets = ROOT.TH1F('mjj_histWithSelectedEvents_twoCentralJets', 'mjj_histWithSelectedEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
-	mjj_histWithSelectedEvents_mixed = ROOT.TH1F('mjj_histWithSelectedEvents_mixed', 'mjj_histWithSelectedEvents_mixed', len(mjj_array)-1, mjj_array)
+	mjjHistWithSelectedEvents_twoCentralJets = ROOT.TH1F('mjjHistWithSelectedEvents_twoCentralJets', 'mjjHistWithSelectedEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
+	mjjHistWithSelectedEvents_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
+	mjjHistWithSelectedEvents_twoCentralJets.GetYaxis().SetTitle('Number of Events')
+	
+	mjjHistWithSelectedEvents_mixed = ROOT.TH1F('mjjHistWithSelectedEvents_mixed', 'mjjHistWithSelectedEvents_mixed', len(mjj_array)-1, mjj_array)
+	mjjHistWithSelectedEvents_mixed.GetXaxis().SetTitle('mjj (GeV)')
+	mjjHistWithSelectedEvents_mixed.GetYaxis().SetTitle('Number of Events')
 
 	#######################
 	#Event loop starts here
@@ -120,34 +130,38 @@ def getFracOfEvents_mjj():
 
 		if jet_geometry == 'Two Central Jets':
 		
-			mjj_histWithAllEvents_twoCentralJets.Fill(mjj_values['leadingJet_trailingJet'])
+			mjjHistWithAllEvents_twoCentralJets.Fill(mjj_values['leadingJet_trailingJet'])
 		
 			if maxCombo == (0,1) or maxCombo == (1,0):
 
-				mjj_histWithSelectedEvents_twoCentralJets.Fill(mjj_values['leadingJet_trailingJet'])
+				mjjHistWithSelectedEvents_twoCentralJets.Fill(mjj_values['leadingJet_trailingJet'])
 
 		elif jet_geometry == 'Mixed':
 			
-			mjj_histWithAllEvents_mixed.Fill(mjj_values['leadingJet_trailingJet'])
+			mjjHistWithAllEvents_mixed.Fill(mjj_values['leadingJet_trailingJet'])
 			
 			if maxCombo == (0,1) or maxCombo == (1,0):
 
-				mjj_histWithSelectedEvents_mixed.Fill(mjj_values['leadingJet_trailingJet'])
+				mjjHistWithSelectedEvents_mixed.Fill(mjj_values['leadingJet_trailingJet'])
 
 	########################
 	#Construct the histograms containing ratios of the events
 	########################
 	
-	ratioHist_twoCentralJets = mjj_histWithSelectedEvents_twoCentralJets.Clone()
-	ratioHist_twoCentralJets.Divide(mjj_histWithAllEvents_twoCentralJets) #Divide the two histograms
+	ratioHist_twoCentralJets = mjjHistWithSelectedEvents_twoCentralJets.Clone()
+	ratioHist_twoCentralJets.Divide(mjjHistWithAllEvents_twoCentralJets) #Divide the two histograms
 	ratioHist_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
 	ratioHist_twoCentralJets.GetYaxis().SetTitle('Ratio of Events')
 
-	ratioHist_mixed = mjj_histWithSelectedEvents_mixed.Clone()
-	ratioHist_mixed.Divide(mjj_histWithAllEvents_mixed) #Divide the two histograms
+	ratioHist_mixed = mjjHistWithSelectedEvents_mixed.Clone()
+	ratioHist_mixed.Divide(mjjHistWithAllEvents_mixed) #Divide the two histograms
 	ratioHist_mixed.GetXaxis().SetTitle('mjj (GeV)')
 	ratioHist_mixed.GetYaxis().SetTitle('Ratio of Events')
 
+	printHisto(mjjHistWithAllEvents_twoCentralJets)
+	printHisto(mjjHistWithAllEvents_mixed)
+	printHisto(mjjHistWithSelectedEvents_twoCentralJets)
+	printHisto(mjjHistWithSelectedEvents_mixed)
 	printHisto(ratioHist_twoCentralJets)
 	printHisto(ratioHist_mixed) 	
 

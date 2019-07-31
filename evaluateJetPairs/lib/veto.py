@@ -84,5 +84,27 @@ def containsLeptonOrPhoton(electrons, muons, taus, photons):
 
 	return contains_lepton_photon
 
+def contains_bJet(jets):
 
+	'''
+	Given all tight jets, determines whether there is a tagged b-jet or not according to 2017 requirements.
+	Returns True if there is at least one b-jet, returns False otherwise.
+	'''
+
+	has_bJet = False
+
+	for jet in jets:
+
+		#Getting b-tag information for each jet
+		tags = jet.getPairDiscri()
+
+		for tag in tags:
+
+			if tag.first == 'pfCombinedSecondaryVertexV2BJetTags':
+
+				jet_btag_CSVv2 = tag.second
+
+				if jet_btag_CSVv2 > 0.8484: has_bJet = True
+	
+	return has_bJet
  

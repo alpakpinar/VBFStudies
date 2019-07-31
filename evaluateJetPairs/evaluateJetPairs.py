@@ -2,6 +2,7 @@ import ROOT
 import numpy as np
 from lib.defineHistos import define2DHistos
 from lib.helperFunctions import *
+from lib.veto import *
 
 # load FWLite C++ libraries
 ROOT.gSystem.Load("libFWCoreFWLite.so");
@@ -23,7 +24,12 @@ def getFracOfEvents_mjj():
 	
 	ROOT.gStyle.SetOptStat(0)
 	
+	electrons, electronLabel = Handle('std::vector<pat::Electron>'), 'slimmedElectrons'
+	muons, muonLabel = Handle('std::vector<pat::Muon>'), 'slimmedMuons'
+	taus, tauLabel = Handle('std::vector<pat::Tau>'), 'slimmedTaus'
+	photons, photonLabel = Handle('std::vector<pat::Photon>'), 'slimmedPhotons'
 	jets, jetLabel = Handle('std::vector<pat::Jet>'), 'slimmedJets'
+	mets, metLabel = Handle('std::vector<pat::MET>'), 'slimmedMETs'
 
 	events = Events('root://cmsxrootd.fnal.gov///store/mc/RunIIFall17MiniAODv2/VBF_HToInvisible_M125_13TeV_TuneCP5_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/00000/14347E60-56F2-E811-81F4-24BE05C6C7E1.root')
 
@@ -31,7 +37,7 @@ def getFracOfEvents_mjj():
 	#Defining relevant histograms
 	#######################
 
-	mjj_array = np.arange(500., 2500., 50.)
+	mjj_array = np.arange(500., 2500., 100.)
 
 	mjj_histWithAllEvents_twoCentralJets = ROOT.TH1F('mjj_histWithAllEvents_twoCentralJets', 'mjj_histWithAllEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
 	mjj_histWithAllEvents_mixed = ROOT.TH1F('mjj_histWithAllEvents_mixed', 'mjj_histWithAllEvents_mixed', len(mjj_array)-1, mjj_array)
@@ -51,12 +57,22 @@ def getFracOfEvents_mjj():
 		if iev % 1000 == 0:
 			print('Working on event {}'.format(iev))
 
+		event.getByLabel(electronLabel, electrons)
+		event.getByLabel(muonLabel, muons)
+		event.getByLabel(tauLabel, taus)
+		event.getByLabel(photonLabel, photons)
 		event.getByLabel(jetLabel, jets)
+		event.getByLabel(metLabel, mets)
 
 		######################
 		#Implementing tight jet ID, 2017 recommendations
 		######################
 	
+		mets_ = mets.product()
+
+		met = mets_[0].pt()
+		met_phi = mets_[0].phi()
+
 		jets_ = jets.product()
 
 		AK4_tightJets = []
@@ -68,8 +84,16 @@ def getFracOfEvents_mjj():
 				AK4_tightJets.append(jet) 
 
 		nJet = len(AK4_tightJets)
-
+		
 		if nJet < 2: continue #Discard the events with number of jets smaller than 2
+		
+		#######################
+		#Apply VBF cuts
+		#######################
+
+		if containsLeptonOrPhoton(electrons, muons, taus, photons): continue #Lepton-photon veto
+
+		if contains_bJet(AK4_tightJets): continue #b-jet veto
 		
 		mjj_values = invMassJetCombos(AK4_tightJets) #Get all the mjj values for all possible combos
 

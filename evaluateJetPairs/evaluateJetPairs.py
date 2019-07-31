@@ -1,6 +1,6 @@
 import ROOT
 import numpy as np
-from lib.defineHistos import define2DHistos
+from lib.defineHistos import define2DHistos, defineHistosForRatioPlot
 from lib.helperFunctions import *
 from lib.veto import *
 
@@ -12,7 +12,7 @@ ROOT.FWLiteEnabler.enable()
 # load FWlite python libraries
 from DataFormats.FWLite import Handle, Events	
 
-def getFracOfEvents_mjj():
+def getFracOfEvents_mjj(fileName):
 
 	'''
 	Constructs the graph showing the fraction of events where leading jet pair coincides with highest mjj pair.
@@ -31,30 +31,30 @@ def getFracOfEvents_mjj():
 	jets, jetLabel = Handle('std::vector<pat::Jet>'), 'slimmedJets'
 	mets, metLabel = Handle('std::vector<pat::MET>'), 'slimmedMETs'
 
-	events = Events('root://cmsxrootd.fnal.gov///store/mc/RunIIFall17MiniAODv2/VBF_HToInvisible_M125_13TeV_TuneCP5_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/00000/14347E60-56F2-E811-81F4-24BE05C6C7E1.root')
+	events = Events(fileName)
 
 	#######################
 	#Defining relevant histograms
 	#######################
 
-	mjj_array = np.arange(500., 2500., 100.)
+	#mjj_array = np.arange(500., 2500., 100.)
 
-	mjjHistWithAllEvents_twoCentralJets = ROOT.TH1F('mjjHistWithAllEvents_twoCentralJets', 'mjjHistWithAllEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
-	mjjHistWithAllEvents_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
-	mjjHistWithAllEvents_twoCentralJets.GetYaxis().SetTitle('Number of Events')
+	#mjjHistWithAllEvents_twoCentralJets = ROOT.TH1F('mjjHistWithAllEvents_twoCentralJets', 'mjjHistWithAllEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
+	#mjjHistWithAllEvents_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
+	#mjjHistWithAllEvents_twoCentralJets.GetYaxis().SetTitle('Number of Events')
 
-	mjjHistWithAllEvents_mixed = ROOT.TH1F('mjjHistWithAllEvents_mixed', 'mjjHistWithAllEvents_mixed', len(mjj_array)-1, mjj_array)
-	mjjHistWithAllEvents_mixed.GetXaxis().SetTitle('mjj (GeV)')
-	mjjHistWithAllEvents_mixed.GetYaxis().SetTitle('Number of Events')
+	#mjjHistWithAllEvents_mixed = ROOT.TH1F('mjjHistWithAllEvents_mixed', 'mjjHistWithAllEvents_mixed', len(mjj_array)-1, mjj_array)
+	#mjjHistWithAllEvents_mixed.GetXaxis().SetTitle('mjj (GeV)')
+	#mjjHistWithAllEvents_mixed.GetYaxis().SetTitle('Number of Events')
 
-	#These histograms only contain the events with highest mjj pair coinciding with the leading jet pair
-	mjjHistWithSelectedEvents_twoCentralJets = ROOT.TH1F('mjjHistWithSelectedEvents_twoCentralJets', 'mjjHistWithSelectedEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
-	mjjHistWithSelectedEvents_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
-	mjjHistWithSelectedEvents_twoCentralJets.GetYaxis().SetTitle('Number of Events')
-	
-	mjjHistWithSelectedEvents_mixed = ROOT.TH1F('mjjHistWithSelectedEvents_mixed', 'mjjHistWithSelectedEvents_mixed', len(mjj_array)-1, mjj_array)
-	mjjHistWithSelectedEvents_mixed.GetXaxis().SetTitle('mjj (GeV)')
-	mjjHistWithSelectedEvents_mixed.GetYaxis().SetTitle('Number of Events')
+	##These histograms only contain the events with highest mjj pair coinciding with the leading jet pair
+	#mjjHistWithSelectedEvents_twoCentralJets = ROOT.TH1F('mjjHistWithSelectedEvents_twoCentralJets', 'mjjHistWithSelectedEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
+	#mjjHistWithSelectedEvents_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
+	#mjjHistWithSelectedEvents_twoCentralJets.GetYaxis().SetTitle('Number of Events')
+	#
+	#mjjHistWithSelectedEvents_mixed = ROOT.TH1F('mjjHistWithSelectedEvents_mixed', 'mjjHistWithSelectedEvents_mixed', len(mjj_array)-1, mjj_array)
+	#mjjHistWithSelectedEvents_mixed.GetXaxis().SetTitle('mjj (GeV)')
+	#mjjHistWithSelectedEvents_mixed.GetYaxis().SetTitle('Number of Events')
 
 	#######################
 	#Event loop starts here
@@ -397,14 +397,23 @@ def count():
 		
 def main():
 
+	#Define the necessary histograms for ratio plots
+	mjj_histos = defineHistosForRatioPlot()
+
+	f = file('inputs/MiniAOD_files2017.txt', 'r')
+
+	for numFile, fileName in enumerate(f.readlines()):
+
+		#if numFile == 2: break #For testing
+
+		getFracOfEvents_mjj(fileName)
+
 	#mother_dict = count()
 	
 	#Get the dictionary containing the definitions of 2D histograms
 	#histo_dict = define2DHistos()
 
 	#fill2DHistos(histo_dict)
-
-	getFracOfEvents_mjj()
 
 #	counter_twoLeadingJets = mother_dict['counter_twoLeadingJets']
 #	counter_otherCombos = mother_dict['counter_otherCombos']

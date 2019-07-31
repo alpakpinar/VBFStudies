@@ -47,3 +47,41 @@ def define2DHistos():
 
 	return histo_dict
 
+def defineHistosForRatioPlot():
+
+	'''
+	Define necessary 1D histograms for construction of ratio plots and store them in a dict.	
+	'''
+
+	mjj_histos = {}
+
+	mjj_array = np.arange(500., 2500., 100.)
+
+	mjjHistWithAllEvents_twoCentralJets = ROOT.TH1F('mjjHistWithAllEvents_twoCentralJets', 'mjjHistWithAllEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
+	mjjHistWithAllEvents_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
+	mjjHistWithAllEvents_twoCentralJets.GetYaxis().SetTitle('Number of Events')
+
+	mjjHistWithAllEvents_mixed = ROOT.TH1F('mjjHistWithAllEvents_mixed', 'mjjHistWithAllEvents_mixed', len(mjj_array)-1, mjj_array)
+	mjjHistWithAllEvents_mixed.GetXaxis().SetTitle('mjj (GeV)')
+	mjjHistWithAllEvents_mixed.GetYaxis().SetTitle('Number of Events')
+
+	#These histograms only contain the events with highest mjj pair coinciding with the leading jet pair
+	mjjHistWithSelectedEvents_twoCentralJets = ROOT.TH1F('mjjHistWithSelectedEvents_twoCentralJets', 'mjjHistWithSelectedEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
+	mjjHistWithSelectedEvents_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
+	mjjHistWithSelectedEvents_twoCentralJets.GetYaxis().SetTitle('Number of Events')
+	
+	mjjHistWithSelectedEvents_mixed = ROOT.TH1F('mjjHistWithSelectedEvents_mixed', 'mjjHistWithSelectedEvents_mixed', len(mjj_array)-1, mjj_array)
+	mjjHistWithSelectedEvents_mixed.GetXaxis().SetTitle('mjj (GeV)')
+	mjjHistWithSelectedEvents_mixed.GetYaxis().SetTitle('Number of Events')
+
+	mjj_histos['mjjHistWithAllEvents_twoCentralJets'] = mjjHistWithAllEvents_twoCentralJets
+	mjj_histos['mjjHistWithAllEvents_mixed'] = mjjHistWithAllEvents_mixed
+	mjj_histos['mjjHistWithSelectedEvents_twoCentralJets'] = mjjHistWithSelectedEvents_twoCentralJets
+	mjj_histos['mjjHistWithSelectedEvents_mixed'] = mjjHistWithSelectedEvents_mixed
+
+	return mjj_histos
+
+
+
+
+

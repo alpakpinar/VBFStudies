@@ -1,5 +1,6 @@
 import ROOT
-from defineHistos import define2DHistos
+from lib.defineHistos import define2DHistos
+from lib.helperFunctions import *
 
 # load FWLite C++ libraries
 ROOT.gSystem.Load("libFWCoreFWLite.so");
@@ -8,125 +9,6 @@ ROOT.FWLiteEnabler.enable()
 
 # load FWlite python libraries
 from DataFormats.FWLite import Handle, Events	
-
-def invMassTwoJets(jet1, jet2):
-	
-	'''
-	Calculate invariant mass of any given two jets.
-	'''
-
-	total_p4 = jet1.p4() + jet2.p4()
-
-	mjj = total_p4.M()
-
-	return mjj
-
-def invMassJetCombos(jets_):
-	
-	'''
-	Calculates invariant mass of all jet combinations and stores them in a dict.
-	Returns the dict.
-	'''
-
-	numJets = len(jets_)
-	mjj_values = {}
-
-	mjj_values['leadingJet_trailingJet'] = invMassTwoJets(jets_[0], jets_[1])
-	mjj_values['otherCombos'] = {}
-
-	for i in range(numJets):
-
-		for j in range(numJets):
-
-			if not ((i==1 and j==0) or (i==0 and j==1)): 
-
-				if i == j: continue
-
-				if ((i,j) in mjj_values['otherCombos'].keys() or (j, i) in mjj_values['otherCombos'].keys()): continue 
-
-				invMass = invMassTwoJets(jets_[i], jets_[j])
-
-				mjj_values['otherCombos'][(i, j)] = invMass
-
-	return mjj_values
-
-def getMaxCombo(mjj_values):
-
-	'''
-	Given mjj_values dict, containing all possible mjj combos, determines the max mjj and which combo it belongs to.
-	'''
-	mjjMax_jetCombo = (0, 1) #By default, the two leading jets
-	max_mjj = mjj_values['leadingJet_trailingJet']
-
-	try:
-		
-		for key, mjj_value in mjj_values['otherCombos'].items():
-
-			if mjj_value > max_mjj: 
-
-				mjjMax_jetCombo = key 
-				max_mjj = mjj_value
-
-		#print(mjjMax_jetCombo)
-
-		return mjjMax_jetCombo
-	
-	except IndexError:
-
-		return mjjMax_jetCombo
-
-def sortJets(jets_list, combo):
-	
-	'''
-	Given the list of jets and indices of two jets in combo, sorts the jets with respect to pt and returns the indices.
-	Larger index is returned first.
-	'''
-	
-	if jets_list[combo[0]].pt() > jets_list[combo[1]].pt():
-
-		idx_jetWithLargerPt, idx_jetWithSmallerPt = combo[0], combo[1]
-	
-	else:
-		
-		idx_jetWithLargerPt, idx_jetWithSmallerPt = combo[1], combo[0]
-
-	return idx_jetWithLargerPt, idx_jetWithSmallerPt
-
-def isTightJet(jet):
-
-	'''
-	Returns True if the given jet passes the tight ID requirements (2017).
-	Otherwise, returns False.
-	'''
-	if abs(jet.eta()) <= 2.7:
-
-		if jet.nConstituents() <= 1: return False
-
-		if jet.neutralHadronEnergyFraction() >= 0.9: return False
-
-		if jet.neutralEmEnergyFraction() >= 0.9: return False
-		
-		if abs(jet.eta()) <= 2.4:
-
-			if jet.chargedHadronEnergyFraction() <= 0: return False
-
-			if jet.chargedMultiplicity() <= 0: return False
-
-	if 2.7 < abs(jet.eta()) <= 3.0:
-
-		if not 0.02 < jet.neutralEmEnergyFraction() < 0.99: return False
-
-		if jet.neutralMultiplicity() <= 2: return False
-
-	if abs(jet.eta()) > 3.0:
-
-		if jet.neutralEmEnergyFraction() > 0.9: return False
-
-		if jet.neutralHadronEnergyFraction() <= 0.02: return False
-
-		if jet.neutralMultiplicity() <= 10: return False
-
-	return True
 
 def fill2DHistos(histo_dict):
 
@@ -220,14 +102,12 @@ def fill2DHistos(histo_dict):
 		leadJetEta_histo.Fill(max_leadJetEta, leadingPair_leadJetEta)
 		trailJetEta_histo.Fill(max_trailJetEta, leadingPair_trailJetEta)
 
-
-	#Create a canvas and save the 2D histogram here
-
-	canv = ROOT.TCanvas('canv', 'canv')
+	#Plot the histograms and save them
 	
-	mjj_histo.Draw('COLZ') #Draw colormap with color palette
+	for hist in histo_dict.values():
 
-	canv.Print('trial2dHisto.png')
+		printHisto(hist)
+
 
 def count():
 

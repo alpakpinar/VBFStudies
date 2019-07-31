@@ -1,4 +1,5 @@
 import ROOT
+import numpy as np
 from lib.defineHistos import define2DHistos
 from lib.helperFunctions import *
 
@@ -9,6 +10,100 @@ ROOT.FWLiteEnabler.enable()
 
 # load FWlite python libraries
 from DataFormats.FWLite import Handle, Events	
+
+def getFracOfEvents_mjj():
+
+	'''
+	Constructs the graph showing the fraction of events where leading jet pair coincides with highest mjj pair.
+	Also takes into account two seperate categories:
+	--Two central jets
+	--Mixed (one central, one forward jet)
+	'''
+	jets, jetLabel = Handle('std::vector<pat::Jet>'), 'slimmedJets'
+
+	events = Events('root://cmsxrootd.fnal.gov///store/mc/RunIIFall17MiniAODv2/VBF_HToInvisible_M125_13TeV_TuneCP5_powheg_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/00000/14347E60-56F2-E811-81F4-24BE05C6C7E1.root')
+
+	#######################
+	#Defining relevant histograms
+	#######################
+
+	mjj_array = np.arange(500., 2500., 50.)
+
+	mjj_histWithAllEvents_twoCentralJets = ROOT.TH1F('mjj_histWithAllEvents_twoCentralJets', 'mjj_histWithAllEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
+	mjj_histWithAllEvents_Mixed = ROOT.TH1F('mjj_histWithAllEvents_Mixed', 'mjj_histWithAllEvents_Mixed', len(mjj_array)-1, mjj_array)
+
+	#These histograms only contain the events with highest mjj pair coinciding with the leading jet pair
+	mjj_histWithSelectedEvents_twoCentralJets = ROOT.TH1F('mjj_histWithSelectedEvents_twoCentralJets', 'mjj_histWithSelectedEvents_twoCentralJets', len(mjj_array)-1, mjj_array)
+	mjj_histWithSelectedEvents_Mixed = ROOT.TH1F('mjj_histWithSelectedEvents_Mixed', 'mjj_histWithSelectedEvents_Mixed', len(mjj_array)-1, mjj_array)
+
+	#######################
+	#Event loop starts here
+	#######################
+
+	for iev, event in enumerate(events):
+
+		#if iev == 1000: break #For testing
+
+		if iev % 1000 == 0:
+			print('Working on event {}'.format(iev))
+
+		event.getByLabel(jetLabel, jets)
+
+		######################
+		#Implementing tight jet ID, 2017 recommendations
+		######################
+	
+		jets_ = jets.product()
+
+		AK4_tightJets = []
+		
+		for jet in jets_:
+
+			if isTightJet(jet):			
+	
+				AK4_tightJets.append(jet) 
+
+		nJet = len(AK4_tightJets)
+
+		if nJet < 2: continue #Discard the events with number of jets smaller than 2
+		
+		mjj_values = invMassJetCombos(AK4_tightJets) #Get all the mjj values for all possible combos
+
+		maxCombo = getMaxCombo(mjj_values) #Get the jet pair for which the maximum mjj happens to be
+
+		jet_geometry = getJetGeometry(AK4_tightJets[0], AK4_tightJets[1]) #Determine the geometry of two leading jets
+
+		if jet_geometry == 'Two Central Jets':
+		
+			mjj_histWithAllEvents_twoCentralJets.Fill(mjj_values['leadingJet_trailingJet'])
+		
+			if maxCombo == (0,1) or maxCombo == (1,0):
+
+				mjj_histWithSelectedEvents_twoCentralJets.Fill(mjj_values['leadingJet_trailingJet'])
+
+		elif jet_geometry == 'Mixed':
+			
+			mjj_histWithAllEvents_Mixed.Fill(mjj_values['leadingJet_trailingJet'])
+			
+			if maxCombo == (0,1) or maxCombo == (1,0):
+
+				mjj_histWithSelectedEvents_Mixed.Fill(mjj_values['leadingJet_trailingJet'])
+
+	########################
+	#Construct the histograms containing ratios of the events
+	########################
+	
+	ratioHist_twoCentralJets = mjj_histWithSelectedEvents_twoCentralJets.Clone()
+	ratioHist_twoCentralJets.Divide(mjj_histWithAllEvents_twoCentralJets) #Divide the two histograms
+	ratioHist_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
+	ratioHist_twoCentralJets.GetYaxis().SetTitle('Ratio of Events')
+
+	ratioHist_Mixed = mjj_histWithSelectedEvents_Mixed.Clone()
+	ratioHist_Mixed.Divide(mjj_histWithAllEvents_Mixed) #Divide the two histograms
+	ratioHist_Mixed.GetXaxis().SetTitle('mjj (GeV)')
+	ratioHist_Mixed.GetYaxis().SetTitle('Ratio of Events')
+ 	
+
 
 def fill2DHistos(histo_dict):
 
@@ -106,7 +201,7 @@ def fill2DHistos(histo_dict):
 	
 	for hist in histo_dict.values():
 
-		printHisto(hist)
+		print2DHisto(hist)
 
 
 def count():

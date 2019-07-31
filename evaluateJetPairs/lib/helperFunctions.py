@@ -83,7 +83,7 @@ def sortJets(jets_list, combo):
 
 	return idx_jetWithLargerPt, idx_jetWithSmallerPt
 
-def printHisto(hist):
+def print2DHisto(hist):
 
 	'''
 	Given the histogram, creates a canvas and plots the histogram as a 2D colormap. 

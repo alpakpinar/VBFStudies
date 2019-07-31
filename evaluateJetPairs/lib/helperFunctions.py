@@ -134,9 +134,12 @@ def printHisto(hist):
 	canv = ROOT.TCanvas('canv')
 
 	hist.Draw()
-	
-	geometry = hist.GetName().split('_')[-1]
-	fileName = 'ratioPlot_' + geometry + '.png'
+
+	histName_splitted = hist.GetName().split('_')
+
+	plotType = histName_splitted[0]	
+	geometry = histName_splitted[-1]
+	fileName = plotType + '_' + geometry + '.png'
 
 	canv.Print(fileName)
 

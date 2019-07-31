@@ -112,9 +112,9 @@ def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, traili
 
 	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
 	
-	twoCentralJets_cut = 'abs(jet_eta[0]) <= 2.5 && abs(jet_eta[1]) <= 2.5'
-	twoForwardJets_cut = 'abs(jet_eta[0]) > 2.5 && abs(jet_eta[1]) > 2.5'
-	oneCentralJetOneForwardJet_cut = '(abs(jet_eta[0]) <= 2.5 && abs(jet_eta[1]) > 2.5) || (abs(jet_eta[0]) > 2.5 && abs(jet_eta[1]) <= 2.5)'
+	twoCentralJets_cut = '(abs(jet_eta[0]) <= 2.5 && abs(jet_eta[1]) <= 2.5)'
+	twoForwardJets_cut = '(abs(jet_eta[0]) > 2.5 && abs(jet_eta[1]) > 2.5)'
+	oneCentralJetOneForwardJet_cut = '((abs(jet_eta[0]) <= 2.5 && abs(jet_eta[1]) > 2.5) || (abs(jet_eta[0]) > 2.5 && abs(jet_eta[1]) <= 2.5))'
 
 	f.eventTree.Draw('met>>met_hist_twoCentralJets', twoCentralJets_cut, '')
 	f.eventTree.Draw('met>>met_hist_twoForwardJets', twoForwardJets_cut, '')
@@ -499,9 +499,9 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 
 	vbfAndTriggerCuts = vbfCuts + ' && ' + trigger + ' == 1'
 
-	twoCentralJets_cut = 'abs(jet_eta[0]) <= 2.5 && abs(jet_eta[1]) <= 2.5'
-	twoForwardJets_cut = 'abs(jet_eta[0]) > 2.5 && abs(jet_eta[1]) > 2.5'
-	oneCentralJetOneForwardJet_cut = '(abs(jet_eta[0]) <= 2.5 && abs(jet_eta[1]) > 2.5) || (abs(jet_eta[0]) > 2.5 && abs(jet_eta[1]) <= 2.5)'
+	twoCentralJets_cut = '(abs(jet_eta[0]) <= 2.5 && abs(jet_eta[1]) <= 2.5)'
+	twoForwardJets_cut = '(abs(jet_eta[0]) > 2.5 && abs(jet_eta[1]) > 2.5)'
+	oneCentralJetOneForwardJet_cut = '((abs(jet_eta[0]) <= 2.5 && abs(jet_eta[1]) > 2.5) || (abs(jet_eta[0]) > 2.5 && abs(jet_eta[1]) <= 2.5))'
 
 	f.eventTree.Draw('mjj>>mjj_hist_twoCentralJets', twoCentralJets_cut, '')
 	f.eventTree.Draw('mjj>>mjj_hist_twoForwardJets', twoForwardJets_cut, '')

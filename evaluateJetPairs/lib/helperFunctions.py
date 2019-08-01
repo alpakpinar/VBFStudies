@@ -186,9 +186,13 @@ def constructRatioPlot(histWithSelectedEvents, histWithAllEvents):
 	histType = histWithSelectedEvents.GetName().split('_')[-1] #twoCentralJets or mixed
 
 	ratioHist = histWithSelectedEvents.Clone('ratioHist_' + histType)
+	print(type(ratioHist))
+	print(ratioHist)
 	ratioHist.Divide(histWithAllEvents) #Divide the two histograms
 	ratioHist.GetXaxis().SetTitle('mjj (GeV)')
 	ratioHist.GetYaxis().SetTitle('Ratio of Events')
+
+	ratioHist.SetDirectory(0)
 	
 	printHisto(ratioHist)
 

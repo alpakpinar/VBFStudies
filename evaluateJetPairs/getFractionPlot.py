@@ -105,8 +105,6 @@ def getFractionPlot_mjj(fileName, mjj_histos):
 		#VBF cuts end here
 		#########################
 
-		print(mjj_histos['mjjHistWithAllEvents_mixed'].GetBinContent(5))
-
 		mjj_values = invMassJetCombos(AK4_tightJets) #Get all the mjj values for all possible combos
 
 		maxCombo = getMaxCombo(mjj_values) #Get the jet pair for which the maximum mjj happens to be

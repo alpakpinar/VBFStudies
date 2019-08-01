@@ -15,7 +15,6 @@ jet_pt = array('f', max_num*[0.])
 jet_energy = array('f', max_num*[0.]) 
 jet_eta = array('f', max_num*[0.]) 
 jet_phi = array('f', max_num*[0.])
-jet_btag_CSVv2 = array('f', max_num*[0.])
 
 minPhi_jetMET = array('f', [0.])
 mjj = array('f', [0.])
@@ -83,12 +82,6 @@ L1_met = array('f', [0.])
 L1_met_eta = array('f', [0.])
 L1_met_phi = array('f', [0.])
 
-#Branch for veto information
-
-containsLepton = array('i', [0]) 
-containsPhoton = array('i', [0]) 
-contains_bJet = array('i', [0])
-
 #MET filters
 
 Flag_BadPFMuonFilter = array('i', [0]) 
@@ -111,7 +104,6 @@ def declare_branches(tree):
 	tree.Branch('jet_energy', jet_energy, 'jet_energy[nJet]/F')
 	tree.Branch('jet_eta', jet_eta, 'jet_eta[nJet]/F')
 	tree.Branch('jet_phi', jet_phi, 'jet_phi[nJet]/F')
-	tree.Branch('jet_btag_CSVv2', jet_btag_CSVv2, 'jet_btag_CSVv2[nJet]/F')	
 	
 	tree.Branch('minPhi_jetMET', minPhi_jetMET, 'minPhi_jetMET/F')
 	tree.Branch('mjj', mjj, 'mjj/F')	
@@ -161,10 +153,6 @@ def declare_branches(tree):
 	tree.Branch('L1_met', L1_met, 'L1_met/F')
 	tree.Branch('L1_met_eta', L1_met_eta, 'L1_met_eta/F')
 	tree.Branch('L1_met_phi', L1_met_phi, 'L1_met_phi/F')
-	
-	tree.Branch('containsLepton', containsLepton, 'containsLepton/I')
-	tree.Branch('containsPhoton', containsPhoton, 'containsPhoton/I')
-	tree.Branch('contains_bJet', contains_bJet, 'contains_bJet/I')
 
 	tree.Branch('Flag_BadPFMuonFilter', Flag_BadPFMuonFilter, 'Flag_BadPFMuonFilter/I')
 	tree.Branch('Flag_goodVertices', Flag_goodVertices, 'Flag_goodVertices/I')

@@ -2,9 +2,10 @@ import ROOT
 import time
 import argparse
 import os 
-from math import pi 
 
 from lib.vbf_tree_2017 import * 
+from lib.helperFunctions import invMassTwoJets, minJetMETPhi, isTightJet
+from lib.veto import *
 
 # load FWLite C++ libraries
 ROOT.gSystem.Load("libFWCoreFWLite.so");
@@ -14,62 +15,6 @@ ROOT.FWLiteEnabler.enable()
 # load FWlite python libraries
 from DataFormats.FWLite import Handle, Events	
 	
-def invMassTwoJets(jets_):
-	
-	'''
-	Calculates the invariant mass of two leading jets in the event.
-	'''
-	
-	leadingJet = jets_[0]
-	trailingJet = jets_[1]
-	
-	total_p4 = leadingJet.p4() + trailingJet.p4()
-
-	mjj = total_p4.M()
-
-	return mjj
-
-
-def minJetMETPhi(jets_, mets_):
-
-	'''
-	Calculates the minimum phi difference between four leading jets and MET.
-	If there are less than four jets in the event, it calculates the minimum phi difference by looking at all the jets.
-	'''
-
-	phiDiffList = []	
-	met = mets_[0]
-
-	if len(jets_) <= 4:
-		for j in jets_:
-
-			if j.pt() < 30: continue
-			phi_diff = abs(j.phi() - met.phi())
-			
-			if phi_diff <= pi:
-				phiDiffList.append(phi_diff)
-
-			else:
-				phiDiffList.append(2*pi - phi_diff)
-
-	else:
-		for i in range(4): #Take only the first four leading jets
-
-			if jets_[i].pt() < 30: continue
-			phi_diff = abs(jets_[i].phi() - met.phi())
-			
-			if phi_diff <= pi:
-				phiDiffList.append(phi_diff)
-
-			else:
-				phiDiffList.append(2*pi - phi_diff)
-
-	if phiDiffList:
-
-		return min(phiDiffList)
-
-	return -1.0 #These events will not pass 	
-
 def writeTree(inputFile, tree, args):
 	
 	electrons, electronLabel = Handle('std::vector<pat::Electron>'), 'slimmedElectrons'
@@ -138,41 +83,9 @@ def writeTree(inputFile, tree, args):
 		
 		for i, jet in enumerate(jets_):
 
-			if abs(jet.eta()) <= 2.7:
-
-				if jet.nConstituents() <= 1: continue
-
-				if jet.neutralHadronEnergyFraction() >= 0.9: continue
-
-				if jet.neutralEmEnergyFraction() >= 0.9: continue
-				
-				if abs(jet.eta()) <= 2.4:
-
-					if jet.chargedHadronEnergyFraction() <= 0: continue
-
-					if jet.chargedMultiplicity() <= 0: continue
-
-					AK4_tightJets.append(jet)			
-
-				else: AK4_tightJets.append(jet)
-					
-			if 2.7 < abs(jet.eta()) <= 3.0:
-
-				if not 0.02 < jet.neutralEmEnergyFraction() < 0.99: continue
-
-				if jet.neutralMultiplicity() <= 2: continue
+			if isTightJet(jet): 
 
 				AK4_tightJets.append(jet)
-
-			if abs(jet.eta()) > 3.0:
-
-				if jet.neutralEmEnergyFraction() > 0.9: continue
-
-				if jet.neutralHadronEnergyFraction() <= 0.02: continue
-		
-				if jet.neutralMultiplicity() <= 10: continue
-
-				AK4_tightJets.append(jet) 
 
 		nJet[0] = len(AK4_tightJets)
 		
@@ -187,109 +100,17 @@ def writeTree(inputFile, tree, args):
 			jet_eta[i] = jet.eta()
 			jet_phi[i] = jet.phi()
 			
-			#Getting b-tag information for each jet
-			tags = jet.getPairDiscri()
-
-			for tag in tags:
-
-				if tag.first == 'pfCombinedSecondaryVertexV2BJetTags':
-	
-					jet_btag_CSVv2[i] = tag.second
-	
-		num_bJets = 0
-
-		for val in jet_btag_CSVv2:
-
-			if val > 0.8484: #2017 requirements
-
-				num_bJets += 1 
-
-		if num_bJets != 0:
-			
-			contains_bJet = 1
-
-		else: contains_bJet = 0
-
-		try:
-
-			absEtaDiff_leadingTwoJets[0] = abs(jet_eta[0] - jet_eta[1])
-
-		except IndexError:
-
-			print('Event contains less than 2 jets!')
-			absEtaDiff_leadingTwoJets[0] = 0
+		absEtaDiff_leadingTwoJets[0] = abs(jet_eta[0] - jet_eta[1])
 
 		minPhi_jetMET[0] = minJetMETPhi(jets_, mets_) #Minimum delta_phi between jets and MET
 	
-		if jet_pt[0] < 50: continue
+		if jet_pt[0] < 30: continue
 
 		###################
 
-		electrons_ = electrons.product()
+		if containsLeptonOrPhoton(electrons, muons, taus, photons): continue #Lepton/photon veto
 
-		nElectron[0] = 0
-	
-		for el in electrons_:
-	
-			if el.electronID('cutBasedElectronID-Spring15-25ns-V1-standalone-loose') == 1. and el.pt() > 10 and abs(el.eta()) < 2.5:
-	
-				electron_pt[nElectron[0]] = el.pt()
-				electron_eta[nElectron[0]] = el.eta()
-				electron_phi[nElectron[0]] = el.phi()
-				nElectron[0] += 1		
-
-		muons_ = muons.product()
-
-		nMuon[0] = 0
-
-		for mu in muons_:
-
-			if (mu.isGlobalMuon() or mu.isTrackerMuon()) and mu.isPFMuon() and mu.pt() > 5: #Iso requirement will be added 
-	
-				muon_pt[nMuon[0]] = mu.pt()
-				muon_eta[nMuon[0]] = mu.eta()
-				muon_phi[nMuon[0]] = mu.phi()
-				nMuon[0] += 1
-
-		taus_ = taus.product()
-
-		nTau[0] = 0
-
-		for tau in taus_:
-
-			if tau.pt() > 20 and abs(tau.eta()) < 2.3: #decayModeFindingNewDMs already implemented by MiniAOD
-	
-				tau_pt[nTau[0]] = tau.pt()
-				tau_eta[nTau[0]] = tau.eta()
-				tau_phi[nTau[0]] = tau.phi()
-				nTau[0] += 1
-
-		#Filling out the branch for lepton veto
-
-		if nElectron[0] + nMuon[0] + nTau[0] != 0:
-
-			containsLepton[0] = 1
-
-		else: containsLepton[0] = 0
-
-		photons_ = photons.product()
-
-		nPhoton[0] = 0
-		
-		for ph in photons_:
-
-			if ph.photonID('PhotonCutBasedIDLoose') == 1 and abs(ph.eta()) < 2.5 and ph.pt() > 15:
-
-				photon_pt[nPhoton[0]] = ph.pt()
-				photon_eta[nPhoton[0]] = ph.eta()
-				photon_phi[nPhoton[0]] = ph.phi()
-				nPhoton[0] += 1
-	
-		if nPhoton[0] != 0: containsPhoton[0] = 1
-
-		else: containsPhoton[0] = 0
-		
-		#########################
+		if contains_bJet(AK4_tightJets): continue #b-jet veto
 
 		genParticles_ = genParticles.product()
 
@@ -465,19 +286,21 @@ def main():
 
 		MCFilesDir = 'evaluateJetPairs/inputs/ROOT_MCFiles'
 
-		for numFile, fileName in os.listdir(MCFilesDir):
+		for numFile, fileName in enumerate(os.listdir(MCFilesDir)):
 			
 			t2 = time.time()
 
 			if args.test or args.shortTest:
 
-				if numFile == 1: break
+				if numFile == 2: break
+
+			file_path = os.path.join(MCFilesDir, fileName)
 
 			print('Working on file {0:<5d} t = {1:.2f}'.format(numFile+1, t2-t1))
 		
-			print('Filename: {}'.format(filename))
+			print('Filename: {}'.format(file_path))
 		
-			writeTree(filename, eventTree, args)
+			writeTree(file_path, eventTree, args)
 
 			if numFile%10 == 0:
 		

@@ -163,7 +163,7 @@ def print2DHisto(hist, logZaxis=True):
 
 	if histName_splitted[1] in ['mixed', 'twoCentralJets']:
 
-		fileName = histo_variable + '_' histName_splitted[1] + '.png'
+		fileName = histo_variable + '_' + histName_splitted[1] + '.png'
 
 	else:
 	

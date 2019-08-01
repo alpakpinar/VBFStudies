@@ -127,14 +127,14 @@ def main():
 
 		print('Working on file {}'.format(numFile+1))
 		
-		#if numFile == 2: break #For testing
+		if numFile == 2: break #For testing
 
 		fill_mjjMETHisto(fileName, MET_mjjHistos)
 
 	#Draw and save the histograms
 
-	paint2DHisto(MET_mjjHistos['mjjMETHisto_twoCentralJets'])
-	paint2DHisto(MET_mjjHistos['mjjMETHisto_mixed'])
+	print2DHisto(MET_mjjHistos['mjjMETHisto_twoCentralJets'])
+	print2DHisto(MET_mjjHistos['mjjMETHisto_mixed'])
 	
 if __name__ == '__main__':
 

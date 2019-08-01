@@ -81,6 +81,33 @@ def defineHistosForRatioPlot():
 
 	return mjj_histos
 
+def defineMET_mjjHistos():
+
+	'''
+	Define necessary 2D MET+mjj histograms.
+	'''
+
+	MET_mjjHistos = {}
+
+	mjj_array = np.arange(500., 2500., 100.)
+	MET_array = np.arange(50., 350., 15.)
+
+	MET_mjjHisto_twoCentralJets = ROOT.TH2F('MET_mjjHisto_twoCentralJets', 'MET_mjjHisto_twoCentralJets', len(mjj_array)-1, mjj_array, len(MET_array)-1, MET_array)
+	MET_mjjHisto_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
+	MET_mjjHisto_twoCentralJets.GetYaxis().SetTitle('MET (GeV)')
+	
+	MET_mjjHisto_mixed = ROOT.TH2F('MET_mjjHisto_mixed', 'MET_mjjHisto_mixed', len(mjj_array)-1, mjj_array, len(MET_array)-1, MET_array)
+	MET_mjjHisto_mixed.GetXaxis().SetTitle('mjj (GeV)')
+	MET_mjjHisto_mixed.GetYaxis().SetTitle('MET (GeV)')
+
+	MET_mjjHistos['MET_mjjHisto_mixed'] = MET_mjjHisto_mixed
+	MET_mjjHistos['MET_mjjHisto_twoCentralJets'] = MET_mjjHisto_twoCentralJets
+
+	return MET_mjjHistos
+
+
+
+
 
 
 

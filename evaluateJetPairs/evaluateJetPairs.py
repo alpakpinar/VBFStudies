@@ -12,7 +12,7 @@ ROOT.FWLiteEnabler.enable()
 # load FWlite python libraries
 from DataFormats.FWLite import Handle, Events	
 
-def getFractionPlot_mjj(fileName):
+def getFractionPlot_mjj(fileName, mjj_histos): 
 
 	'''
 	Constructs the graph showing the fraction of events where leading jet pair coincides with highest mjj pair.
@@ -25,8 +25,11 @@ def getFractionPlot_mjj(fileName):
 	
 	ROOT.gStyle.SetOptStat(0)
 	
-	ratio_histos = {}
-
+	#mjjHistWithAllEvents_twoCentralJets = mjj_histos['mjjHistWithAllEvents_twoCentralJets']
+	#mjjHistWithAllEvents_mixed = mjj_histos['mjjHistWithAllEvents_mixed']
+	#mjjHistWithSelectedEvents_twoCentralJets = mjj_histos['mjjHistWithSelectedEvents_twoCentralJets']
+	#mjjHistWithSelectedEvents_mixed = mjj_histos['mjjHistWithSelectedEvents_mixed'] 
+	
 	electrons, electronLabel = Handle('std::vector<pat::Electron>'), 'slimmedElectrons'
 	muons, muonLabel = Handle('std::vector<pat::Muon>'), 'slimmedMuons'
 	taus, tauLabel = Handle('std::vector<pat::Tau>'), 'slimmedTaus'
@@ -65,7 +68,7 @@ def getFractionPlot_mjj(fileName):
 
 	for iev, event in enumerate(events):
 
-		#if iev == 1000: break #For testing
+		if iev == 1000: break #For testing
 
 		if iev % 1000 == 0:
 			print('Working on event {}'.format(iev))
@@ -133,19 +136,19 @@ def getFractionPlot_mjj(fileName):
 
 		if jet_geometry == 'Two Central Jets':
 		
-			mjjHistWithAllEvents_twoCentralJets.Fill(mjj_values['leadingJet_trailingJet'])
+			mjj_histos['mjjHistWithAllEvents_twoCentralJets'].Fill(mjj_values['leadingJet_trailingJet'])
 		
 			if maxCombo == (0,1) or maxCombo == (1,0):
 
-				mjjHistWithSelectedEvents_twoCentralJets.Fill(mjj_values['leadingJet_trailingJet'])
+				mjj_histos['mjjHistWithSelectedEvents_twoCentralJets'].Fill(mjj_values['leadingJet_trailingJet'])
 
 		elif jet_geometry == 'Mixed':
 			
-			mjjHistWithAllEvents_mixed.Fill(mjj_values['leadingJet_trailingJet'])
+			mjj_histos['mjjHistWithAllEvents_mixed'].Fill(mjj_values['leadingJet_trailingJet'])
 			
 			if maxCombo == (0,1) or maxCombo == (1,0):
 
-				mjjHistWithSelectedEvents_mixed.Fill(mjj_values['leadingJet_trailingJet'])
+				mjj_histos['mjjHistWithSelectedEvents_mixed'].Fill(mjj_values['leadingJet_trailingJet'])
 
 	########################
 	#Construct the histograms containing ratios of the events
@@ -409,7 +412,11 @@ def main():
 
 		if numFile == 2: break #For testing
 
-		getFractionPlot_mjj(fileName)
+		getFractionPlot_mjj(fileName, mjj_histos)
+	
+	print(type(mjj_histos['mjjHistWithSelectedEvents_mixed']))
+
+	constructRatioPlot(mjj_histos['mjjHistWithSelectedEvents_twoCentralJets'], mjj_histos['mjjHistWithAllEvents_twoCentralJets'])
 
 	#mother_dict = count()
 	

@@ -6,4 +6,5 @@ tmp/
 *.log
 /output
 inputs/backup_ROOTFiles
+evaluateJetPairs/inputs/ROOT_MCFiles
 VBF_HToInv_2017.root 

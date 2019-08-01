@@ -45,7 +45,7 @@ def getFractionPlot_mjj(fileName, mjj_histos):
 
 	for iev, event in enumerate(events):
 
-		if iev == 1000: break #For testing
+		#if iev == 1000: break #For testing
 
 		if iev % 1000 == 0:
 			print('Working on event {}'.format(iev))
@@ -127,27 +127,6 @@ def getFractionPlot_mjj(fileName, mjj_histos):
 
 				mjj_histos['mjjHistWithSelectedEvents_mixed'].Fill(mjj_values['leadingJet_trailingJet'])
 
-	########################
-	#Construct the histograms containing ratios of the events
-	#SHOULD BE MOVED TO ANOTHER FUNCTION AND EXECUTED ONLY AT THE END!
-	########################
-	
-	#ratioHist_twoCentralJets = mjjHistWithSelectedEvents_twoCentralJets.Clone('ratioHist_twoCentralJets')
-	#ratioHist_twoCentralJets.Divide(mjjHistWithAllEvents_twoCentralJets) #Divide the two histograms
-	#ratioHist_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
-	#ratioHist_twoCentralJets.GetYaxis().SetTitle('Ratio of Events')
-
-	#ratioHist_mixed = mjjHistWithSelectedEvents_mixed.Clone('ratioHist_mixed')
-	#ratioHist_mixed.Divide(mjjHistWithAllEvents_mixed) #Divide the two histograms
-	#ratioHist_mixed.GetXaxis().SetTitle('mjj (GeV)')
-	#ratioHist_mixed.GetYaxis().SetTitle('Ratio of Events')
-
-	#printHisto(ratioHist_twoCentralJets)
-	#printHisto(ratioHist_mixed) 	
-	#printHisto(mjjHistWithAllEvents_twoCentralJets)
-	#printHisto(mjjHistWithAllEvents_mixed)
-	#printHisto(mjjHistWithSelectedEvents_twoCentralJets)
-	#printHisto(mjjHistWithSelectedEvents_mixed)
 
 def main():
 
@@ -164,7 +143,7 @@ def main():
 
 		print('Working on file {}'.format(numFile+1))
 		
-		if numFile == 2: break #For testing
+		#if numFile == 2: break #For testing
 
 		getFractionPlot_mjj(fileName, mjj_histos)
 

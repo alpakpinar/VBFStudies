@@ -1,4 +1,5 @@
 import ROOT
+import os
 from math import pi
 
 def minJetMETPhi(jets_, mets_):
@@ -139,9 +140,22 @@ def printHisto(hist):
 
 	plotType = histName_splitted[0]	
 	geometry = histName_splitted[-1]
-	fileName = plotType + '_' + geometry + '.png'
 
-	canv.Print(fileName)
+	#Save to the ratio plots directory if it is a ratio histogram
+
+	if 'ratioHist' == plotType:
+
+		plotDir = 'pngFiles/ratioPlots'
+		fileName = plotType + '_' + geometry + '.png'
+		filePath = os.path.join(plotDir, fileName)
+	
+	else:
+	
+		plotDir = 'pngFiles'	
+		fileName = plotType + '_' + geometry + '.png'
+		filePath = os.path.join(plotDir, fileName)	
+
+	canv.Print(filePath)
 
 def print2DHisto(hist, logZaxis=True):
 

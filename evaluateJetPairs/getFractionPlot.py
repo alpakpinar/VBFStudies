@@ -1,5 +1,6 @@
 import ROOT
 import numpy as np
+import os 
 from lib.defineHistos import define2DHistos, defineHistosForRatioPlot
 from lib.helperFunctions import *
 from lib.veto import *
@@ -12,7 +13,7 @@ ROOT.FWLiteEnabler.enable()
 # load FWlite python libraries
 from DataFormats.FWLite import Handle, Events	
 
-def getFractionPlot_mjj(fileName, mjj_histos): 
+def fillFractionPlot_mjj(fileName, mjj_histos): 
 
 	'''
 	Constructs the graph showing the fraction of events where leading jet pair coincides with highest mjj pair.
@@ -99,7 +100,7 @@ def getFractionPlot_mjj(fileName, mjj_histos):
 		if AK4_tightJets[0].eta() * AK4_tightJets[1].eta() > 0: continue
 
 		#Leading jet pt cuts
-		if not (AK4_tightJets[0].pt() > 100 and AK4_tightJets[1].pt() > 30): continue
+		if not (AK4_tightJets[0].pt() > 160 and AK4_tightJets[1].pt() > 50): continue
 
 		#########################
 		#VBF cuts end here
@@ -137,17 +138,25 @@ def main():
 
 		hist.SetDirectory(0)
 
-	f = file('inputs/MiniAOD_files2017.txt', 'r')
+	#f = file('inputs/MiniAOD_files2017.txt', 'r')
 
-	for numFile, fileName in enumerate(f.readlines()):
+	inputDir = 'inputs/ROOT_MCFiles'
+
+	for numFile, fileName in enumerate(os.listdir(inputDir)):
 
 		print('Working on file {}'.format(numFile+1))
 		
+		file_path = os.path.join(inputDir, fileName)
+
+		print('File: {}'.format(file_path))
+		
 		#if numFile == 2: break #For testing
 
-		getFractionPlot_mjj(fileName, mjj_histos)
+		fillFractionPlot_mjj(file_path, mjj_histos)
 
 	constructRatioPlot(mjj_histos['mjjHistWithSelectedEvents_twoCentralJets'], mjj_histos['mjjHistWithAllEvents_twoCentralJets'])
+	constructRatioPlot(mjj_histos['mjjHistWithSelectedEvents_mixed'], mjj_histos['mjjHistWithAllEvents_mixed'])
+
 
 if __name__ == '__main__':
 

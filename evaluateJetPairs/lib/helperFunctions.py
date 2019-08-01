@@ -143,7 +143,7 @@ def printHisto(hist):
 
 	canv.Print(fileName)
 
-def print2DHisto(hist):
+def print2DHisto(hist, logZaxis=True):
 
 	'''
 	Given the histogram, creates a canvas and plots the histogram as a 2D colormap. 
@@ -153,10 +153,21 @@ def print2DHisto(hist):
 	canv = ROOT.TCanvas('canv')
 	
 	hist.Draw('COLZ')
-	canv.SetLogz(1)
-	histo_variable = hist.GetName().split('_')[0]
+	
+	if logZaxis:
+		
+		canv.SetLogz(1)
 
-	fileName = histo_variable + '.png'	
+	histName_splitted = hist.GetName().split('_')
+	histo_variable = histName_splitted[0]
+
+	if histName_splitted[1] in ['mixed', 'twoCentralJets']:
+
+		fileName = histo_variable + '_' histName_splitted[1] + '.png'
+
+	else:
+	
+		fileName = histo_variable + '.png'	
 
 	canv.Print(fileName)
 

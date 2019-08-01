@@ -92,16 +92,16 @@ def defineMET_mjjHistos():
 	mjj_array = np.arange(500., 2500., 100.)
 	MET_array = np.arange(50., 350., 15.)
 
-	MET_mjjHisto_twoCentralJets = ROOT.TH2F('MET_mjjHisto_twoCentralJets', 'MET_mjjHisto_twoCentralJets', len(mjj_array)-1, mjj_array, len(MET_array)-1, MET_array)
-	MET_mjjHisto_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
-	MET_mjjHisto_twoCentralJets.GetYaxis().SetTitle('MET (GeV)')
+	mjjMETHisto_twoCentralJets = ROOT.TH2F('mjjMETHisto_twoCentralJets', 'mjjMETHisto_twoCentralJets', len(mjj_array)-1, mjj_array, len(MET_array)-1, MET_array)
+	mjjMETHisto_twoCentralJets.GetXaxis().SetTitle('mjj (GeV)')
+	mjjMETHisto_twoCentralJets.GetYaxis().SetTitle('MET (GeV)')
 	
-	MET_mjjHisto_mixed = ROOT.TH2F('MET_mjjHisto_mixed', 'MET_mjjHisto_mixed', len(mjj_array)-1, mjj_array, len(MET_array)-1, MET_array)
-	MET_mjjHisto_mixed.GetXaxis().SetTitle('mjj (GeV)')
-	MET_mjjHisto_mixed.GetYaxis().SetTitle('MET (GeV)')
+	mjjMETHisto_mixed = ROOT.TH2F('mjjMETHisto_mixed', 'mjjMETHisto_mixed', len(mjj_array)-1, mjj_array, len(MET_array)-1, MET_array)
+	mjjMETHisto_mixed.GetXaxis().SetTitle('mjj (GeV)')
+	mjjMETHisto_mixed.GetYaxis().SetTitle('MET (GeV)')
 
-	MET_mjjHistos['MET_mjjHisto_mixed'] = MET_mjjHisto_mixed
-	MET_mjjHistos['MET_mjjHisto_twoCentralJets'] = MET_mjjHisto_twoCentralJets
+	MET_mjjHistos['mjjMETHisto_mixed'] = mjjMETHisto_mixed
+	MET_mjjHistos['mjjMETHisto_twoCentralJets'] = mjjMETHisto_twoCentralJets
 
 	return MET_mjjHistos
 

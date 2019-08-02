@@ -175,6 +175,8 @@ def print2DHisto(hist, logZaxis=True):
 	histName_splitted = hist.GetName().split('_')
 	histo_variable = histName_splitted[0]
 
+	histoDir = 'pngFiles/2DHistos'
+
 	if histName_splitted[1] in ['mixed', 'twoCentralJets']:
 
 		fileName = histo_variable + '_' + histName_splitted[1] + '.png'
@@ -183,7 +185,9 @@ def print2DHisto(hist, logZaxis=True):
 	
 		fileName = histo_variable + '.png'	
 
-	canv.Print(fileName)
+	file_path = os.path.join(histoDir, fileName)
+
+	canv.Print(file_path)
 
 def getJetGeometry(jet1, jet2):
 

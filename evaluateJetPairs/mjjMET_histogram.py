@@ -1,5 +1,6 @@
 import ROOT
 import numpy as np
+import os 
 from lib.defineHistos import defineMET_mjjHistos 
 from lib.helperFunctions import *
 from lib.veto import *
@@ -121,15 +122,19 @@ def main():
 
 		hist.SetDirectory(0)
 
-	f = file('inputs/MiniAOD_files2017.txt', 'r')
+	#f = file('inputs/MiniAOD_files2017.txt', 'r')
 
-	for numFile, fileName in enumerate(f.readlines()):
+	inputDir = 'inputs/ROOT_MCFiles'
+
+	for numFile, fileName in enumerate(os.listdir(inputDir)):
 
 		print('Working on file {}'.format(numFile+1))
 		
-		if numFile == 2: break #For testing
+		#if numFile == 2: break #For testing
 
-		fill_mjjMETHisto(fileName, MET_mjjHistos)
+		file_path = os.path.join(inputDir, fileName)
+
+		fill_mjjMETHisto(file_path, MET_mjjHistos)
 
 	#Draw and save the histograms
 

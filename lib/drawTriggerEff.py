@@ -34,6 +34,8 @@ def constructTriggerEff(histo_cut, histo_all, trigger, args, pngDir, fileName):
 
 		eff_graph.SetTitle(trigger + ';' + variable + ' (GeV);eff')
 
+		eff_graph.SetAxisRange(0., 1.05, 'Y')
+
 		if not args.noWrite:
 
 			eff_graph.Write('eff_graph_' + trigger + '_' + variable + '_' + case)
@@ -474,7 +476,7 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 
 		out = ROOT.TFile(filePath, 'RECREATE')
 
-	mjj_array = np.arange(0., 3000., 300.)
+	mjj_array = np.arange(300., 3000., 300.)
 	#mjj_array = array('f', [500., 520., 540., 570., 600., 640., 680., 730., 790., 880., 1000.]) 
 
 	mjj_hist_twoCentralJets = ROOT.TH1F('mjj_hist_twoCentralJets', 'mjj_hist_twoCentralJets', len(mjj_array)-1, mjj_array)

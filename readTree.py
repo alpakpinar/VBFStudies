@@ -299,7 +299,7 @@ if __name__ == '__main__':
     eff_graphs_trailingJetPt = {}
     trailingJetPt_hist_withTriggers = {}
     
-    cuts = [1000, 160, 50, 150] #Cuts that will be applied: mjj, leadingJetPt, trailingJetPt, MET
+    cuts = [1000, 140, 40, 150] #Cuts that will be applied: mjj, leadingJetPt, trailingJetPt, MET
 
     #for count, trigger in enumerate(VBF_triggers):
 

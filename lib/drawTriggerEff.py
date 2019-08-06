@@ -33,9 +33,7 @@ def constructTriggerEff(histo_cut, histo_all, trigger, args, pngDir, fileName):
 		eff_graph = ROOT.TEfficiency(histo_cut, histo_all)
 
 		eff_graph.SetTitle(trigger + ';' + variable + ' (GeV);eff')
-
-		eff_graph.SetAxisRange(0., 1.05, 'Y')
-
+	
 		if not args.noWrite:
 
 			eff_graph.Write('eff_graph_' + trigger + '_' + variable + '_' + case)
@@ -43,7 +41,17 @@ def constructTriggerEff(histo_cut, histo_all, trigger, args, pngDir, fileName):
 		canv = ROOT.TCanvas('canv', 'canv')
 	
 		eff_graph.Draw('AP')
+		
+		ROOT.gPad.Update()
+		graph = eff_graph.GetPaintedGraph()
+		graph.SetMinimum(0)
+		graph.SetMaximum(1)
+
 		#text.Draw('same')
+		
+		if not args.noWrite:
+
+			eff_graph.Write('eff_graph_' + trigger + '_' + variable + '_' + case)
 
 		#Create the relevant dir if not already present
 

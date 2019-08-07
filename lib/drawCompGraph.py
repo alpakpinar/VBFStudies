@@ -187,7 +187,6 @@ def drawCompGraph_mjj(dataFile, trigger1, trigger2, label1, label2, cuts, sepera
 
 ###########################
 
-
 def drawCompGraph_MET(dataFile, trigger1, trigger2, label1, label2, cuts, seperateRegions=False):
 
 	'''
@@ -266,7 +265,74 @@ def drawCompGraph_MET(dataFile, trigger1, trigger2, label1, label2, cuts, sepera
 
 	fin.Close()
 
+def drawDistributionForRejected(dataFile, variable, *argv):
 
+	'''
+	Draws the distribution of given variable for the events that are accepted by the MET trigger,
+	but rejected by the VBF trigger specified.
+	
+	dataFile: The input file contatining the event tree.
+	
+	variable: The variable of interest to be plotted
+	It can be mjj or MET at the moment.
+
+	In argv, following must be provided with the correct order:
+	--- VBF trigger in consideration
+	--- MET trigger in consideration
+	--- A list containing the cuts applied: 
+		--> If variable is mjj, the list should have length 2 with leading jet pt and trailing jet pt cuts
+		--> If variable is MET, the list should have length 3 with mjj, leading jet pt and trailing jet pt cuts
+	'''
+
+	vbfTrigger = argv[0]
+	metTrigger = argv[1]
+	cuts = argv[2]
+
+	if variable == 'mjj':
+
+		leadingJetPtCut, trailingJetPtCut = cuts[0], cuts[1]
+	
+		allCuts = 'minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && jet_pt[0] > ' + str(leadingJetPtCut) + ' && jet_pt[1] > ' + str(trailingJetPtCut) 
+
+		mjj_array = np.arange(500., 5000., 100.)
+
+		histo = ROOT.TH1F('histo', 'Distn for Events Failing the VBF Trigger but Passing MET Trigger', len(mjj_array)-1, mjj_array)
+		histo.GetXaxis().SetTitle('mjj (GeV)')
+		histo.GetYaxis().SetTitle('Number of Events')
+
+	elif variable == 'MET':
+
+		mjjCut, leadingJetPtCut, trailingJetPtCut = cuts[0], cuts[1], cuts[2]
+	
+		allCuts = 'minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && mjj > ' + str(mjjCut) + ' && jet_pt[0] > ' + str(leadingJetPtCut) + ' && jet_pt[1] > ' + str(trailingJetPtCut) 
+
+		met_array = np.arange(50., 500., 25.)
+
+		histo = ROOT.TH1F('histo', 'Distn for Events Failing the VBF Trigger but Passing MET Trigger', len(met_array)-1, met_array)
+		histo.GetXaxis().SetTitle('met (GeV)')
+		histo.GetYaxis().SetTitle('Number of Events')
+
+	else:
+	
+		raise ValueError("variable argument must be either 'mjj' or 'MET'!") 
+
+	# Append the trigger business
+	
+	allCuts += ' && {0} == 0 && {1} == 1'.format(vbfTrigger, metTrigger)
+
+	canv = ROOT.TCanvas('canv', 'canv')
+
+	fin = ROOT.TFile(dataFile)
+
+	# Print and save the distribution
+
+	fin.eventTree.Draw('{}>>histo'.format(variable.lower()), allCuts, '')
+	
+	fileName = '{}_notPassingVBF.png'.format(variable)
+
+	canv.Print(fileName)
+
+	fin.Close()	
 
 
 

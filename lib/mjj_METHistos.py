@@ -16,8 +16,15 @@ def fillAndSave_MjjMETHisto(tree, allCuts, fileName):
 
 	Returns the filled histogram.
 	''' 
+	# No stat box in the histogram
 	
-	mjj_array = np.arange(500., 5000., 200.)
+	ROOT.gStyle.SetOptStat(0)
+	
+	# Plot with numbers printed on bins
+
+	ROOT.gStyle.SetPaintTextFormat('.2g')
+
+	mjj_array = np.arange(500., 5000., 450.)
 	met_array = np.arange(50., 300., 20.)
 
 	# Fill the histogram from the tree to a temp histogram
@@ -34,11 +41,17 @@ def fillAndSave_MjjMETHisto(tree, allCuts, fileName):
 
 	histo = ROOT.gDirectory.Get('hist')
 	
-	if 'VBF' in histoType:
+	if 'passingOnlyVBF' in histoType:
 		histo.SetTitle('Events Passing VBF Trigger & Failing MET Trigger')
 
-	elif 'MET' in histoType:
+	elif 'passingMET' in histoType:
 		histo.SetTitle('Events Passing MET Trigger') 
+
+	elif 'EventsPassingVBF' in histoType:
+		histo.SetTitle('Events Passing VBF Trigger')
+
+	elif 'EventsWithoutVBF' in histoType:
+		histo.SetTitle('Events Passing VBF Selections (No Trigger Req)')
 
 	histo.GetXaxis().SetTitle('MET (GeV)')
 	histo.GetYaxis().SetTitle('mjj (GeV)')
@@ -55,13 +68,13 @@ def fillAndSave_MjjMETHisto(tree, allCuts, fileName):
 
 	canv = ROOT.TCanvas('canv', 'canv', 800, 600)
 
-	histo.Draw('COLZ')
+	histo.Draw('COLZ,TEXT')
 	
 	canv.Print(file_path)
 
 	print('*'*20)
 	print('INFO: {} saved'.format(file_path))
-	print('*'*20)
+	print('*'*20 + '\n')
 
 	return histo
 
@@ -85,9 +98,6 @@ def draw2DHistoForEventsAcceptedOnlyByVBFTrigger(dataFile, *argv):
 	Returns the filled histogram.
 	'''
 
-	# No stat box in the histogram
-	
-	ROOT.gStyle.SetOptStat(0)
 
 	vbfTrigger, metTrigger, cuts = argv[0], argv[1], argv[2]
 
@@ -108,7 +118,7 @@ def draw2DHistoForEventsAcceptedOnlyByVBFTrigger(dataFile, *argv):
 	f = ROOT.TFile(dataFile)
 	tree = f.eventTree
 
-	fileName = 'mjj_METHisto_leadJetPtCut{0}_trailJetPtCut{1}_passingVBF.png'.format(leadJetPtCut, trailJetPtCut)
+	fileName = 'mjj_METHisto_leadJetPtCut{0}_trailJetPtCut{1}_passingOnlyVBF.png'.format(leadJetPtCut, trailJetPtCut)
 
 	filledHisto = fillAndSave_MjjMETHisto(tree, allCuts, fileName) 
 
@@ -193,6 +203,10 @@ def draw2DHistoForPercentageVBFTriggerGain(dataFile, *argv):
 	# No stat box in thee histogram
 
 	ROOT.gStyle.SetOptStat(0)
+	
+	# Plot with numbers printed on bins
+
+	ROOT.gStyle.SetPaintTextFormat('.2g')
 
 	vbfTrigger, metTrigger, cuts = argv[0], argv[1], argv[2]
 	
@@ -222,16 +236,88 @@ def draw2DHistoForPercentageVBFTriggerGain(dataFile, *argv):
 
 	canv = ROOT.TCanvas('canv', 'canv', 800, 600)
 
-	histo_eventsPassingVBFTrigger_failingMETTrrigger.Draw('COLZ')
+	histo_eventsPassingVBFTrigger_failingMETTrrigger.Draw('COLZ,TEXT')
 	
 	canv.Print(file_path)
 
 	print('*'*20)
 	print('INFO: {} saved'.format(file_path))
-	print('*'*20)
+	print('*'*20 + '\n')
 	
+def draw2DHisto_PercentageOfEventsPassingVBFTrigger(dataFile, vbfTrigger, cuts):
 
+	'''
+	Fills, draws and saves a 2D histogram containing the ratio of number of events passing the VBF trigger,
+	as a function of mjj and MET.
+	
+	Saves the histogram as a .png file in the relevant directory.
+	
+	ARGUMENTS:
+	---inputFile: The ROOT file containing the eventTree.
+	---vbfTrigger: VBF trigger in consideration.
+	---cuts: A tuple or list of length 2, containing leading jet pt and trailing jet pt cuts: (leadJetPt, trailJetPt)
+	''' 
+	if len(cuts) != 2: raise ValueError('Number of cuts should be exactly 2!')
 
+	if not (isinstance(cuts, list) or isinstance(cuts, tuple)): raise TypeError('cuts must be provided as a list or tuple!')
+
+	# Proceed if no problem
+
+	# No stat box in thee histogram
+
+	ROOT.gStyle.SetOptStat(0)
+	
+	# Plot with numbers printed on bins
+
+	ROOT.gStyle.SetPaintTextFormat('.2g')
+
+	leadJetPtCut, trailJetPtCut = cuts[0], cuts[1]
+	
+	mainCuts = 'minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && jet_pt[0] > ' + str(leadJetPtCut) + ' && jet_pt[1] > ' + str(trailJetPtCut) 
+	
+	# Append the trigger business
+
+	allCuts = mainCuts + ' && {} == 1'.format(vbfTrigger)
+	
+	f = ROOT.TFile(dataFile)
+	tree = f.eventTree
+
+	fileName_withVBFTrigger = 'mjj_METHisto_leadJetPtCut{0}_trailJetPtCut{1}_numEventsPassingVBFTrigger.png'.format(leadJetPtCut, trailJetPtCut)
+
+	fileName_allEvents = 'mjj_METHisto_RatioHist_leadJetPtCut{0}_trailJetPtCut{1}_numEventsWithoutVBFTrigger.png'.format(leadJetPtCut, trailJetPtCut)
+	
+	# Get the two histograms
+
+	hist = fillAndSave_MjjMETHisto(tree, allCuts, fileName_withVBFTrigger)
+
+	hist_allEvents = fillAndSave_MjjMETHisto(tree, mainCuts, fileName_allEvents)
+
+	# Divide the two histograms
+	
+	hist.Divide(hist_allEvents)
+
+	# Save the ratio histogram
+
+	pngDir = 'pngImages/mjj_MET2DPlots'
+
+	if not os.path.isdir(pngDir): os.makedirs(pngDir)
+
+	fileName = 'mjj_METHisto_RatioEventsPassingVBFTrig_leadJetPtCut{0}_trailJetPtCut{1}.png'.format(leadJetPtCut, trailJetPtCut)
+
+	file_path = os.path.join(pngDir, fileName)
+
+	# Define the canvas and print the histogram
+
+	canv = ROOT.TCanvas('canv', 'canv', 800, 600)
+
+	hist.Draw('COLZ,TEXT')
+	
+	canv.Print(file_path)
+
+	print('*'*20)
+	print('INFO: {} saved'.format(file_path))
+	print('*'*20 + '\n')
+	
 
 
 

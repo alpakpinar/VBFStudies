@@ -6,10 +6,18 @@ from array import array
 def constructTriggerEff(histo_cut, histo_all, trigger, args, pngDir, fileName):
 
 	'''
-	Draws the efficiency graph for a given trigger, given two historgrams.
+	Draws and saves the efficiency graph for a given trigger, given two historgrams.
 	Saves the graph both as a graph in the relevant ROOT file and a png file in the relevant directory (if noWrite option is NOT specified while running the main script).
 	Saves the png file in the given directory pngDir, and filename will be fileName. Creates the pngDir if not already created.
 	Called in other drawTriggerEff functions.
+	
+	ARGUMENTS:
+	---histo_cut: The histogram with VBF cuts + trigger cut applied
+	---histo_all: The histogram with only VBF cuts applied
+	---trigger: The trigger in consideration
+	---args: This is the arguments parsed in while calling ../readTree.py.
+	---pngDir: The name of the directory to save the histogram as a .png file.
+	---fileName: The name of the .png file to be saved.
 	'''
 
 	#Obtain the variable to be plotted and the case (two jets forward, central etc...)
@@ -68,9 +76,15 @@ def constructTriggerEff(histo_cut, histo_all, trigger, args, pngDir, fileName):
 def drawTriggerEff_MET(inputFile, trigger, args, mjjCut, leadingJetPtCut, trailingJetPtCut):
 
 	'''
-	Constructs the trigger efficiency graph for a given trigger, as a function of MET.
-	Returns the MET histogram wih VBF cuts + trigger and efficiency plot.
-	On top of default VBF cuts, applies the given mjj, leadingJetPt and trailingJetPt cuts.
+	Constructs the trigger efficiency graph for a given trigger, as a function of invariant mass of two leading jets, mjj.
+	Applies the default VBF cuts and given leadingJetPt and trailingJetPt cuts.
+
+	ARGUMENTS:	
+	--- inputFile: The ROOT file containing eventTree.
+	--- trigger: The trigger name for which the efficiency curve will be drawn.
+	--- args: This is the arguments parsed in while calling ../readTree.py.
+	--- leadingJetPtCut: The leading jet pt cut to be applied.
+	--- trailingJetPtCut: The trailing jet pt cut to be applied.
 	'''
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')
@@ -456,8 +470,14 @@ def drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtC
 
 	'''
 	Constructs the trigger efficiency graph for a given trigger, as a function of invariant mass of two leading jets, mjj.
-	Returns the mjj histogram wih VBF cuts + trigger and efficiency plot.
 	Applies the default VBF cuts and given leadingJetPt and trailingJetPt cuts.
+
+	ARGUMENTS:	
+	--- inputFile: The ROOT file containing eventTree.
+	--- trigger: The trigger name for which the efficiency curve will be drawn.
+	--- args: This is the arguments parsed in while calling ../readTree.py.
+	--- leadingJetPtCut: The leading jet pt cut to be applied.
+	--- trailingJetPtCut: The trailing jet pt cut to be applied.
 	'''
 
 	f = ROOT.TFile.Open(inputFile, 'UPDATE')

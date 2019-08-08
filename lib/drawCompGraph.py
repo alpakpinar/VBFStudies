@@ -17,7 +17,17 @@ def drawCompGraph(histo1, histo2, label1, label2, variable, cuts, case=None):
 	If case is None (default), no region seperation will be done.	
 
 	Cuts applied must be given as a list for the cuts argument. 
-	
+
+	ARGUMENTS:
+	---histo1: First histogram to be drawn in the comparison plot.
+	---histo2: Second histogram to be drawn in the comparison plot.
+	---label1: Label of the first histogram, to be written on the legend.	
+	---label2: Label of the second histogram, to be written on the legend.
+	---variable: The variable for which the comparison will be made. (the x-axis variable)
+			 	 It can only be 'MET', 'leadingJetPt' or 'trailingJetPt'.
+	---cuts: A list or tuple containing mjj, leading jet pt and trailing jet pt cuts.
+	---case: The case for the two forward jets in the event. 
+			 If it is None, all cases will be taken into account. (default)
 	'''
 
 	#Check the variable and case arguments
@@ -264,108 +274,4 @@ def drawCompGraph_MET(dataFile, trigger1, trigger2, label1, label2, cuts, sepera
 		drawCompGraph(hist1, hist2, label1, label2, 'MET', cuts)
 
 	fin.Close()
-
-def drawDistributionForAcceptedOnlyByVBF(dataFile, variable, *argv):
-
-	'''
-	Draws the distribution of given variable for the events that are accepted by the VBF trigger,
-	but rejected by the MET trigger specified.
-	
-	dataFile: The input file contatining the event tree.
-	
-	variable: The variable of interest to be plotted
-	It can be mjj or MET at the moment.
-
-	In argv, following must be provided with the correct order:
-	--- VBF trigger in consideration
-	--- MET trigger in consideration
-	--- A list containing the jet pt cuts applied 
-	'''
-
-	vbfTrigger = argv[0]
-	metTrigger = argv[1]
-	cuts = argv[2]
-
-	if len(cuts) == 2:
-
-		leadingJetPtCut, trailingJetPtCut = cuts[0], cuts[1]
-		allCuts = 'minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && jet_pt[0] > ' + str(leadingJetPtCut) + ' && jet_pt[1] > ' + str(trailingJetPtCut) 
-
-	else:
-		
-		mjjCut, leadingJetPtCut, trailingJetPtCut, metCut = cuts[0], cuts[1], cuts[2], cuts[3]
-		allCuts = 'minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && mjj > ' + str(mjjCut) + ' && met > ' + str(metCut[0]) + ' && met < ' + str(metCut[1]) + ' && jet_pt[0] > ' + str(leadingJetPtCut) + ' && jet_pt[1] > ' + str(trailingJetPtCut) 
-
-	print(allCuts)
-	
-	# Append the trigger business
-	
-	allCuts += ' && {0} == 0 && {1} == 1'.format(metTrigger, vbfTrigger)
-
-	canv = ROOT.TCanvas('canv', 'canv')
-
-	fin = ROOT.TFile(dataFile)
-
-	if variable == 'mjj':
-
-		mjj_array = np.arange(500., 5000., 100.)
-
-		histo = ROOT.TH1F('histo', 'Distn for Events Failing the VBF Trigger but Passing MET Trigger', len(mjj_array)-1, mjj_array)
-		#histo.GetXaxis().SetTitle('mjj (GeV)')
-		#histo.GetYaxis().SetTitle('Number of Events')
-
-	elif variable == 'MET':
-
-		met_array = np.arange(50., 500., 25.)
-
-		histo = ROOT.TH1F('histo', 'Distn for Events Failing the VBF Trigger but Passing MET Trigger', len(met_array)-1, met_array)
-
-	elif variable == 'leadJetPt':
-
-		leadJetPt_array = np.arange(50., 500., 25.)
-		histo = ROOT.TH1F('histo', 'Distn for Events Failing the VBF Trigger but Passing MET Trigger', len(leadJetPt_array)-1, leadJetPt_array)
-	
-	elif variable == 'trailJetPt':
-
-		trailJetPt_array = np.arange(20., 300., 20.)
-		histo = ROOT.TH1F('histo', 'Distn for Events Failing the VBF Trigger but Passing MET Trigger', len(trailJetPt_array)-1, trailJetPt_array)
-	
-	else:
-	
-		raise ValueError("variable argument must be one of the following: 'mjj', 'leadJetPt', 'trailJetPt' or 'MET'!") 
-
-	# Print and save the distribution
-
-	if variable in ['mjj', 'MET']:
-
-		print(fin.eventTree.GetEntries(allCuts))
-		fin.eventTree.Draw('{}>>histo'.format(variable.lower()), allCuts, '')
-		hist = ROOT.gDirectory.Get('histo')
-		hist.SetTitle('')
-		hist.GetXaxis().SetTitle('{} (GeV)'.format(variable))
-		hist.GetYaxis().SetTitle('Number of Events')
-
-	elif variable == 'leadJetPt':
-
-		fin.eventTree.Draw('jet_pt[0]>>histo', allCuts, '')
-		hist = ROOT.gDirectory.Get('histo')
-		hist.SetTitle('')
-		hist.GetXaxis().SetTitle('{} (GeV)'.format(variable))
-		hist.GetYaxis().SetTitle('Number of Events')
-
-	elif variable == 'trailJetPt':
-
-		fin.eventTree.Draw('jet_pt[1]>>histo', allCuts, '')
-		hist = ROOT.gDirectory.Get('histo')
-		hist.SetTitle('')
-		hist.GetXaxis().SetTitle('{} (GeV)'.format(variable))
-		hist.GetYaxis().SetTitle('Number of Events')
-	
-	fileName = '{}_notPassingMET.png'.format(variable)
-
-	canv.Print(fileName)
-
-	fin.Close()	
-
-
 

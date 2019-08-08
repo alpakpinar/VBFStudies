@@ -258,6 +258,7 @@ def main():
 	parser.add_argument('-t', '--test', help = 'Only go over the first file for testing', action = 'store_true')
 	parser.add_argument('-s', '--shortTest', help = 'Only go over the first 100 events in the first file for testing', action = 'store_true')
 	parser.add_argument('-l', '--local', help = 'Run over the local files', action = 'store_true')
+	parser.add_argument('-b', '--background', help = 'Run over the background files', action = 'store_true')
 	args = parser.parse_args()
 	
 	#Create a new ROOT file
@@ -266,9 +267,30 @@ def main():
 		
 		output = ROOT.TFile('inputs/VBF_HToInv_2017_test.root', 'RECREATE')
 	
-	elif args.shortTest:
+	elif args.shortTest and not args.background:
 
 		output = ROOT.TFile('inputs/VBF_HToInv_2017_shortTest.root', 'RECREATE')
+
+	elif args.shortTest and args.background:
+		
+		backgroundFilesDir = 'inputs/backgroundFiles'
+
+		txtFileName_splitted = os.listdir(backgroundFilesDir)[0].split('_')[1:-1]
+		ROOT_fileName = ''.join(txtFileName_splitted) + '_shortTest' + '.root'
+		ROOT_filePath = os.path.join('inputs', ROOT_fileName)
+	
+		output = ROOT.TFile(ROOT_filePath, 'RECREATE')
+
+	elif args.background:
+		
+		backgroundFilesDir = 'inputs/backgroundFiles'
+
+		txtFileName_splitted = os.listdir(backgroundFilesDir)[0].split('_')[1:-1]
+		ROOT_fileName = ''.join(txtFileName_splitted) + '.root'
+		ROOT_filePath = os.path.join('inputs', ROOT_fileName)
+	
+		output = ROOT.TFile(ROOT_filePath, 'RECREATE')
+
 
 	else:
 	
@@ -301,6 +323,39 @@ def main():
 			print('Filename: {}'.format(file_path))
 		
 			writeTree(file_path, eventTree, args)
+
+			if numFile%10 == 0:
+		
+				output.cd() #Go to the file directory
+				
+				#Save the output root file
+				output.Write()
+
+	elif args.background:
+
+		backgroundFilesDir = 'inputs/backgroundFiles'
+
+		txtFile = os.listdir(backgroundFilesDir)[0]
+
+		txtFile_path = os.path.join(backgroundFilesDir, txtFile)
+
+		f = file(txtFile_path, 'r')
+
+		for numFile, fileName in enumerate(f.readlines()):
+
+			t2 = time.time()
+
+			fileName = 'root://cmsxrootd.fnal.gov//' + fileName
+			
+			if args.test or args.shortTest:
+
+				if numFile == 2: break
+
+			print('Working on file {0:<5d} t = {1:.2f}'.format(numFile+1, t2-t1))
+		
+			print('Filename: {}'.format(fileName))
+		
+			writeTree(fileName, eventTree, args)
 
 			if numFile%10 == 0:
 		

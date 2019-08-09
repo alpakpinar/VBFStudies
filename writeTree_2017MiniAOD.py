@@ -15,7 +15,7 @@ ROOT.FWLiteEnabler.enable()
 # load FWlite python libraries
 from DataFormats.FWLite import Handle, Events	
 	
-def writeTree(inputFile, tree, args, numEvents, numSavedEvents):
+def writeTree(inputFile, tree, args):
 
 	'''
 	Reads the inputFile and fills the tree.
@@ -51,8 +51,6 @@ def writeTree(inputFile, tree, args, numEvents, numSavedEvents):
 	t1 = time.time()
 
 	for numEvent, event in enumerate(events):
-
-		numEvents += 1
 
 		if args.shortTest:
 			
@@ -274,13 +272,6 @@ def writeTree(inputFile, tree, args, numEvents, numSavedEvents):
 
 		tree.Fill()
 
-		numSavedEvents += 1
-
-	print('Cumulative number of events looped over in this file: {}'.format(numEvents))
-	print('Cumulative number of events saved in this file: {}'.format(numSavedEvents))
-
-	return numEvents, numSavedEvents
-
 def main():
 
 	parser = argparse.ArgumentParser()
@@ -288,6 +279,15 @@ def main():
 	parser.add_argument('-s', '--shortTest', help = 'Only go over the first 100 events in the first file for testing', action = 'store_true')
 	parser.add_argument('-l', '--local', help = 'Run over the local files', action = 'store_true')
 	parser.add_argument('-b', '--background', help = 'Run over the background files', action = 'store_true')
+	parser.add_argument('-c', '--counter', help = '''Determines which files on the input txt file to be run over. 
+													 counter=0: File will run over files 1-5 in the given txt file
+													 counter=1: File will run over files 6-10 in the given txt file
+													 and so on.''', type = int)
+	parser.add_argument('-f', '--file', help= '''Determines which txt file to be run over.
+											     file=0: File will run over the first .txt file in the backgroundFiles dir
+												 file=1: File will run over the second .txt file in the backgroundFiles dir
+												 and so on.''', type = int)
+
 	args = parser.parse_args()
 	
 	#Create a new ROOT file
@@ -302,20 +302,20 @@ def main():
 
 	elif args.shortTest and args.background:
 		
-		backgroundFilesDir = 'inputs'
+		backgroundFilesDir = 'inputs/backgroundFiles'
 
-		txtFileName_splitted = os.listdir(backgroundFilesDir)[0].split('_')[1:-1]
-		ROOT_fileName = ''.join(txtFileName_splitted) + '_shortTest' + '.root'
+		txtFileName_splitted = os.listdir(backgroundFilesDir)[1].split('_')[1:-1]
+		ROOT_fileName = '_'.join(txtFileName_splitted) + '_shortTest' + '.root'
 		ROOT_filePath = os.path.join('inputs', ROOT_fileName)
 	
 		output = ROOT.TFile(ROOT_filePath, 'RECREATE')
 
 	elif args.background:
 	
-		backgroundFilesDir = 'inputs'
+		backgroundFilesDir = 'inputs/backgroundFiles'
 
-		txtFileName_splitted = os.listdir(backgroundFilesDir)[0].split('_')[1:-1]
-		ROOT_fileName = ''.join(txtFileName_splitted) + '.root'
+		txtFileName_splitted = os.listdir(backgroundFilesDir)[7].split('_')[1:-1]
+		ROOT_fileName = '_'.join(txtFileName_splitted) + '.root'
 		ROOT_filePath = os.path.join('inputs', ROOT_fileName)
 	
 		output = ROOT.TFile(ROOT_filePath, 'RECREATE')
@@ -357,7 +357,7 @@ def main():
 		
 			print('Filename: {}'.format(file_path))
 		
-			numEvents, numSavedEvents = writeTree(file_path, eventTree, args, numEvents, numSavedEvents)
+			writeTree(file_path, eventTree, args, numEvents, numSavedEvents)
 
 			if numFile%10 == 0:
 		
@@ -370,18 +370,29 @@ def main():
 
 		backgroundFilesDir = 'inputs/backgroundFiles'
 
-		txtFile = os.listdir(backgroundFilesDir)[0]
+		txtFile = os.listdir(backgroundFilesDir)[7]
 
 		txtFile_path = os.path.join(backgroundFilesDir, txtFile)
 
 		f = file(txtFile_path, 'r')
 
-		for numFile, fileName in enumerate(f.readlines()):
+		# Get the index for the first file 		
+
+		counter = args.counter
+		file_idx = 5*counter
+
+		print('*'*20)
+		print('INFO: Will run over files with idx between {}-{}'.format(file_idx, file_idx+4))
+		print('*'*20)
+
+		for numFile, fileEntry in enumerate(f.readlines()[file_idx:file_idx+5]):
 
 			t2 = time.time()
 
-			fileName = 'root://cmsxrootd.fnal.gov//' + fileName
-			
+			fileName = 'root://cmsxrootd.fnal.gov//' + fileEntry[0]
+
+			numEvents += fileEntry[1]
+	
 			if args.test or args.shortTest:
 
 				if numFile == 2: break
@@ -390,14 +401,18 @@ def main():
 		
 			print('Filename: {}'.format(fileName))
 		
-			numEvents, numSavedEvents = writeTree(fileName, eventTree, args, numEvents, numSavedEvents)
+			writeTree(fileName, eventTree, args)
 
-			if numFile%10 == 0:
-		
-				output.cd() #Go to the file directory
-				
-				#Save the output root file
-				output.Write()
+			print('Cumulative number of events looped over: {}'.format(numEvents))
+
+		#	if numFile%10 == 0:
+		#
+		#		output.cd() #Go to the file directory
+		#		
+		#		#Save the output root file
+		#		output.Write()
+
+		output.Write()
 
 	else:
 
@@ -415,7 +430,7 @@ def main():
 		
 			print('Filename: {}'.format(filename))
 		
-			numEvents, numSavedEvents = writeTree(filename, eventTree, args, numEvents, numSavedEvents)
+			writeTree(filename, eventTree, args, numEvents, numSavedEvents)
 
 			if numFile%10 == 0:
 		

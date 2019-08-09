@@ -15,7 +15,7 @@ ROOT.FWLiteEnabler.enable()
 # load FWlite python libraries
 from DataFormats.FWLite import Handle, Events	
 	
-def writeTree(inputFile, tree, args):
+def writeTree(inputFile, tree, args, numEvents, numSavedEvents):
 
 	'''
 	Reads the inputFile and fills the tree.
@@ -55,13 +55,6 @@ def writeTree(inputFile, tree, args):
 		if args.shortTest:
 			
 			if numEvent == 100: break
-
-		# If running on background events
-		# terminate when 1M events are saved
-
-		if args.background:
-
-			if numSavedEvents == 1000000: break
 
 		event.getByLabel(electronLabel, electrons)
 		event.getByLabel(muonLabel, muons)
@@ -272,6 +265,13 @@ def writeTree(inputFile, tree, args):
 
 		tree.Fill()
 
+		numSavedEvents += 1
+
+	print('Cumulative number of events looped over: {}'.format(numEvents))
+	print('Cumulative number of events saved      : {}'.format(numSavedEvents))
+
+	return numSavedEvents
+
 def main():
 
 	parser = argparse.ArgumentParser()
@@ -283,12 +283,19 @@ def main():
 													 counter=0: File will run over files 1-5 in the given txt file
 													 counter=1: File will run over files 6-10 in the given txt file
 													 and so on.''', type = int)
-	parser.add_argument('-f', '--file', help= '''Determines which txt file to be run over.
+	parser.add_argument('-f', '--fileIdx', help= '''Determines which txt file to be run over.
 											     file=0: File will run over the first .txt file in the backgroundFiles dir
 												 file=1: File will run over the second .txt file in the backgroundFiles dir
 												 and so on.''', type = int)
 
 	args = parser.parse_args()
+	
+	# Get the index for the first file 		
+	counter = args.counter
+	file_idx = 5*counter
+
+	# Get which txt file in the background dir is to be considered
+	txtFileIdx = args.fileIdx 
 	
 	#Create a new ROOT file
 
@@ -314,8 +321,8 @@ def main():
 	
 		backgroundFilesDir = 'inputs/backgroundFiles'
 
-		txtFileName_splitted = os.listdir(backgroundFilesDir)[7].split('_')[1:-1]
-		ROOT_fileName = '_'.join(txtFileName_splitted) + '.root'
+		txtFileName_splitted = os.listdir(backgroundFilesDir)[txtFileIdx].split('_')[2:-1]
+		ROOT_fileName = '_'.join(txtFileName_splitted) + '_files{}-{}'.format(file_idx, file_idx+4)  + '.root'
 		ROOT_filePath = os.path.join('inputs', ROOT_fileName)
 	
 		output = ROOT.TFile(ROOT_filePath, 'RECREATE')
@@ -370,18 +377,14 @@ def main():
 
 		backgroundFilesDir = 'inputs/backgroundFiles'
 
-		txtFile = os.listdir(backgroundFilesDir)[7]
+		txtFile = os.listdir(backgroundFilesDir)[txtFileIdx]
 
 		txtFile_path = os.path.join(backgroundFilesDir, txtFile)
 
 		f = file(txtFile_path, 'r')
 
-		# Get the index for the first file 		
-
-		counter = args.counter
-		file_idx = 5*counter
-
 		print('*'*20)
+		print('INFO: Will consider txt file {}'.format(txtFile))
 		print('INFO: Will run over files with idx between {}-{}'.format(file_idx, file_idx+4))
 		print('*'*20)
 
@@ -389,9 +392,11 @@ def main():
 
 			t2 = time.time()
 
-			fileName = 'root://cmsxrootd.fnal.gov//' + fileEntry[0]
+			splittedFileEntry = fileEntry.split('  ')
 
-			numEvents += fileEntry[1]
+			fileName = 'root://cmsxrootd.fnal.gov//' + splittedFileEntry[0]
+
+			numEvents += int(splittedFileEntry[1])
 	
 			if args.test or args.shortTest:
 
@@ -401,7 +406,7 @@ def main():
 		
 			print('Filename: {}'.format(fileName))
 		
-			writeTree(fileName, eventTree, args)
+			numSavedEvents = writeTree(fileName, eventTree, args, numEvents, numSavedEvents)
 
 			print('Cumulative number of events looped over: {}'.format(numEvents))
 

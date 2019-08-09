@@ -15,7 +15,20 @@ ROOT.FWLiteEnabler.enable()
 # load FWlite python libraries
 from DataFormats.FWLite import Handle, Events	
 	
-def writeTree(inputFile, tree, args):
+def writeTree(inputFile, tree, args, numEvents, numSavedEvents):
+
+	'''
+	Reads the inputFile and fills the tree.
+
+	ARGUMENTS:
+	---inputFile: MiniAOD ROOT file containing the events.
+	---tree: The tree to be written. This is to be declared before calling this function.
+	---args: Arguments parsed while calling this script.
+			 If args contain the flag short, the event loop will be terminated at event 100.
+			 If args contain the flag background, the event loop will be terminated if the total number of saved events reach 1M.
+	---numEvents: Cumulative number of events looped over. This is to keep track of total number of events looped over. 
+	---numSavedEvents: Cumulative number of events that are saved to the tree. This is to keep track of total number of events saved.
+	'''
 	
 	electrons, electronLabel = Handle('std::vector<pat::Electron>'), 'slimmedElectrons'
 	muons, muonLabel = Handle('std::vector<pat::Muon>'), 'slimmedMuons'
@@ -39,9 +52,18 @@ def writeTree(inputFile, tree, args):
 
 	for numEvent, event in enumerate(events):
 
+		numEvents += 1
+
 		if args.shortTest:
 			
 			if numEvent == 100: break
+
+		# If running on background events
+		# terminate when 1M events are saved
+
+		if args.background:
+
+			if numSavedEvents == 1000000: break
 
 		event.getByLabel(electronLabel, electrons)
 		event.getByLabel(muonLabel, muons)
@@ -252,6 +274,13 @@ def writeTree(inputFile, tree, args):
 
 		tree.Fill()
 
+		numSavedEvents += 1
+
+	print('Cumulative number of events looped over in this file: {}'.format(numEvents))
+	print('Cumulative number of events saved in this file: {}'.format(numSavedEvents))
+
+	return numEvents, numSavedEvents
+
 def main():
 
 	parser = argparse.ArgumentParser()
@@ -268,12 +297,12 @@ def main():
 		output = ROOT.TFile('inputs/VBF_HToInv_2017_test.root', 'RECREATE')
 	
 	elif args.shortTest and not args.background:
-
+	
 		output = ROOT.TFile('inputs/VBF_HToInv_2017_shortTest.root', 'RECREATE')
 
 	elif args.shortTest and args.background:
 		
-		backgroundFilesDir = 'inputs/backgroundFiles'
+		backgroundFilesDir = 'inputs'
 
 		txtFileName_splitted = os.listdir(backgroundFilesDir)[0].split('_')[1:-1]
 		ROOT_fileName = ''.join(txtFileName_splitted) + '_shortTest' + '.root'
@@ -282,8 +311,8 @@ def main():
 		output = ROOT.TFile(ROOT_filePath, 'RECREATE')
 
 	elif args.background:
-		
-		backgroundFilesDir = 'inputs/backgroundFiles'
+	
+		backgroundFilesDir = 'inputs'
 
 		txtFileName_splitted = os.listdir(backgroundFilesDir)[0].split('_')[1:-1]
 		ROOT_fileName = ''.join(txtFileName_splitted) + '.root'
@@ -304,6 +333,12 @@ def main():
 	
 	t1 = time.time()
 
+	# Track the total number of events looped over
+	# and total saved number of events
+
+	numEvents = 0
+	numSavedEvents = 0
+
 	if args.local:
 
 		MCFilesDir = 'evaluateJetPairs/inputs/ROOT_MCFiles'
@@ -314,7 +349,7 @@ def main():
 
 			if args.test or args.shortTest:
 
-				if numFile == 2: break
+				if numFile == 3: break
 
 			file_path = os.path.join(MCFilesDir, fileName)
 
@@ -322,7 +357,7 @@ def main():
 		
 			print('Filename: {}'.format(file_path))
 		
-			writeTree(file_path, eventTree, args)
+			numEvents, numSavedEvents = writeTree(file_path, eventTree, args, numEvents, numSavedEvents)
 
 			if numFile%10 == 0:
 		
@@ -355,7 +390,7 @@ def main():
 		
 			print('Filename: {}'.format(fileName))
 		
-			writeTree(fileName, eventTree, args)
+			numEvents, numSavedEvents = writeTree(fileName, eventTree, args, numEvents, numSavedEvents)
 
 			if numFile%10 == 0:
 		
@@ -380,7 +415,7 @@ def main():
 		
 			print('Filename: {}'.format(filename))
 		
-			writeTree(filename, eventTree, args)
+			numEvents, numSavedEvents = writeTree(filename, eventTree, args, numEvents, numSavedEvents)
 
 			if numFile%10 == 0:
 		
@@ -388,6 +423,12 @@ def main():
 				
 				#Save the output root file
 				output.Write()
+
+	print('*'*20)
+	print('RESULTS')
+	print('Total number of events looped over: {}'.format(numEvents))
+	print('Total number of events saved:       {}'.format(numSavedEvents))
+	print('*'*20)
 
 	output.Close()
 	#inputFile = 'root://cmsxrootd.fnal.gov///store/mc/RunIISummer17MiniAOD/VBF_HToInvisible_M125_13TeV_powheg_pythia8/MINIAODSIM/NZSFlatPU28to62_92X_upgrade2017_realistic_v10-v1/50000/CE13A08A-579E-E711-B9BB-001E67E5E8B6.root'	

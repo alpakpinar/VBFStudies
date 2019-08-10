@@ -8,3 +8,5 @@ tmp/
 inputs/backup_ROOTFiles
 evaluateJetPairs/inputs/ROOT_MCFiles
 VBF_HToInv_2017.root 
+inputs/ZJetsToNuNu*
+logFiles/

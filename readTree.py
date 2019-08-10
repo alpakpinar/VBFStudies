@@ -10,6 +10,7 @@ from lib.histos import declareHistos
 from lib.selections import *
 from lib.drawTriggerEff import *
 from lib.drawCompGraph import *
+from lib.mjj_METHistos import *
 
 def getArgs():
 
@@ -19,6 +20,7 @@ def getArgs():
 	parser.add_argument('-s', '--shortTest', help = 'Run over the short test file', action = 'store_true')
 	parser.add_argument('-c', '--clean', help = 'Clean the ROOT file by deleting all previous histograms', action = 'store_true')
 	parser.add_argument('-n', '--noWrite', help = 'Do not write the efficiency graphs and histograms to the ROOT file', action = 'store_true')
+	parser.add_argument('-b', '--background', help = 'Run over ZJetsToNuNu background files', action = 'store_true')
 	args = parser.parse_args()
 
 	return args
@@ -120,6 +122,11 @@ def drawCutFlow(inputFile):
 	print('*'*29)
 
 	f.Close()
+
+############################
+# readTree NOT UPDATED
+# NOT RECOMMENDED TO USE
+############################
 	
 def readTree(inputFile):
 
@@ -212,20 +219,26 @@ def readTree(inputFile):
 	print('Total number of events passed L1 + HLT + VBF selections  : {0:6d}		Passing Ratio: {1:6.2f}%\n'.format(event_count_afterALL, event_count_afterALL*100/event_count_before)) 
 	print('Job finished')
 
-def drawTriggerEff_mjjRange(inputFile, args, leadingJetPtCuts, trailingJetPtCuts, triggers):
+#############################
+
+def calculateScaleFactors(xSections, numEvents):
 
 	'''
-	Given the leadingJetPtCuts, trailingJetPtCuts and triggers lists, draws and saves trigger efficiency plots for each of the given cuts for the given triggers.
+	Calculate histogram scaling factors for given x-section and numEvents lists.
 	'''
 	
-	for leadingJetPtCut in leadingJetPtCuts:
+	scaleFactors = []
 
-		for trailingJetPtCut in trailingJetPtCuts:
+	for idx in range(len(xSections)):
 
-			for trigger in triggers:
+		scaleFactors.append(xSections[idx]/numEvents[idx])
 
-				drawTriggerEff_mjj(inputFile, trigger, args, leadingJetPtCut, trailingJetPtCut)	
+	return scaleFactors
 	
+##############################
+# MAIN SCRIPT
+##############################
+
 def main():
 	
 	args = getArgs()
@@ -242,6 +255,23 @@ def main():
 		print('Starting job')
 		print('File: {}'.format(inputFile))
 	
+	elif args.background:
+
+		idx = 0
+		inputDir = 'inputs'
+
+		inputList = [fileName for fileName in os.listdir(inputDir) if fileName.startswith('ZJetsToNuNu')]
+		inputFile = os.path.join(inputDir, inputList[idx])
+		print('Starting job')
+		print('File: {}'.format(inputFile))
+	
+		xSections = [306.2, 0.3434, 91.38, 0.005146, 13.13, 3.245, 1.500]
+		numEvents = [19859833, 338948, 16052981, 6734, 9134120, 5697594, 2030827] 
+	
+		scaleFactors = calculateScaleFactors(xSections, numEvents)
+
+		scaleFactor = scaleFactors[idx]
+
 	else:
  
 		inputFile = 'inputs/VBF_HToInv_' + str(args.year) + '.root'
@@ -297,7 +327,7 @@ def main():
 	eff_graphs_trailingJetPt = {}
 	trailingJetPt_hist_withTriggers = {}
 	
-	cuts = [1000, 150, 50, 150] #Cuts that will be applied: mjj, leadingJetPt, trailingJetPt, MET
+	cuts = [1200, 80, 40, 150] #Cuts that will be applied: mjj, leadingJetPt, trailingJetPt, MET
 
 	#for count, trigger in enumerate(VBF_triggers):
 
@@ -325,11 +355,25 @@ def main():
 			#drawCompGraph_trailingJetPt(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
 			#drawCompGraph_mjj(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
 
-	#drawCompGraph_MET(inputFile, triggers[0], triggers[3], legendLabels[0], legendLabels[3], cuts)
+	#drawCompGraph_MET(inputFile, triggers[0], triggers[4], legendLabels[0], legendLabels[4], cuts)
 	#drawCompGraph_leadingJetPt(inputFile, triggers[0], triggers[3], legendLabels[0], legendLabels[3], cuts)
 	#drawCompGraph_trailingJetPt(inputFile, triggers[0], triggers[3], legendLabels[0], legendLabels[3], cuts)
-	drawCompGraph_mjj(inputFile, triggers[0], triggers[3], legendLabels[0], legendLabels[3], cuts)
+	#drawCompGraph_mjj(inputFile, triggers[0], triggers[4], legendLabels[0], legendLabels[4], cuts)
+	
+	#jetptCuts = [80,40]
 
+	#for var in ['mjj', 'MET', 'leadJetPt', 'trailJetPt']:
+	#
+	#	drawDistributionForAcceptedOnlyByVBF(inputFile, var, triggers[0], triggers[4], newCuts)
+
+	jetCuts = (80, 40)
+
+	#draw2DHistoForEventsAcceptedOnlyByVBFTrigger(inputFile, triggers[0], triggers[4], jetCuts, scaleFactor, saveToROOTFile=True) 
+	#draw2DHistoForEventsAcceptedByMETTrigger(inputFile, triggers[4], jetCuts, scaleFactor, saveToROOTFile=True)
+
+	draw2DHistoForPercentageVBFTriggerGain(inputFile, triggers[0], triggers[4], jetCuts) 
+
+	#draw2DHisto_PercentageOfEventsPassingVBFTrigger(inputFile, triggers[0], jetCuts)
 	#drawCutFlow(inputFile)
 
 

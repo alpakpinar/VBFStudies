@@ -36,11 +36,12 @@ readTree.py imports helper functions from other scripts located in lib/. Inside 
 
 readTree.py accepts some command line options:
 
-- `-y`, `--year`      : Tells the script about the dataset year. For example, if `-y 2017` is used while calling the script, the script will look for a ROOT file produced from 2017 samples. This option can be either 2017 or 2018.
-- `-t`, `--test`      : If specified, the script will run over a test file. (Produced with writeTree using -t option)
-- `-s`, `--shortTest` : If specified, the script will run over a short test file. (Produced with writeTree using -s option)
-- `-c`, `--clean`     : (NOT RECOMMENDED) If specified, the script will clean the ROOT file by deleting all the previous histograms stored.
-- `-n`, `--noWrite`   : If specified, the resulting histograms/graphs won't be saved in the ROOT file. If not specified, script will save the histograms/graphs in the input file by updating it.
+- `-y`, `--year`       : Tells the script about the dataset year. For example, if `-y 2017` is used while calling the script, the script will look for a ROOT file produced from 2017 samples. This option can be either 2017 or 2018.
+- `-t`, `--test`       : If specified, the script will run over a test file. (Produced with writeTree using -t option)
+- `-s`, `--shortTest`  : If specified, the script will run over a short test file. (Produced with writeTree using -s option)
+- `-c`, `--clean `     : (NOT RECOMMENDED) If specified, the script will clean the ROOT file by deleting all the previous histograms stored.
+- `-n`, `--noWrite`    : If specified, the resulting histograms/graphs won't be saved in the ROOT file. If not specified, script will save the histograms/graphs in the input file by updating it.
+- `-b`, `--background` : If specified, the script will run over one of the background files. (to be explained further...)
 
 As an example, to run over the 2017 test files, we enter:
 

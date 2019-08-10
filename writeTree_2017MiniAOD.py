@@ -275,8 +275,8 @@ def writeTree(inputFile, tree, args, numEvents, numSavedEvents):
 def main():
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-t', '--test', help = 'Only go over the first file for testing', action = 'store_true')
-	parser.add_argument('-s', '--shortTest', help = 'Only go over the first 100 events in the first file for testing', action = 'store_true')
+	parser.add_argument('-t', '--test', help = 'Only go over the first two files for testing', action = 'store_true')
+	parser.add_argument('-s', '--shortTest', help = 'Only go over the first 100 events in the first two files for testing', action = 'store_true')
 	parser.add_argument('-l', '--local', help = 'Run over the local files', action = 'store_true')
 	parser.add_argument('-b', '--background', help = 'Run over the background files', action = 'store_true')
 	parser.add_argument('-c', '--counter', help = '''Determines which files on the input txt file to be run over. 

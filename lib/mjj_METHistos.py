@@ -2,7 +2,7 @@ import ROOT
 import numpy as np
 import os
 
-def fillAndSave_MjjMETHisto(tree, allCuts, fileName, histoName=None, scale=False, saveToROOTFile=False):
+def fillAndSave_MjjMETHisto(tree, allCuts, scaleFactor, fileName, histoName=None, saveToROOTFile=False):
 
 	'''
 	Used by other draw2DHisto functions to fill, draw and save the 2D histogram,
@@ -17,12 +17,11 @@ def fillAndSave_MjjMETHisto(tree, allCuts, fileName, histoName=None, scale=False
 	===ARGUMENTS===
 	--- tree           : The eventTree in the ROOT file.
 	--- allCuts        : A string containing all the cuts applied, including trigger cuts.
+	--- scaleFactor    : The scale factor for the histogram.
+						 If histogram is not to be scaled, scaleFactor=None can be passed into the function.
 	--- fileName       : Name of the png file to be saved.
 	--- histoName      : Name of the histogram to be saved in the ROOT file.
 						 If the histogram won't be saved in a ROOT file, the default value None can be used.
-	--- scale          : If scale is False, the number of events in the resulting histogram won't be scaled. (default)
-				   		 If histogram is to be scaled, scale must be an integer or float specifying the scale factor.  
-			 	   		 Histogram will be multiplied by the provided scaleFactor at the end.
 	--- saveToROOTFile : If True, the histogram will be saved into a ROOT file. By default, this option is False.
 
 	Returns the filled histogram.
@@ -82,9 +81,8 @@ def fillAndSave_MjjMETHisto(tree, allCuts, fileName, histoName=None, scale=False
 
 	# Scale the histogram if requested
 	
-	if scale: 
+	if scaleFactor: 
 
-		scaleFactor = scale
 		print('INFO: Scaling the 2D histogram by {}'.format(scaleFactor))
 		histo.Scale(scaleFactor)
 
@@ -121,7 +119,7 @@ def fillAndSave_MjjMETHisto(tree, allCuts, fileName, histoName=None, scale=False
 
 	return histo
 
-def draw2DHistoForEventsAcceptedOnlyByVBFTrigger(dataFile, vbfTrigger, metTrigger, cuts, scale=False, saveToROOTFile=False):
+def draw2DHistoForEventsAcceptedOnlyByVBFTrigger(dataFile, vbfTrigger, metTrigger, cuts, scaleFactor, saveToROOTFile=False):
 
 	'''
 	Plots and saves 2D histogram for events that are passing the VBF trigger,
@@ -138,9 +136,8 @@ def draw2DHistoForEventsAcceptedOnlyByVBFTrigger(dataFile, vbfTrigger, metTrigge
 	--- vbfTrigger     : VBF trigger in consideration 
 	--- metTrigger     : MET trigger in consideration
 	--- cuts           : A list or tuple containing leading jet pt and trailing jet pt cuts: (leadJetPt, trailingJetPt)
-	--- scale          : If scale is False, the number of events in the resulting histogram won't be scaled. (default)
-				 	     If histogram is to be scaled, scale must be a tuple of the following form: (True, scaleFactor)
-			 		     Histogram will be multiplied by the provided scaleFactor at the end.
+	--- scaleFactor    : The scale factor for the histogram.
+						 If histogram is not to be scaled, scaleFactor=None can be passed into the function.
 	--- saveToROOTFile : If True, the histogram will be saved into a ROOT file. By default, this option is False.
 
 	Returns the filled histogram.
@@ -175,7 +172,7 @@ def draw2DHistoForEventsAcceptedOnlyByVBFTrigger(dataFile, vbfTrigger, metTrigge
 
 	#fileName = 'mjj_METHisto_leadJetPtCut{0}_trailJetPtCut{1}_passingOnlyVBF.png'.format(leadJetPtCut, trailJetPtCut)
 
-	filledHisto = fillAndSave_MjjMETHisto(tree, allCuts, fileName, histoName, scale, saveToROOTFile) 
+	filledHisto = fillAndSave_MjjMETHisto(tree, allCuts, scaleFactor, fileName, histoName, saveToROOTFile) 
 
 	# Temporary
 	filledHisto.RebinY(2)
@@ -189,7 +186,7 @@ def draw2DHistoForEventsAcceptedOnlyByVBFTrigger(dataFile, vbfTrigger, metTrigge
 	
 	return filledHisto
 
-def draw2DHistoForEventsAcceptedByMETTrigger(dataFile, metTrigger, cuts, scale=False, saveToROOTFile=False):
+def draw2DHistoForEventsAcceptedByMETTrigger(dataFile, metTrigger, cuts, scaleFactor, saveToROOTFile=False):
 	
 	'''
 	Plots a 2D histogram for events that are passing the MET trigger.
@@ -204,9 +201,8 @@ def draw2DHistoForEventsAcceptedByMETTrigger(dataFile, metTrigger, cuts, scale=F
 	--- dataFile       : Input ROOT file containing eventTree.
 	--- metTrigger     : MET trigger in consideration.
 	--- cuts   	       : A list or tuple containing leading jet pt and trailing jet pt cuts: (leadJetPt, trailJetPt)
-	--- scale          : If scale is False, the number of events in the resulting histogram won't be scaled. (default)
-				         If histogram is to be scaled, scale must be an integer or float specifying the scale factor.  
-			 	         Histogram will be multiplied by the provided scaleFactor at the end.
+	--- scaleFactor    : The scale factor for the histogram.
+						 If histogram is not to be scaled, scaleFactor=None can be passed into the function.
 	--- saveToROOTFile : If True, the histogram will be saved into a ROOT file. By default, this option is False.
 
 	Returns the filled histogram.
@@ -244,7 +240,7 @@ def draw2DHistoForEventsAcceptedByMETTrigger(dataFile, metTrigger, cuts, scale=F
 	
 	#fileName = 'mjj_METHisto_leadJetPtCut{0}_trailJetPtCut{1}_passingMET.png'.format(leadJetPtCut, trailJetPtCut)
 
-	filledHisto = fillAndSave_MjjMETHisto(tree, allCuts, fileName, histoName, scale, saveToROOTFile)
+	filledHisto = fillAndSave_MjjMETHisto(tree, allCuts, scaleFactor, fileName, histoName, saveToROOTFile)
 
 	# Temporary
 	filledHisto.RebinY(2)
@@ -258,7 +254,7 @@ def draw2DHistoForEventsAcceptedByMETTrigger(dataFile, metTrigger, cuts, scale=F
 	
 	return filledHisto
 
-def draw2DHistoForPercentageVBFTriggerGain(dataFile, vbfTrigger, metTrigger, cuts, scale=False, saveToROOTFile=False):
+def draw2DHistoForPercentageVBFTriggerGain(dataFile, vbfTrigger, metTrigger, cuts, saveToROOTFile=False):
 
 	'''
 	Plots a 2D histogram containing the ratio of the following as a function of mjj and MET:
@@ -270,9 +266,6 @@ def draw2DHistoForPercentageVBFTriggerGain(dataFile, vbfTrigger, metTrigger, cut
 	--- vbfTrigger     : VBF trigger in consideration.
 	--- metTrigger     : MET trigger in consideration.
 	--- cuts   	       : A list or tuple containing leading jet pt and trailing jet pt cuts: (leadJetPt, trailJetPt)
-	--- scale          : If scale is False, the number of events in the resulting histogram won't be scaled. (default)
-				 	     If histogram is to be scaled, scale must be a tuple of the following form: (True, scaleFactor)
-			 		     Histogram will be multiplied by the provided scaleFactor at the end.
 	--- saveToROOTFile : If True, the histogram will be saved into a ROOT file. By default, this option is False.
 
 	Saves the 2D histogram in the relevant directory.
@@ -286,6 +279,10 @@ def draw2DHistoForPercentageVBFTriggerGain(dataFile, vbfTrigger, metTrigger, cut
 	# Plot with numbers printed on bins
 
 	ROOT.gStyle.SetPaintTextFormat('.2g')
+	
+	# Don't scale any histogram
+
+	scaleFactor = None
 
 	if len(cuts) != 2: raise ValueError('Number of cuts should be exactly 2!')
 
@@ -293,9 +290,9 @@ def draw2DHistoForPercentageVBFTriggerGain(dataFile, vbfTrigger, metTrigger, cut
 
 	leadJetPtCut, trailJetPtCut = cuts[0], cuts[1]
 
-	histo_eventsPassingMETTrigger = draw2DHistoForEventsAcceptedByMETTrigger(dataFile, metTrigger, cuts, scale, saveToROOTFile)
+	histo_eventsPassingMETTrigger = draw2DHistoForEventsAcceptedByMETTrigger(dataFile, metTrigger, cuts, scaleFactor, saveToROOTFile)
 
-	histo_eventsPassingVBFTrigger_failingMETTrrigger = draw2DHistoForEventsAcceptedOnlyByVBFTrigger(dataFile, vbfTrigger, metTrigger, cuts, scale, saveToROOTFile)
+	histo_eventsPassingVBFTrigger_failingMETTrrigger = draw2DHistoForEventsAcceptedOnlyByVBFTrigger(dataFile, vbfTrigger, metTrigger, cuts, scaleFactor, saveToROOTFile)
 
 	# Divide the two histograms
 
@@ -328,8 +325,6 @@ def draw2DHistoForPercentageVBFTriggerGain(dataFile, vbfTrigger, metTrigger, cut
 	print('*'*20)
 	print('INFO: {} saved'.format(file_path))
 	print('*'*20 + '\n')
-	
-##################################
 
 def draw2DHisto_PercentageOfEventsPassingVBFTrigger(dataFile, vbfTrigger, cuts):
 
@@ -358,6 +353,10 @@ def draw2DHisto_PercentageOfEventsPassingVBFTrigger(dataFile, vbfTrigger, cuts):
 
 	ROOT.gStyle.SetPaintTextFormat('.2g')
 
+	# Don't scale any histogram
+
+	scaleFactor = None
+
 	leadJetPtCut, trailJetPtCut = cuts[0], cuts[1]
 	
 	mainCuts = 'minPhi_jetMET > 0.5 && jet_eta[0]*jet_eta[1]<0 && absEtaDiff_leadingTwoJets > 2.5 && jet_pt[0] > ' + str(leadJetPtCut) + ' && jet_pt[1] > ' + str(trailJetPtCut) 
@@ -375,9 +374,9 @@ def draw2DHisto_PercentageOfEventsPassingVBFTrigger(dataFile, vbfTrigger, cuts):
 	
 	# Get the two histograms
 
-	hist = fillAndSave_MjjMETHisto(tree, allCuts, fileName_withVBFTrigger)
+	hist = fillAndSave_MjjMETHisto(tree, allCuts, scaleFactor, fileName_withVBFTrigger)
 
-	hist_allEvents = fillAndSave_MjjMETHisto(tree, mainCuts, fileName_allEvents)
+	hist_allEvents = fillAndSave_MjjMETHisto(tree, mainCuts, scaleFactor, fileName_allEvents)
 
 	# Divide the two histograms
 	

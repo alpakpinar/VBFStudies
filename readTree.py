@@ -20,7 +20,11 @@ def getArgs():
 	parser.add_argument('-s', '--shortTest', help = 'Run over the short test file', action = 'store_true')
 	parser.add_argument('-c', '--clean', help = 'Clean the ROOT file by deleting all previous histograms', action = 'store_true')
 	parser.add_argument('-n', '--noWrite', help = 'Do not write the efficiency graphs and histograms to the ROOT file', action = 'store_true')
-	parser.add_argument('-b', '--background', help = 'Run over ZJetsToNuNu background files', action = 'store_true')
+	parser.add_argument('-b', '--background', help = '''
+													 Run over ZJetsToNuNu background files
+													 User must also provide this option with an index between 0-6,
+												 	 telling the script to run over which background file.
+													 ''', type= int) 
 	args = parser.parse_args()
 
 	return args
@@ -243,6 +247,8 @@ def main():
 	
 	args = getArgs()
 	
+	scaleFactor = None
+
 	if args.test:
 
 		inputFile = 'inputs/VBF_HToInv_' + str(args.year) + '_test.root'
@@ -255,15 +261,17 @@ def main():
 		print('Starting job')
 		print('File: {}'.format(inputFile))
 	
-	elif args.background:
+	elif args.background is not None:
 
-		idx = 0
+		idx = args.background
 		inputDir = 'inputs'
 
 		inputList = [fileName for fileName in os.listdir(inputDir) if fileName.startswith('ZJetsToNuNu')]
 		inputFile = os.path.join(inputDir, inputList[idx])
 		print('Starting job')
 		print('File: {}'.format(inputFile))
+
+		# Hard coded x-sections and number of events for each background sample
 	
 		xSections = [306.2, 0.3434, 91.38, 0.005146, 13.13, 3.245, 1.500]
 		numEvents = [19859833, 338948, 16052981, 6734, 9134120, 5697594, 2030827] 
@@ -282,21 +290,29 @@ def main():
 
 	#histos = declareHistos()
 
-	#inputFile = 'inputs/VBF_HToInv_2017_test.root'
-
-	#readTree(inputFile) 
+	#####################################
+	# DECLARE:
+	# Trigger list 
+	# Trigger labels for printing on legends
+	# Cuts to be applied (mjj, leadJetPt, trailJetPt, MET)
+	#####################################
 
 	triggers = ['HLT_DiJet110_35_Mjj650_PFMET110_v5', 'HLT_DiJet110_35_Mjj650_PFMET120_v5', 'HLT_DiJet110_35_Mjj650_PFMET130_v5', 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v16', 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v16', 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v15', 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v15']
-
-	VBF_triggers = triggers[:3]
-
-	histos = []
 	
-	##############################
-	#Clean the ROOT file if needed
-	##############################
+	legendLabels = ['VBF_MET110', 'VBF_MET120', 'VBF_MET130', 'METNoMu110', 'METNoMu120', 'METNoMu130', 'METNoMu140']
+	
+	cuts = [1000, 80, 40, 150] 
+
+	jetCuts = cuts[1:3] # Only the jet pt cuts
+	
+	#####################################
+	# Clean the ROOT file if needed
+	# Not updated, NOT RECOMMENDED TO USE
+	#####################################
 
 	if args.clean:
+
+		histos = []
 		
 		for trigger in triggers:
 
@@ -312,72 +328,129 @@ def main():
 		cleanROOTFile(inputFile, histos)
 
 	###############################
+	# CALL FUNCTIONS HERE 
+	###############################
 
-	legendLabels = ['VBF_MET110', 'VBF_MET120', 'VBF_MET130', 'METNoMu110', 'METNoMu120', 'METNoMu130', 'METNoMu140']
-	
-	eff_graphs_MET = {}
-	met_hist_withTriggers = {}	
-	
-	eff_graphs_mjj = {}
-	mjj_hist_withTriggers = {}
+	if args.background is None:
 
-	eff_graphs_leadingJetPt = {}
-	leadingJetPt_hist_withTriggers = {}
-	
-	eff_graphs_trailingJetPt = {}
-	trailingJetPt_hist_withTriggers = {}
-	
-	cuts = [1200, 80, 40, 150] #Cuts that will be applied: mjj, leadingJetPt, trailingJetPt, MET
+		##################################################################################
+		# drawTriggerEff_mjj: Call to draw trigger efficiency as a function of mjj.
+		#   				  Constructs three curves for three cases:
+		#		 			  Two leading jets forward, two leading jets central and mixed.
+		# 					 
+		#					  Outputs:
+		#					  A ROOT file named as the trigger in consideration, located in output/ dir. 
+		#					  Trigger efficiency curves will be saved in the ROOT file.
+		#					  Also saves the curves as png files inside pngImages/triggerEffPlots/mjjPlots
+		#
+		#					  Check out lib/drawTriggerEff.py for implementation.
+		##################################################################################
 
-	#for count, trigger in enumerate(VBF_triggers):
+		drawTriggerEff_mjj(inputFile, triggers[0], args, cuts[1], cuts[2]) 
 
-	#	drawTriggerEff_mjj(inputFile, trigger, args, cuts[1], cuts[2])
+		##################################################################################
+		# drawTriggerEff_MET: Call to draw trigger efficiency as a function of MET.
+		#   				  Constructs three curves for three cases:
+		#		 			  Two leading jets forward, two leading jets central and mixed. 					 
+		#
+		#					  Outputs:
+		#					  A ROOT file named as the trigger in consideration, located in output/ dir. 
+		#					  Trigger efficiency curves will be saved in the ROOT file.
+		#					  Also saves the curves as png files inside pngImages/triggerEffPlots/METPlots
+		#
+		#					  Check out lib/drawTriggerEff.py for implementation.
+		##################################################################################
+
+		drawTriggerEff_MET(inputFile, triggers[0], args, cuts[0], cuts[1], cuts[2])
 		
-		#leadingJetPt_hist_withTriggers[trigger], eff_graphs_leadingJetPt[trigger] = drawTriggerEff_leadingJetPt(inputFile, trigger, args, cuts[0])
+		##################################################################################
+		# drawCompGraph_mjj:  Call to draw a comparison graph (number of events passing for each) for two triggers, as a function of mjj.
+		# 					  Unlike drawTriggerEff_mjj, by default, the graph is drawn considering all three cases.
+		#
+		#					  Outputs:
+		#					  Saves the comparison graph as a png file in pngImages/triggerCompPlots/mjjPlots
+		#
+		#					  Check out lib/drawCompGraph.py for implementation.
+		##################################################################################
 
-		#trailingJetPt_hist_withTriggers[trigger], eff_graphs_trailingJetPt[trigger] = drawTriggerEff_trailingJetPt(inputFile, trigger, args, cuts[0], cuts[1])
+		drawCompGraph_mjj(inputFile, triggers[0], triggers[4], legendLabels[0], legendLabels[4], cuts)
 		
-		#drawTriggerEff_MET(inputFile, trigger, args, cuts[0], cuts[1], cuts[2])
+		##################################################################################
+		# drawCompGraph_MET:  Call to draw a comparison graph (number of events passing for each) for two triggers, as a function of MET.
+		# 					  Unlike drawTriggerEff_MET, by default, the graph is drawn considering all three cases.
+		#
+		#					  Outputs:
+		#					  Saves the comparison graph as a png file in pngImages/triggerCompPlots/METPlots
+		#
+		#					  Check out lib/drawCompGraph.py for implementation.
+		##################################################################################
 
-	#For testing
-	#drawTriggerEff_mjj(inputFile, 'HLT_DiJet110_35_Mjj650_PFMET110_v5', args, cuts[1], cuts[2])
-	#drawTriggerEff_MET(inputFile, 'HLT_DiJet110_35_Mjj650_PFMET110_v5', args, 1250, cuts[1], cuts[2])
-	#drawTriggerEff_MET(inputFile, 'HLT_DiJet110_35_Mjj650_PFMET110_v5', args, 1500, cuts[1], cuts[2])
+		drawCompGraph_MET(inputFile, triggers[0], triggers[4], legendLabels[0], legendLabels[4], cuts)
 
-	#Draw all the comparison graphs 
-
-	#for i in range(3):
-
-	#	for j in range(3, 7):
-
-	#		drawCompGraph_MET(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
-			#drawCompGraph_leadingJetPt(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
-			#drawCompGraph_trailingJetPt(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
-			#drawCompGraph_mjj(inputFile, triggers[i], triggers[j], legendLabels[i], legendLabels[j], cuts)
-
-	#drawCompGraph_MET(inputFile, triggers[0], triggers[4], legendLabels[0], legendLabels[4], cuts)
-	#drawCompGraph_leadingJetPt(inputFile, triggers[0], triggers[3], legendLabels[0], legendLabels[3], cuts)
-	#drawCompGraph_trailingJetPt(inputFile, triggers[0], triggers[3], legendLabels[0], legendLabels[3], cuts)
-	#drawCompGraph_mjj(inputFile, triggers[0], triggers[4], legendLabels[0], legendLabels[4], cuts)
-	
-	#jetptCuts = [80,40]
-
-	#for var in ['mjj', 'MET', 'leadJetPt', 'trailJetPt']:
+	##################################################################################
+	# draw2DHistoForEventsAcceptedOnlyByVBFTrigger: Call to draw a 2D histogram with MET on x-axis and mjj on y-axis.
+	#												The histogram will contain events that passes a given VBF trigger, but doesnt'pass the given MET trigger.
 	#
-	#	drawDistributionForAcceptedOnlyByVBF(inputFile, var, triggers[0], triggers[4], newCuts)
+	#												If the histograms are to be scaled, the function must be provided with the scale factor, using scaleFactor argument.
+	#												Otherwise, scaleFactor arg can be ignored.
+	# 
+	#												Outputs:
+	#												If saveToROOTFile option is set to True (False by default), the 2D histogram will be saved to a new ROOT file.
+	#												Also saves the histogram as a png file in pngImages/mjj_MET2DPlots.
+	#
+	#												Check out lib/mjj_METHistos.py for implementation.
+	##################################################################################
+	
+	##################################################################################
+	# draw2DHistoForEventsAcceptedByMETTrigger    : Call to draw a 2D histogram with MET on x-axis and mjj on y-axis.
+	#												The histogram will contain events that passes the given MET trigger.
+	#
+	#												If the histograms are to be scaled, the function must be provided with the scale factor, using scaleFactor argument.
+	#												Otherwise, scaleFactor arg can be ignored.
+	# 
+	#												Outputs:
+	#												If saveToROOTFile option is set to True (False by default), the 2D histogram will be saved to a new ROOT file.
+	#												Also saves the histogram as a png file in pngImages/mjj_MET2DPlots.
+	#
+	#												Check out lib/mjj_METHistos.py for implementation.
+	##################################################################################
 
-	jetCuts = (80, 40)
+	draw2DHistoForEventsAcceptedOnlyByVBFTrigger(inputFile, triggers[0], triggers[4], jetCuts, scaleFactor, saveToROOTFile=True) 
+	draw2DHistoForEventsAcceptedByMETTrigger(inputFile, triggers[4], jetCuts, scaleFactor, saveToROOTFile=True)
 
-	#draw2DHistoForEventsAcceptedOnlyByVBFTrigger(inputFile, triggers[0], triggers[4], jetCuts, scaleFactor, saveToROOTFile=True) 
-	#draw2DHistoForEventsAcceptedByMETTrigger(inputFile, triggers[4], jetCuts, scaleFactor, saveToROOTFile=True)
+	##################################################################################
+	# draw2DHistoForPercentageVBFTriggerGain      : Call to draw a 2D histogram with MET on x-axis and mjj on y-axis.
+	#												The histogram entries will be the ratio of the two:
+	#												-- Number of events passing the given VBF trigger but failing the given MET trigger
+	#												-- Number of events passing the given MET trigger
+	#
+	#												Outputs:
+	#												If saveToROOTFile option is set to True (False by default), the 2D histogram will be saved to a new ROOT file.
+    #                                               Also saves the histogram as a png file in pngImages/mjj_MET2DPlots.
+	#
+	#												Check out lib/mjj_METHistos.py for implementation.
+	#
+	#												NOTE: When draw2DHistoForPercentageVBFTriggerGain is called, 
+	#												draw2DHistoForEventsAcceptedOnlyByVBFTrigger and draw2DHistoForEventsAcceptedByMETTrigger are also called inside the function.
+	#												Thus, individual histograms (before the ratio is taken) are also saved.
+	#												No need to call these two functions individually. 
+	##################################################################################
 
 	draw2DHistoForPercentageVBFTriggerGain(inputFile, triggers[0], triggers[4], jetCuts) 
+	
+	##################################################################################
+	# draw2DHisto_PercentageOfEventsPassingVBFTrigger: Call to draw a 2D histogram with MET on x-axis and mjj on y-axis.
+    #                                                  The histogram entries will be the ratio of the two:
+    #                                                  -- Number of events passing the given VBF trigger 
+    #                                                  -- Number of events passing the basic VBF selections, no trigger requirement
+	#
+	#												   Outputs:
+	#												   Saves the histogram as a png file in pngImages/mjj_MET2DPlots.
+	#
+    #                                                  Check out lib/mjj_METHistos.py for implementation.
+	##################################################################################
 
-	#draw2DHisto_PercentageOfEventsPassingVBFTrigger(inputFile, triggers[0], jetCuts)
-	#drawCutFlow(inputFile)
-
-
-
+	draw2DHisto_PercentageOfEventsPassingVBFTrigger(inputFile, triggers[0], jetCuts)
 
 if __name__ == '__main__':
 

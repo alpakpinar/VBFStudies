@@ -41,12 +41,19 @@ readTree.py accepts some command line options:
 - `-s`, `--shortTest`  : If specified, the script will run over a short test file. (Produced with writeTree using -s option)
 - `-c`, `--clean `     : (NOT RECOMMENDED) If specified, the script will clean the ROOT file by deleting all the previous histograms stored.
 - `-n`, `--noWrite`    : If specified, the resulting histograms/graphs won't be saved in the ROOT file. If not specified, script will save the histograms/graphs in the input file by updating it.
-- `-b`, `--background` : If specified, the script will run over one of the background files. (to be explained further...)
+- `-b`, `--background` : If specified, the script will run over one of the background files. 
+						 To specify which background file to run over, an index between 0-6 must be provided with this option.
 
 As an example, to run over the 2017 test files, we enter:
 
 ```
 python readTree.py -y 2017 -t
+```
+
+Or, if we want to run over the second background file:
+
+```
+python readTree.py -b 1
 ```
  
 
